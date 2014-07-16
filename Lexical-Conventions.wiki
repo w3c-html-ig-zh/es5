@@ -1,0 +1,896 @@
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch07}}
+
+ECMAScript 程序的源文本先转换成一个由 [[#Token|Token]]、[[#line-terminator|行终止符]]、[[#comments|注释]]、[[#white-space|空白字符]] 组成的输入元素序列；源文本被从左到右地扫描，反复获取尽可能长的字符序列来作为下一个输入元素的。
+
+词法有两个目标符。''{{toanchor|InputElementDiv}}'' 目标符用在允许除法 ('''/''') 或除赋值 ('''/=''') 运算符开始的句法上下文中。''{{toanchor|InputElementRegExp}}'' 目标符用在其他句法文法上下文。
+
+{{note| 不存在既允许除法或除赋值运算符开头又允许 '''''RegularExpressionLiteral''''' 开头的句法上下文。它不会受到分号插入（见 7.9）影响；如下面的例子：
+  a {{=}} b 
+  /hi/g.exec(c).map(d);
+
+其中 '''''LineTerminator''''' 后的第一个非空白、非注释字符是斜线（'''/'''），并且这个句法上下文允许除法或除赋值运算符，所以不会在这个 '''''LineTerminator''''' 位置插入分号。也就是说，上面的例子解释为：
+
+  a {{=}} b / hi / g.exec(c).map(d);
+}}
+
+
+语法：
+
+  ''<b id="InputElementDiv">InputElementDiv</b>'' ::
+    ''{{toanchor|WhiteSpace}}''
+    ''{{toanchor|LineTerminator}}''
+    ''{{toanchor|Comment}}''
+    ''{{toanchor|Token}}''
+    ''{{toanchor|DivPunctuator}}''
+
+  ''<b id="InputElementRegExp">InputElementRegExp</b>'' ::
+    ''{{toanchor|WhiteSpace}}''
+    ''{{toanchor|LineTerminator}}''
+    ''{{toanchor|Comment}}''
+    ''{{toanchor|Token}}''
+    ''{{toanchor|RegularExpressionLiteral}}''
+
+== {{anchor|x7.1}}Unicode 格式控制字符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.1}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch07/7.1}}
+
+Unicode 格式控制字符（即，Unicode 字符数据库中 [http://www.fileformat.info/info/unicode/category/Cf/list.htm Cf分类] 里的字符，如“<span title="left-to-right mark">左至右符号</span>”或“<span title="left-to-right mark">右至左符号</span>”）是用来控制被更高层级协议（如标记语言）忽略的文本范围的格式的控制代码。
+
+允许在源代码文本中出现控制字符是有利于编辑和显示的。所有格式控制字符可写入到注释、字符串字面量、正则表达式字面量中。
+
+'''<ZWNJ>''' 和 '''<ZWJ>''' 是格式控制字符，它们被用于在某些语言中形成单词或段落时产生必要的差异。在ECMAScript源代码文本中，'''<ZWNJ>''' 和 '''<ZWJ>''' 可能也被用于标识符的首字符之后。
+
+
+'''<BOM>''' 是一个格式控制字符，它主要被用在文本的开头，将文本作为 Unicode 来标记，且允许检查文本编码和字节顺序。为了达到这个目的，'''<BOM>''' 字符有时也能显示在文本的开始位置之后，例如作为一个合并文件的结果。'''<BOM>''' 字符被作为[[#white-space|空白字符]]来对待（见 [[#7.2|7.2]]）
+
+'''表1''' 总结了一些在注释，字符串字面量，正则表达式字面量之外被特殊对待的格式控制字符。
+
+{| style="border-collapse:collapse;" cellpadding="6" border="1" align="center"
+|+ '''表1 - 格式控制字符用法'''
+|- style="background:#EEE"
+! 代码单元值
+! 名称
+! 正式名称
+! 用法
+|-
+| \u200C
+| <span title="Zero width non-joiner">零宽度非连接器</span>
+| <ZWNJ>
+| ''[[#IdentifierPart|IdentifierPart]]''
+|-
+| \u200D
+| <span title="Zero width joiner">零宽度连接器</span>
+| <ZWJ>
+| ''[[#IdentifierPart|IdentifierPart]]''
+|-
+| \uFEFF
+| <span title="Byte Order Mark">字节顺序标记</span>
+| <BOM>
+| ''[[#Whitespace|Whitespace]]''
+|}
+
+== {{anchor|x7.2}}{{anchor|white-space}}空白字符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.2}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch07/7.2}}
+
+空白字符用来改善源文本的可读性和分割 [[ES5/notation#Token|Token]]（不可分割的词法单位），此外就无关紧要。空白字符可以出现在两个 [[ES5/notation#Token|Token]] 之间，还可以出现在输入的开始或结束位置，也可以出现在 ''[[#StringLiteral|StringLiteral]]'' 或 ''[[#RegularExpressionLiteral|RegularExpressionLiteral]]''（在这里它表示组成字面量的字符）或 ''[[#Comment|Comment]]'' 中，但是不能出现的其他任何 [[ES5/notation#Token|Token]] 内。{{extra note||出现在函数定义中的空格很有可能被保留下来，并在访问其源代码字符串时被作为字符串显示，但这并不是本规范涉及的部分。}}
+
+'''表2''' 中列出了 ECMAScript 空白字符。 
+
+{| style="border-collapse:collapse;" cellpadding="6" border="1" align="center"
+|+ '''表2 — 空白字符'''
+|- style="background:#EEE"
+! 代码单元值
+! 名称
+! 正式名称
+|-
+| \u0009
+| 制表符
+| <TAB>
+|-
+| \u000B
+| 垂直制表符
+| <VT>
+|-
+| \u000C
+| 换页符
+| <FF>
+|-
+| \u0020
+| 空格符
+| <SP>
+|-
+| \u00A0
+| 非中断空格符
+| <NBSP>
+|-
+| \uFEFF<br/>其它 [http://www.fileformat.info/info/unicode/category/Zs/list.htm Zs类字符]
+| 字节顺序标记<br/>其它 Unicode 空白分隔符
+| <BOM><br/><USP>
+|}
+
+ECMAScript 实现必须认可 Unicode 3.0 中定义的所有空白字符。后续版本的 Unicode 标准可能定义其他空白字符。ECMAScript 实现可以认可更高版本 Unicode 标准里的空白字符。
+
+语法：
+
+  ''<b id="WhiteSpace">WhiteSpace</b>'' ::
+    <TAB>
+    <VT>
+    <FF>
+    <SP>
+    <NBSP>
+    <BOM>
+    <USP>
+
+== {{anchor|x7.3}}{{anchor|line-terminator}}行终止符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.3}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch07/7.3}}
+
+像空白字符一样，行终止字符用于改善源文本的可读性和分割 [[ES5/notation#Token|Token]]（不可分割的词法单位）。然而，不像空白字符，行终止符对句法的行为有一定的影响。一般情况下，行终止符可以出现在任何两个 [[ES5/notation#Token|Token]] 之间，但也有少数地方，句法禁止这样做。行终止符也影响自动插入分号的过程（[[#automatic-semicolon-insertion|7.9]]）。行终止符不能出现在 ''{{toanchor|StringLiteral}}'' 之外的任何 [[ES5/notation#Token|Token]] 内。行终止符只能出现在作为 ''{{toanchor|LineContinuation}}'' 的一部分的 ''{{toanchor|StringLiteral}}'' 里。
+
+行终止符可以出现在 ''{{toanchor|MultiLineComment}}'' 内，但不能出现在 ''{{toanchor|SingleLineComment}}'' 内。
+
+正则表达式的 '''\s''' 类匹配的空白字符集中包含行终止符。
+
+'''表3''' 列出了 ECMAScript 的行终止字符。
+
+{| style="border-collapse:collapse;" cellpadding="6" border="1" align="center"
+|+ '''表3 — 行终止字符'''
+|- style="background:#EEE"
+! 代码单元值
+! 名称
+! 正式名称
+|-
+| \u000A
+| <span title="Line Feed">换行符</span>
+| <LF>
+|-
+| \u000D
+| <span title="Carriage Return">回车符</span>
+| <CR>
+|-
+| \u2028
+| <span title="Line separator">行分隔符</span>
+| <LS>
+|-
+| \u2029
+| <span title="Paragraph separator">段落分割符</span>
+| <PS>
+|}
+
+只有 '''表3''' 中的字符才被视为行终止符。其他新行或折行字符被视为空白，但不作为行终止符。字符序列 '''<CR><LF>''' 作一个行终止符。计算行数时它应该被视为一个字符。
+
+语法：
+
+  ''<b id="LineTerminator">LineTerminator</b>'' ::
+    <LF>
+    <CR>
+    <LS>
+    <PS>
+
+  ''<b id="LineTerminatorSequence">LineTerminatorSequence</b>'' ::
+    <LF>
+    <CR> &#x5b;[[ES5/notation#lookahead-not-in|lookahead ?]] <LF> ]
+    <LS>
+    <PS>
+    <CR> <LF>
+
+== {{anchor|x7.4}}{{anchor|comments}}注释 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.4}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch07/7.4}}
+
+注释可以是单行或多行。多行注释不能嵌套。
+
+因为单行注释可以包含除了 ''{{toanchor|LineTerminator}}'' 字符之外的任何字符，又因为有一般规则：一个 [[ES5/notation#Token|Token]] 总是尽可能匹配更长，所以一个单行注释总是包含从 '''//''' 到行终止符之间的所有字符。然而，在该行末尾的 ''{{toanchor|LineTerminator}}'' 不被看成是单行注释的一部分，它被词法识别成句法输入元素流的一部分。这一点非常重要，因为这意味着是否存在单行注释都不影响自动分号插入进程（见 [[#automatic-semicolon-insertion|7.9]]）。
+
+像空白一样，注释会被句法简单丢弃，除了 ''{{toanchor|MultiLineComment}}'' 包含行终止符字符的情况，这种情况下整个注释会当作一个 ''{{toanchor|LineTerminator}}'' 提供给句法文法解析。
+
+语法：
+
+  ''<b id="Comment">Comment</b>'' ::
+    ''{{toanchor|MultiLineComment}}''
+    ''{{toanchor|SingleLineComment}}''
+
+  ''<b id="MultiLineComment">MultiLineComment</b>'' ::
+    '''/*''' ''{{toanchor|MultiLineCommentChars}}{{opt}}'' '''*/'''
+
+  ''<b id="MultilineCommentChars">MultiLineCommentChars</b>'' ::
+    ''{{toanchor|MultiLineNotAsteriskChar}}'' ''{{toanchor|MultiLineCommentChars}}{{opt}}''
+    '''*''' ''{{toanchor|PostAsteriskCommentChars}}{{opt}}''
+
+  ''<b id="PostAsteriskCommentChars">PostAsteriskCommentChars</b>'' ::
+    ''{{toanchor|MultiLineNotForwardSlashOrAsteriskChar}}'' ''{{toanchor|MultiLineCommentChars}}{{opt}}''
+    '''*''' ''{{toanchor|PostAsteriskCommentChars}}{{opt}}''
+
+  ''<b id="MultiLineNotAsteriskChar">MultiLineNotAsteriskChar</b>'' ::
+    ''[[ES5#SourceCharacter|SourceCharacter]]'' '''but not *'''
+
+  ''<b id="MultiLineNotForwardSlashOrAsteriskChar">MultiLineNotForwardSlashOrAsteriskChar</b>'' ::
+    ''[[ES5#SourceCharacter|SourceCharacter]]'' '''but not / or *'''
+
+  ''<b id="SingleLineComment">SingleLineComment</b>'' ::
+    '''//''' ''{{toanchor|SingleLineCommentChars}}{{opt}}''
+
+  ''<b id="SingleLineCommentChars">SingleLineCommentChars</b>'' ::
+    ''{{toanchor|SingleLineCommentChar}}'' ''{{toanchor|SingleLineCommentChars}}{{opt}}''
+
+  ''<b id="SingleLineCommentChar">SingleLineCommentChar</b>'' ::
+    ''[[ES5#SourceCharacter|SourceCharacter]]'' '''but not''' ''{{toanchor|LineTerminator}}''
+
+== {{anchor|x7.5}}Token {{extra note|http://www.w3.org/html/ig/zh/wiki/ES5/notation#Token|概念定义}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.5}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch07/7.5}}
+
+语法：
+
+  ''<b id="Token">Token</b>'' ::
+    ''{{toanchor|IdentifierName}}''
+    ''{{toanchor|Punctuator}}''
+    ''{{toanchor|NumericLiteral}}''
+    ''{{toanchor|StringLiteral}}''
+
+{{ note | ''{{toanchor|DivPunctuator}}'' 和 ''{{toanchor|RegularExpressionLiteral}}'' 产生式定义 '''Token'''，但 '''Token''' 的产生式不包含它们。}}
+
+== {{anchor|x7.6}}标识符名和标识符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.6}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch07/7.6}}
+
+标识符名属于 [[#Token|Token]]，[http://www.unicode.org/versions/Unicode3.0.0/ch05.pdf Unicode标准第5章] 的“Identifiers”节给出的文法加入了一些小修改来解释它。''{{toanchor|Identifier}}'' 是一个 ''{{toanchor|IdentifierName}}'' 但不是一个 ''{{toanchor|ReservedWord}}''。Unicode 标识符文法基于 Unicode 标准指出的 normative 和 informative 字符分类 {{question||这两个分类指什么？}}。所有符合 ECMAScript 的实现必须能够正确处理 Unicode 标准 3.0 版本中指定的分类里的字符的分类。
+
+本标准增加了个别字符：在 ''{{toanchor|IdentifierName}}'' 的任何位置允许出现美元符（'''$'''）和下划线（'''_'''）。
+
+''{{toanchor|IdentifierName}}'' 还允许出现 Unicode 转义序列，它们被 ''{{toanchor|UnicodeEscapeSequence}}'' 的<b title="CV">字符值</b>计算成单个字符贡献给 ''{{toanchor|IdentifierName}}''（见 [[#string-literals|7.8.4]]）。''{{toanchor|UnicodeEscapeSequence}}'' 前面的 '''\''' 不给 ''{{toanchor|IdentifierName}}'' 贡献字符。''{{toanchor|UnicodeEscapeSequence}}'' 不能提供单个字符给将要成为非法字符的 ''{{toanchor|IdentifierName}}''。换句话说，如果一个 '''\''' ''{{toanchor|UnicodeEscapeSequence}}'' 序列被 ''{{toanchor|UnicodeEscapeSequence}}'' 的<b title="CV">字符值</b>替换，结果必须仍是有效的包含与原 ''{{toanchor|IdentifierName}}'' 精确相同字符序列的 ''{{toanchor|IdentifierName}}''。本规范说明的所有标识符是根据它的实际字符，不管转义序列贡献特定字符与否。
+
+根据 Unicode 标准两个规范的 {{toanchor|IdentifierName}} 相等，是说除非他们的代码单元序列准确相等，否则不同（换句话说，符合 ECMAScript 的实现只需要按位比较 {{toanchor|IdentifierName}} 值）。其目的是为了传入编译器之前就把[[ES5/source|源代码文本]]转换为<b title="Normalization Form">正规形式</b> C。
+
+ECMAScript 实现可以识别后续版本 Unicode 标准定义的标识符字符。如果考虑可移植性，程序员应该只采用 Unicode 3.0 中定义的标识符字符。
+
+语法：
+
+  ''<b id="Identifier">Identifier</b>'' ::
+    ''{{toanchor|IdentifierName}}'' '''but not''' ''{{toanchor|ReservedWord}}''
+
+  ''<b id="IdentifierName">IdentifierName</b>'' ::
+    ''{{toanchor|IdentifierStart}}''
+    ''{{toanchor|IdentifierName}}'' ''{{toanchor|IdentifierPart}}''
+
+  ''<b id="IdentifierStart">IdentifierStart</b>'' ::
+    ''{{toanchor|UnicodeLetter}}''
+    '''$'''
+    '''_'''
+    '''\''' ''{{toanchor|UnicodeEscapeSequence}}''
+
+   ''<b id="IdentifierPart">IdentifierPart</b>'' ::
+    ''{{toanchor|IdentifierStart}}''
+    ''{{toanchor|UnicodeCombiningMark}}''
+    ''{{toanchor|UnicodeDigit}}''
+    ''{{toanchor|UnicodeConnectorPunctuation}}''
+    <ZWNJ>
+    <ZWJ>
+
+  ''<b id="UnicodeLetter">UnicodeLetter</b>''
+    any character in the Unicode categories 
+    “[http://www.fileformat.info/info/unicode/category/Lu/list.htm Uppercase letter (Lu)]”, “[http://www.fileformat.info/info/unicode/category/Ll/list.htm Lowercase letter (Ll)]”, 
+    “[http://www.fileformat.info/info/unicode/category/Lt/list.htm Titlecase letter (Lt)]”, “[http://www.fileformat.info/info/unicode/category/Lm/list.htm Modifier letter (Lm)]”,
+    “[http://www.fileformat.info/info/unicode/category/Lo/list.htm Other letter (Lo)]”,or “[http://www.fileformat.info/info/unicode/category/Nl/list.htm Letter number (Nl)]”.
+
+  ''<b id="UnicodeCombiningMark">UnicodeCombiningMark</b>''
+    any character in the Unicode categories “[http://www.fileformat.info/info/unicode/category/Mn/list.htm Non-spacing mark (Mn)]”
+    or “[http://www.fileformat.info/info/unicode/category/Mc/list.htm Combining spacing mark (Mc)]”
+
+  ''<b id="UnicodeDigit">UnicodeDigit</b>''
+    any character in the Unicode category “[http://www.fileformat.info/info/unicode/category/Nd/list.htm Decimal number (Nd)]”
+
+  ''<b id="UnicodeConnectorPunctuation">UnicodeConnectorPunctuation</b>''
+    any character in the Unicode category “[http://www.fileformat.info/info/unicode/category/Pc/list.htm Connector punctuation (Pc)]”
+
+=== {{anchor|x7.6.1}}{{anchor|reserved-words}}保留字 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.6.1}}
+
+保留字不能作为 ''{{toanchor|Identifier}}'' 的 ''{{toanchor|IdentifierName}}''。
+
+语法 
+
+  ''<b id="ReservedWord">ReservedWord</b>'' ::
+    ''{{toanchor|Keyword}}''
+    ''{{toanchor|FutureReservedWord}}''
+    ''{{toanchor|NullLiteral}}''
+    ''{{toanchor|BooleanLiteral}}''
+
+
+==== {{anchor|x7.6.1.1}}关键词 ====
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.6.1.1}}
+
+下列 [[#x7.5|Token]] 是 ECMAScript 的关键词，不能用作 ECMAScript 程序的 ''{{toanchor|Identifier}}''。
+
+语法 
+
+  ''<b id="Keyword">Keyword</b>'' :: '''one of'''
+     '''break'''      '''do'''         '''instanceof'''        '''typeof'''
+     '''case'''       '''else'''       '''new'''               '''var'''
+     '''catch'''      '''finally'''    '''return'''            '''void'''
+     '''continue'''   '''for'''        '''switch'''            '''while'''
+     '''debugger'''   '''function'''   '''this'''              '''with'''
+     '''default'''    '''if'''         '''throw'''             '''delete'''
+     '''in'''         '''try'''
+
+
+==== {{anchor|x7.6.1.2}}未来保留字 ====
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.6.1.2}}
+
+下列词被用作建议扩展关键字，因此保留，以便未来可能采用这些扩展。
+
+语法 
+
+  ''<b id="FutureReservedWord">FutureReservedWord</b>'' :: '''one of'''
+     '''class'''      '''enum'''       '''extends'''       '''super'''
+     '''const'''      '''export'''     '''import'''
+
+当下列 [[#x7.5|Token]] 出现在[[ES5/execution#strict-mode-code|严格模式代码 (strict mode code )]]（见 [[ES5/execution#strict-mode-code|10.1.1]]）里，将被当成是 ''{{toanchor|FutureReservedWord}}''。任意这些 [[#x7.5|Token]] 出现在任意上下文中的[[ES5/execution#strict-mode-code|严格模式代码]]中，如果 ''{{toanchor|FutureReservedWord}}'' 出现的位置会产生错误，那么必须抛出对应的异常：
+
+  '''implements'''      '''let'''         '''private'''       '''public'''      '''yield'''
+  '''interface'''       '''package'''     '''protected'''     '''static'''
+
+== {{anchor|x7.7}}标点符号 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.7}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch07/7.7}}
+
+
+
+
+语法 
+
+  ''<b id="Punctuator">Punctuator</b>'' :: '''one of'''
+    '''{'''       '''}'''       '''('''       ''')'''       '''['''       ''']'''
+    '''.'''       ''';'''       ''','''       '''<'''       '''>'''       '''<='''
+    '''>='''      '''=='''      '''!='''      '''==='''     '''!=='''
+    '''+'''       '''-'''       '''*'''       '''%'''       '''++'''      '''--'''
+    '''<<'''      '''>>'''      '''>>>'''     '''&'''       '''|'''       '''^'''
+    '''!'''       '''~'''       '''&&'''      '''||'''      '''?'''       ''':'''
+    '''='''       '''+='''      '''-='''      '''*='''      '''%='''      '''<<='''
+    '''>>='''     '''>>>='''    '''&='''      '''|='''      '''^='''
+
+  ''<b id="DivPunctuator">DivPunctuator</b>'' :: '''one of'''
+    '''/'''       '''/='''
+
+== {{anchor|x7.8}}{{anchor|literals}}字面量 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.8}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch07/7.8}}
+
+语法 
+
+  ''<b id="Literal">Literal</b>'' ::
+    ''{{toanchor|NullLiteral}}''
+    ''{{toanchor|BooleanLiteral}}''
+    ''{{toanchor|NumericLiteral}}''
+    ''{{toanchor|StringLiteral}}'' 
+    ''{{toanchor|RegularExpressionLiteral}}''
+
+=== {{anchor|x7.8.1}}空值字面量 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.8.1}}
+
+
+语法：
+
+  ''<b id="NullLiteral">NullLiteral</b>'' ::
+    '''null'''
+
+语义：
+
+空值字面量的值 '''null'''，是 [[ES5/types#Null|Null类型]] 的唯一值。
+
+=== {{anchor|x7.8.2}}布尔值字面量 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.8.2}}
+
+
+语法：
+  ''<b id="BooleanLiteral">BooleanLiteral</b>'' ::
+    '''true'''
+    '''false'''
+
+语义：
+
+布尔值字面量的值 '''true''' 是个 [[ES5/types#Boolean|Boolean类型]] 值 ，即 '''true'''。
+布尔值字面量的值 '''false''' 是个 [[ES5/types#Boolean|Boolean类型]] 值 ，即 '''false'''。
+
+=== {{anchor|x7.8.3}}{{anchor|numeric-literals}}数值字面量 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.8.3}}
+
+
+语法：
+
+  ''<b id="NumericLiteral">NumericLiteral</b>'' ::
+    ''{{toanchor|DecimalLiteral}}''
+    ''{{toanchor|HexIntegerLiteral}}''
+
+  ''<b id="DecimalLiteral">DecimalLiteral</b>'' ::
+    ''{{toanchor|DecimalIntegerLiteral}}'' '''.''' ''{{toanchor|DecimalDigits}}{{opt}}'' ''{{toanchor|ExponentPart}}{{opt}}''
+    '''.''' ''{{toanchor|DecimalDigits}}'' ''{{toanchor|ExponentPart}}{{opt}}''
+    ''{{toanchor|DecimalIntegerLiteral}}'' ''{{toanchor|ExponentPart}}{{opt}}''
+
+  ''<b id="DecimalIntegerLiteral">DecimalIntegerLiteral</b>'' ::
+    '''0'''
+    ''{{toanchor|NonZeroDigit}}'' ''{{toanchor|DecimalDigits}}{{opt}}''
+
+  ''<b id="DecimalDigits">DecimalDigits</b>'' ::
+    ''{{toanchor|DecimalDigit}}''
+    ''{{toanchor|DecimalDigits}}'' ''{{toanchor|DecimalDigit}}''
+
+  ''<b id="DecimalDigit">DecimalDigit</b>'' :: '''one of'''
+    '''0 1 2 3 4 5 6 7 8 9'''
+
+  ''<b id="NonZeroDigit">NonZeroDigit</b>'' :: '''one of'''
+    '''1 2 3 4 5 6 7 8 9'''
+
+  ''<b id="ExponentPart">ExponentPart</b>'' ::
+    ''{{toanchor|ExponentIndicator}}'' ''{{toanchor|SignedInteger}}''
+
+  ''<b>ExponentIndicator</b>'' :: '''one of'''
+    '''e E'''
+
+  ''<b id="SignedInteger">SignedInteger</b>'' ::
+    ''{{toanchor|DecimalDigits}}''
+    '''+''' ''{{toanchor|DecimalDigits}}''
+    '''-''' ''{{toanchor|DecimalDigits}}''
+
+  ''<b id="HexIntegerLiteral">HexIntegerLiteral</b>'' ::
+    '''0x''' ''{{toanchor|HexDigit}}''
+    '''0X''' ''{{toanchor|HexDigit}}''
+    ''{{toanchor|HexIntegerLiteral}}'' ''{{toanchor|HexDigit}}''
+
+  ''<b id="HexDigit">HexDigit</b>'' :: '''one of'''
+    '''0 1 2 3 4 5 6 7 8 9 a b c d e f A B C D E F'''
+
+源字符中的 ''{{toanchor|NumericLiteral}}'' 后面不允许紧跟着 ''{{toanchor|IdentifierStart}}'' 或 ''{{toanchor|DecimalDigit}}''。
+
+{{note| 例如：'''3in''' 是错误的，不会解析为 '''3''' 和 '''in''' 这两个输入元素。}}
+
+
+语义：
+
+一个数值字面量代表一个 [[ES5/types#Number|Number类型]] 的值。此值取决于两个步骤：第一，由字面量得出的<b title="mathematical value（MV）">数学值</b>）；第二，这个数学值按照后面描述的规则舍入。
+
+* ''{{toanchor|NumericLiteral}}'' :: ''{{toanchor|DecimalLiteral}}'' 的数学值是 ''{{toanchor|DecimalLiteral }}'' 的数学值。
+
+* ''{{toanchor|NumericLiteral}}'' :: ''{{toanchor|HexIntegerLiteral}}'' 的数学值是 ''{{toanchor|HexIntegerLiteral}}'' 的数学值。
+
+* ''{{toanchor|DecimalLiteral}}'' :: ''{{toanchor|DecimalIntegerLiteral}}'' '''.''' 的数学值是 ''{{toanchor|DecimalIntegerLiteral}}'' 的数学值。
+
+* ''{{toanchor|DecimalLiteral}}'' :: ''{{toanchor|DecimalIntegerLiteral}}'' '''.''' ''{{toanchor|DecimalDigits}}'' 的数学值是 ''{{toanchor|DecimalIntegerLiteral}}'' 的数学值加上 (''{{toanchor|DecimalDigits}}'' 的数学值乘 '''10'''<sup>-<var>n</var></sup>), 这里的 <var>n</var> 是 ''{{toanchor|DecimalDigits}}'' 的字符个数。
+
+* ''{{toanchor|DecimalLiteral}}'' :: ''{{toanchor|DecimalIntegerLiteral}}'' '''.''' ''{{toanchor|ExponentPart}}'' 的数学值是 ''{{toanchor|DecimalIntegerLiteral}}'' 的数学值乘 '''10'''<sup><var>e</var></sup>, 这里的 <var>e</var> 是 ''{{toanchor|ExponentPart}}'' 的数学值。
+
+* ''{{toanchor|DecimalLiteral}}'' :: ''{{toanchor|DecimalIntegerLiteral}}'' '''.''' ''{{toanchor|DecimalDigits}}'' ''{{toanchor|ExponentPart}}'' 的数学值是 (''{{toanchor|DecimalIntegerLiteral}}'' 的数学值加 (''{{toanchor|DecimalDigits}}'' 的数学值乘 '''10'''<sup>-<var>n</var></sup>)) 乘 '''10'''<sup><var>e</var></sup>, 这里的 <var>n</var> 是 ''{{toanchor|DecimalDigits}}'' 的字符个数，<var>e</var> 是 ''{{toanchor|ExponentPart}}'' 的数学值。
+
+* ''{{toanchor|DecimalLiteral}}'' :: '''.''' ''{{toanchor|DecimalDigits}}'' 的数学值是 ''{{toanchor|DecimalDigits}}'' 的数学值乘 '''10'''<sup>-<var>n</var></sup>, 这里的 <var>n</var> 是 ''{{toanchor|DecimalDigits}}'' 的字符个数。
+
+* ''{{toanchor|DecimalLiteral}}'' :: '''.''' ''{{toanchor|DecimalDigits}}'' ''{{toanchor|ExponentPart}}'' 的数学值是 ''{{toanchor|DecimalDigits}}'' 的数学值乘 '''10'''<sup><var>e</var>-<var>n</var></sup>, 这里的 <var>n</var> 是 ''{{toanchor|DecimalDigits}}'' 的字符个数，<var>e</var> 是 ''{{toanchor|ExponentPart}}'' 的数学值。
+
+* ''{{toanchor|DecimalLiteral}}'' :: ''{{toanchor|DecimalIntegerLiteral}}'' 的数学值是 ''{{toanchor|DecimalIntegerLiteral}}'' 的数学值。
+
+* ''{{toanchor|DecimalLiteral}}'' :: ''{{toanchor|DecimalIntegerLiteral}}'' ''{{toanchor|ExponentPart}}'' 的数学值是 ''{{toanchor|DecimalIntegerLiteral}}'' 的数学值乘 '''10'''<sup><var>e</var></sup>, 这里的 <var>e</var> 是 ''{{toanchor|ExponentPart}}'' 的数学值。
+
+* ''{{toanchor|DecimalIntegerLiteral}}'' :: '''0''' 的数学值是 '''0'''。
+
+* ''{{toanchor|DecimalIntegerLiteral}}'' :: ''{{toanchor|NonZeroDigit}}'' ''{{toanchor|DecimalDigits}}'' 的数学值是 (''{{toanchor|NonZeroDigit}}'' 的数学值乘 '''10'''<sup><var>n</var></sup>) 加 ''{{toanchor|DecimalDigits}}'' 的数学值, 这里的 <var>n</var> 是 ''{{toanchor|DecimalDigits}}'' 的字符个数。
+
+* ''{{toanchor|DecimalDigits}}'' :: ''{{toanchor|DecimalDigit}}'' 的数学值是 ''{{toanchor|DecimalDigit}}'' 的数学值。
+
+* ''{{toanchor|DecimalDigits}}'' :: ''{{toanchor|DecimalDigits}}'' ''{{toanchor|DecimalDigit}}'' 的数学值是 (''{{toanchor|DecimalDigits}}'' 的数学值乘 '''10''') 加 ''{{toanchor|DecimalDigit}}'' 的数学值。
+
+* ''{{toanchor|ExponentPart}}'' :: ExponentIndicator ''{{toanchor|SignedInteger}}'' 的数学值是 ''{{toanchor|SignedInteger}}'' 的数学值。
+
+* ''{{toanchor|SignedInteger}}'' :: ''{{toanchor|DecimalDigits}}'' 的数学值是 ''{{toanchor|DecimalDigits}}'' 的数学值。
+
+* ''{{toanchor|SignedInteger}}'' :: '''+''' ''{{toanchor|DecimalDigits}}'' 的数学值是 ''{{toanchor|DecimalDigits}}'' 的数学值。
+
+* ''{{toanchor|SignedInteger}}'' :: '''-''' ''{{toanchor|DecimalDigits}}'' 的数学值是 ''{{toanchor|DecimalDigits}}'' 的数学值取负。
+
+* ''{{toanchor|DecimalDigit}}'' :: '''0''' 或 ''{{toanchor|HexDigit}}'' :: '''0''' 的数学值是 '''0'''。
+
+* ''{{toanchor|DecimalDigit}}'' :: '''1''' 或 ''{{toanchor|NonZeroDigit}}'' :: '''1''' 或 ''{{toanchor|HexDigit}}'' :: '''1''' 的数学值是 '''1'''。
+
+* ''{{toanchor|DecimalDigit}}'' :: '''2''' 或 ''{{toanchor|NonZeroDigit}}'' :: '''2''' 或 ''{{toanchor|HexDigit}}'' :: '''2''' 的数学值是 '''2'''。
+
+* ''{{toanchor|DecimalDigit}}'' :: '''3''' 或 ''{{toanchor|NonZeroDigit}}'' :: '''3''' 或 ''{{toanchor|HexDigit}}'' :: '''3''' 的数学值是 '''3'''。
+
+* ''{{toanchor|DecimalDigit}}'' :: '''4''' 或 ''{{toanchor|NonZeroDigit}}'' :: '''4''' 或 ''{{toanchor|HexDigit}}'' :: '''4''' 的数学值是 '''4'''。
+
+* ''{{toanchor|DecimalDigit}}'' :: '''5''' 或 ''{{toanchor|NonZeroDigit}}'' :: '''5''' 或 ''{{toanchor|HexDigit}}'' :: '''5''' 的数学值是 '''5'''。
+
+* ''{{toanchor|DecimalDigit}}'' :: '''6''' 或 ''{{toanchor|NonZeroDigit}}'' :: '''6''' 或 ''{{toanchor|HexDigit}}'' :: '''6''' 的数学值是 '''6'''。
+
+* ''{{toanchor|DecimalDigit}}'' :: '''7''' 或 ''{{toanchor|NonZeroDigit}}'' :: '''7''' 或 ''{{toanchor|HexDigit}}'' :: '''7''' 的数学值是 '''7'''。
+
+* ''{{toanchor|DecimalDigit}}'' :: '''8''' 或 ''{{toanchor|NonZeroDigit}}'' :: '''8''' 或 ''{{toanchor|HexDigit}}'' :: '''8''' 的数学值是 '''8'''。
+
+* ''{{toanchor|DecimalDigit}}'' :: '''9''' 或 ''{{toanchor|NonZeroDigit}}'' :: '''9''' 或 ''{{toanchor|HexDigit}}'' :: '''9''' 的数学值是 '''9'''。
+
+* ''{{toanchor|HexDigit}}'' :: '''a''' 或 ''{{toanchor|HexDigit}}'' :: '''A''' 的数学值是 '''10'''。
+
+* ''{{toanchor|HexDigit}}'' :: '''b''' 或 ''{{toanchor|HexDigit}}'' :: '''B''' 的数学值是 '''11'''。
+
+* ''{{toanchor|HexDigit}}'' :: '''c''' 或 ''{{toanchor|HexDigit}}'' :: '''C''' 的数学值是 '''12'''。
+
+* ''{{toanchor|HexDigit}}'' :: '''d''' 或 ''{{toanchor|HexDigit}}'' :: '''D''' 的数学值是 '''13'''。
+
+* ''{{toanchor|HexDigit}}'' :: '''e''' 或 ''{{toanchor|HexDigit}}'' :: '''E''' 的数学值是 '''14'''。
+
+* ''{{toanchor|HexDigit}}'' :: '''f''' 或 ''{{toanchor|HexDigit}}'' :: '''F''' 的数学值是 '''15'''。
+
+* ''{{toanchor|HexIntegerLiteral}}'' :: '''0x''' ''{{toanchor|HexDigit}}'' 的数学值是 ''{{toanchor|HexDigit}}'' 的数学值。
+
+* ''{{toanchor|HexIntegerLiteral}}'' :: '''0X''' ''{{toanchor|HexDigit}}'' 的数学值是 ''{{toanchor|HexDigit}}'' 的数学值。
+
+* ''{{toanchor|HexIntegerLiteral}}'' :: ''{{toanchor|HexIntegerLiteral}}'' ''{{toanchor|HexDigit}}'' 的数学值是 (''{{toanchor|HexIntegerLiteral}}'' 的数学值乘 '''16''') 加 ''{{toanchor|HexDigit}}'' 的数学值。
+
+
+数值字面量的确切数学值一旦被确定，它就会舍入成 [[ES5/types#Number|Number类型]] 的值。如果数学值是 '''0'''，那么舍入值是 '''+0'''；否则，舍入值必须是数学值对应的[[ES5/types#Number|数字值]]，除非此字面量是<b title="significant digit">有效数字</b>超过20位的 ''{{toanchor|DecimalLiteral}}''，这种情况下，数字值的产生方式可以是下面两种方式中的一种：一，将20位后的每个<b title="significant digit">有效数字</b>用 '''0''' 替换后产生的数学值；二，将20位后的每个<b title="significant digit">有效数字</b>用 '''0''' 替换，并且递增第20位<b title="significant digit">有效数字</b>位置的字面量值所产生的数学值 {{question||64位IEEE754浮点数在16位十进制之后就开始近似了，此处定义20位以及其后的近似是否有意义？}}。<b title="significant digit">有效数字</b>必须满足这么几个条件，首先它不能是 ''{{toanchor|ExponentPart}}'' 的一部分，并且
+
+* 它不是 '''0'''；或 
+
+* 它的左侧是非零数字，它的右侧是不在 ''{{toanchor|ExponentPart}}'' 的非零数字。
+
+符合标准的实现，在处理[[ES5/execution#strict-mode-code|严格模式代码]]时，按照 [[ES5/annexB#numeric-literals|B.1.1]] 的描述，不得扩展 ''{{toanchor|NumericLiteral}}'' 包含 ''[[ES5/annexB#OctalIntegerLiteral|OctalIntegerLiteral]]'' 的语法。
+
+=== {{anchor|x7.8.4}}{{anchor|string-literals}}字符串字面量 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.8.4}}
+
+字符串字面量是在闭合的单引号或双引号中的零个或多个字符。每个字符都可以用一个转义序列代表。除了<b title="closing quote character">闭合用的引号字符</b>、<b title="backslash">反斜杠</b>、<b title="carriage return">回车符</b>、<b title="line separator">行分隔符</b>、<b title="paragraph separator">段落分隔符</b>、<b title="line feed">换行符</b>之外的所有字符都可以直接出现的字符串字面量里。任何字符都可以通过转移序列的形式出现。
+
+
+语法 
+
+  ''<b id="StringLiteral">StringLiteral</b>'' ::
+    '''"''' ''{{toanchor|DoubleStringCharacters}}{{opt}}'' '''"'''
+    '''&#39;''' ''{{toanchor|SingleStringCharacters}}{{opt}}'' '''&#39;'''
+
+  ''<b id="DoubleStringCharacters">DoubleStringCharacters</b>'' ::
+    ''{{toanchor|DoubleStringCharacter}}'' ''{{toanchor|DoubleStringCharacters}}{{opt}}''
+
+  ''<b id="SingleStringCharacters">SingleStringCharacters</b>'' ::
+    ''{{toanchor|SingleStringCharacter}}'' ''{{toanchor|SingleStringCharacters}}{{opt}}''
+
+  ''<b id="DoubleStringCharacter">DoubleStringCharacter</b>'' ::
+    ''[[ES5/source#SourceCharacter|SourceCharacter]]'' '''but not <nowiki>"</nowiki> or \ or''' ''{{toanchor|LineTerminator}}''
+    '''\''' ''{{toanchor|EscapeSequence}}''
+    ''{{toanchor|LineContinuation}}''
+
+  ''<b id="SingleStringCharacter">SingleStringCharacter</b>'' ::
+    ''[[ES5/source#SourceCharacter|SourceCharacter]]'' '''but not &#39; or \ or''' ''{{toanchor|LineTerminator}}''
+    '''\''' ''{{toanchor|EscapeSequence}}''
+    ''{{toanchor|LineContinuation}}''
+
+  ''<b id="LineContinuation">LineContinuation</b>'' ::
+    '''\''' ''{{toanchor|LineTerminatorSequence}}''
+
+  ''<b id="EscapeSequence">EscapeSequence</b>'' ::
+    ''{{toanchor|CharacterEscapeSequence}}''
+    '''0''' &#x5b;[[ES5/notation#lookahead-not-in|lookahead ?]] ''{{toanchor|DecimalDigit}}'']
+    ''{{toanchor|HexEscapeSequence}}''
+    ''{{toanchor|UnicodeEscapeSequence}}''
+
+  ''<b id="CharacterEscapeSequence">CharacterEscapeSequence</b>'' ::
+    ''{{toanchor|SingleEscapeCharacter}}''
+    ''{{toanchor|NonEscapeCharacter}}''
+
+  ''<b id="SingleEscapeCharacter">SingleEscapeCharacter</b>'' :: '''one of'''
+    '''&#39; " \ b f n r t v'''
+
+  ''<b id="NonEscapeCharacter">NonEscapeCharacter</b>'' ::
+    ''[[ES5/source#SourceCharacter|SourceCharacter]]'' '''but not''' ''{{toanchor|EscapeCharacter}}'' '''or''' ''{{toanchor|LineTerminator}}''
+
+  ''<b id="EscapeCharacter">EscapeCharacter</b>'' ::
+    ''{{toanchor|SingleEscapeCharacter}}''
+    ''{{toanchor|DecimalDigit}}''
+    '''x'''
+    '''u'''
+
+  ''<b id="HexEscapeSequence">HexEscapeSequence</b>'' ::
+    '''x''' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}''
+
+  ''<b id="UnicodeEscapeSequence">UnicodeEscapeSequence</b>'' ::
+    '''u''' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}''
+
+[[#numeric-literals|7.8.3]] 给出了 ''{{toanchor|HexDigit}}'' 非终结符的定义。[[ES5/source|第6章]] 定义了 ''[[ES5/source#SourceCharacter|SourceCharacter]]''。
+
+
+语义 
+
+
+一个字符串字面量代表一个 [[ES5/types#String|String类型]] 的值。字面量的<b title="String Value (SV)">字符串值</b>由字符串字面量各部分贡献的<b title="CharacterValue (CV)">字符值</b>描述。作为这一过程的一部分，字符字面量里的某些字符字符会被解释成包含<b title="Mathematical Value (MV)">数学值</b>，如 [[#numeric-literals|7.8.3]] 和下面描述的。
+
+* ''{{toanchor|StringLiteral}}'' :: '''""''' 的字符串值是空字符序列。
+
+* ''{{toanchor|StringLiteral}}'' :: '''&#39;&#39;''' 的字符串值是空字符序列。
+
+* ''{{toanchor|StringLiteral}}'' :: '''"''' ''{{toanchor|DoubleStringCharacters}}'' '''"''' 的字符串值是 ''{{toanchor|DoubleStringCharacters}}'' 的字符串值。
+
+* ''{{toanchor|StringLiteral}}'' :: '''&#39;''' ''{{toanchor|SingleStringCharacters}}'' '''&#39;''' 的字符串值是 ''{{toanchor|SingleStringCharacters}}'' 的字符串值。
+
+* ''{{toanchor|DoubleStringCharacters}}'' :: ''{{toanchor|DoubleStringCharacter}}'' 的字符串值是包含一个字符的序列，此字符的字符值是 ''{{toanchor|DoubleStringCharacter}}'' 的字符值。
+
+* ''{{toanchor|DoubleStringCharacters}}'' :: ''{{toanchor|DoubleStringCharacter}}'' ''{{toanchor|DoubleStringCharacters}}'' 的字符串值是 （''{{toanchor|DoubleStringCharacter}}'' 的字符值后面跟着 ''{{toanchor|DoubleStringCharacters}}'' 的字符串值里所有字符的）序列。
+
+* ''{{toanchor|SingleStringCharacters}}'' :: ''{{toanchor|SingleStringCharacter}}'' 的字符串值是包含一个字符的序列，此字符的字符值是 ''{{toanchor|SingleStringCharacter}}'' 的字符值。
+
+* ''{{toanchor|SingleStringCharacters}}'' :: ''{{toanchor|SingleStringCharacter}}'' ''{{toanchor|SingleStringCharacters}}'' 的字符串值是（''{{toanchor|SingleStringCharacter}}'' 的字符值后面跟着 ''{{toanchor|SingleStringCharacters}}'' 的字符串值里所有字符的）序列。
+
+* ''{{toanchor|LineContinuation}}'' :: '''\''' ''{{toanchor|LineTerminatorSequence}}'' 的字符串值是空字符序列。
+
+* ''{{toanchor|DoubleStringCharacter}}'' :: ''[[ES5/source#SourceCharacter|SourceCharacter]]'' '''but not " or \ or''' ''{{toanchor|LineTerminator}}'' 的字符值是 ''[[ES5/source#SourceCharacter|SourceCharacter]]'' 字符自身。
+
+* ''{{toanchor|DoubleStringCharacter}}'' :: '''\''' ''{{toanchor|EscapeSequence}}'' 的字符值是 ''{{toanchor|EscapeSequence}}'' 的字符值。
+
+* ''{{toanchor|DoubleStringCharacter}}'' :: ''{{toanchor|LineContinuation}}'' 的字符值是空字符序列。
+
+* ''{{toanchor|SingleStringCharacter}}'' :: ''[[ES5/source#SourceCharacter|SourceCharacter]]'' '''but not &#39; or \ or''' ''{{toanchor|LineTerminator}}''的字符值是 ''[[ES5/source#SourceCharacter|SourceCharacter]]'' 字符自身。
+
+* ''{{toanchor|SingleStringCharacter}}'' :: '''\''' ''{{toanchor|EscapeSequence}}'' 的字符值是 ''{{toanchor|EscapeSequence}}'' 的字符值。
+
+* ''{{toanchor|SingleStringCharacter}}'' :: ''{{toanchor|LineContinuation}}'' 的字符值是空字符序列。
+
+* ''{{toanchor|EscapeSequence}}'' :: ''{{toanchor|CharacterEscapeSequence}}'' 的字符值是 ''{{toanchor|CharacterEscapeSequence}}'' 的字符值。
+
+* ''{{toanchor|EscapeSequence}}'' :: '''0''' &#x5b;[[ES5/notation#lookahead-not-in|lookahead ?]] ''{{toanchor|DecimalDigit}}''] 的字符值是 '''<NUL>''' 字符（Unicode 值 0000）。
+
+* ''{{toanchor|EscapeSequence}}'' :: ''{{toanchor|HexEscapeSequence}}'' 的字符值是 ''{{toanchor|HexEscapeSequence}}'' 的字符值。
+
+* ''{{toanchor|EscapeSequence}}'' :: ''{{toanchor|UnicodeEscapeSequence}}'' 的字符值是 ''{{toanchor|UnicodeEscapeSequence}}'' 的字符值。
+
+* ''{{toanchor|CharacterEscapeSequence}}'' :: ''{{toanchor|SingleEscapeCharacter}}'' 的字符值是 '''表4''' 里的 ''{{toanchor|SingleEscapeCharacter}}'' 确定的代码单元值字符：
+
+
+{| border="1" align="center" cellpadding="5" style="border-collapse:collapse;"
+|+ '''表4 - 字符串单字符转义序列'''
+|- style="background:#EEE;"
+! 转义序列
+! 代码单元值
+! 名称
+! 符号
+|-
+| \b
+| \u0008
+| <b title="backspace">退格符</b>
+| <BS>
+|-
+| \t
+| \u0009
+| <b title="horizontal tab">水平制表符</b>
+| <HT>
+|-
+| \n
+| \u000A
+| <b title="line feed (new line)">换行符</b>
+| <LF>
+|-
+| \v
+| \u000B
+| <b title="vertical tab">垂直制表符</b>
+| <VT>
+|-
+| \f
+| \u000C
+| <b title="form feed">换页符</b>
+| <FF>
+|-
+| \r
+| \u000D
+| <b title="carriage return">回车符</b>
+| <CR>
+|-
+| \"
+| \u0022
+| <b title="double quote">双引号</b>
+| "
+|-
+| \'
+| \u0027
+| <b title="single quote">单引号</b>
+| '
+|-
+| \\
+| \u005C
+| <b title="backslash">反斜杠</b>
+| \
+|}
+
+
+* ''{{toanchor|CharacterEscapeSequence}}'' :: ''{{toanchor|NonEscapeCharacter}}'' 的字符值是 ''{{toanchor|NonEscapeCharacter}}'' 的字符值。
+
+* ''{{toanchor|NonEscapeCharacter}}'' :: ''[[ES5/source#SourceCharacter|SourceCharacter]]'' '''but not''' ''{{toanchor|EscapeCharacter}}'' '''or''' ''{{toanchor|LineTerminator}}'' 的字符值是 ''[[ES5/source#SourceCharacter|SourceCharacter]]'' 字符自身。
+
+* ''{{toanchor|HexEscapeSequence}}'' :: '''x''' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}'' 的字符值是 (('''16''' 乘第一个 ''{{toanchor|HexDigit}}'' 的数学值) 加第二个 ''{{toanchor|HexDigit}}'' 的数学值) 代码单元确定的字符。
+
+* ''{{toanchor|UnicodeEscapeSequence}}'' :: '''u''' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}'' 的字符值是 ('''4096''' 乘第一个 ''{{toanchor|HexDigit}}'' 的数学值) 加 ('''256''' 乘第二个 ''{{toanchor|HexDigit}}'' 的数学值) 加 ('''16''' 乘第三个 ''{{toanchor|HexDigit}}'' 的数学值) 加 ( 第四个 ''{{toanchor|HexDigit}}'' 的数学值) 代码单元确定的字符。
+
+
+符合标准的实现，在处理[[ES5/execution#strict-mode-code|严格模式代码]]时，按照 [[ES5/annexB#string-literals|B.1.2]] 的描述，不得扩展 ''{{toanchor|EscapeSequence}}'' 包含 ''[[ES5/annexB#OctalEscapeSequence|OctalEscapeSequence]]'' 的语法。
+
+{{note| 行终止符不能出现在字符串字面量里，除非它成为 ''LineContinuation'' 的一部分产生空字符序列。让字符串字面量的字符串值包含行终止符的正确方法是使用转义序列，如 '''\n''' 或 '''\u000A'''。}}
+
+=== {{anchor|x7.8.5}}正则表达式字面量 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.8.5}}
+
+
+正则表达式字面量是一个输入元素，它在每次被解析执行时候都会转换成一个 [[ES5/builtins#x15.10|RegExp对象]] 的。当程序中的两个正则表达式字面量解释执行为正则表达式对象后就不能用 '''===''' 来比较它们是否相等，即使它们所包含的内容相同。[[ES5/builtins#x15.10|RegExp对象]] 也可以在运行时使用 [[ES5/builtins#x15.10.4|new RegExp]] 或以函数方式调用 [[ES5/builtins#x15.10.3|RegExp]] 构造器来创建。
+
+下面的产生式描述了正则表达式字面量的语法，输入元素扫描器还用它搜索正则表达式字面量的结束位置。''{{toanchor|RegularExpressionBody}}'' 和 ''{{toanchor|RegularExpressionFlags}}'' 包含的字符组成的字符串会直接传递给正则表达式构造器，在那里用更严格文法进行解析。一个实现可以扩展正则表达式构造器的文法。但它不能扩展 ''{{toanchor|RegularExpressionBody}}'' 和 ''{{toanchor|RegularExpressionFlags}}'' 产生式或使用这些产生式的产生式。
+
+
+语法 
+
+  ''<b id="RegularExpressionLiteral ">RegularExpressionLiteral</b>'' ::
+    '''/''' ''{{toanchor|RegularExpressionBody}}'' '''/''' ''{{toanchor|RegularExpressionFlags}}''
+
+  ''<b id="RegularExpressionBody">RegularExpressionBody</b>'' ::
+    ''{{toanchor|RegularExpressionFirstChar}}'' ''{{toanchor|RegularExpressionChars}}''
+
+  ''<b id="RegularExpressionChars">RegularExpressionChars</b> ::
+    &#x5b;[[ES5/notation#empty|empty]]]
+    ''{{toanchor|RegularExpressionChars}}'' ''{{toanchor|RegularExpressionChar}}''
+
+  ''<b id="RegularExpressionFirstChar">RegularExpressionFirstChar</b>'' ::
+    ''{{toanchor|RegularExpressionNonTerminator}}'' '''but not * or \ or / or ['''
+    ''{{toanchor|RegularExpressionBackslashSequence}}''
+    ''{{toanchor|RegularExpressionClass}}''
+
+  ''<b id="RegularExpressionChar">RegularExpressionChar</b>'' ::
+    ''{{toanchor|RegularExpressionNonTerminator}}'' '''but not \ or / or ['''
+    ''{{toanchor|RegularExpressionBackslashSequence}}''
+    ''{{toanchor|RegularExpressionClass}}''
+
+  ''<b id="RegularExpressionBackslashSequence">RegularExpressionBackslashSequence</b>'' ::
+    '''\''' ''{{toanchor|RegularExpressionNonTerminator}}''
+
+  ''<b id="RegularExpressionNonTerminator">RegularExpressionNonTerminator</b>'' ::
+    ''[[ES5#SourceCharacter|SourceCharacter]]'' '''but not''' ''{{toanchor|LineTerminator}}''
+
+  ''<b id="RegularExpressionClass">RegularExpressionClass</b>'' ::
+    '''[''' ''{{toanchor|RegularExpressionClassChars}}'' ''']'''
+
+  ''<b id="RegularExpressionClassChars">RegularExpressionClassChars</b>'' ::
+    &#x5b;[[ES5/notation#empty|empty]]]
+    ''{{toanchor|RegularExpressionClassChars}}'' ''{{toanchor|RegularExpressionClassChar}}''
+
+  ''<b id="RegularExpressionClassChar">RegularExpressionClassChar</b>'' ::
+    ''{{toanchor|RegularExpressionNonTerminator}}'' '''but not ] or \'''
+    ''{{toanchor|RegularExpressionBackslashSequence}}''
+
+  ''<b id="RegularExpressionFlags">RegularExpressionFlags</b>'' ::
+    &#x5b;[[ES5/notation#empty|empty]]]
+    ''{{toanchor|RegularExpressionFlags}}'' ''{{toanchor|IdentifierPart}}''
+
+{{note| 正则表达式字面量不能为空；并不是说正则表达式字面量不能代表空，字符 '''//''' 会启动一个单行注释。要指定一个空的正则表达式，使用：'''/(?:)/''' 。}}
+
+
+语义 
+
+
+正则表达式字面量会解释执行为一个 [[ES5/types#Object|Object类型]] 值，它是标准内置构造器 [[ES5/builtins#x15.10|RegExp]] 的一个实例。此值取决于两个步骤：首先，展开组成正则表达式产生式 ''{{toanchor|RegularExpressionBody}}'' 和 ''{{toanchor|RegularExpressionFlags}}'' 的字符，将其以未解析形式分别存成两个字符串 <var>Pattern</var> 和 <var>Flags</var>。然后，在每次解释执行字面量时创建新对象，仿佛使用 '''new RegExp('''<var>Pattern</var>''','''<var>Flags</var>''')''' 一样，这里的 [[ES5/builtins#x15.10|RegExp]] 是标准内置构造器名。新构造的对象将成为 ''{{toanchor|RegularExpressionLiteral}}'' 的值。如果调用 '''new RegExp''' 会产生 [[ES5/builtins#x15.10.4.1|15.10.4.1]] 指定的错误，那么必须把错误当作是早期错误 ( 见[[ES5#x16|第16章]])。
+
+== {{anchor|x7.9}}自动分号插入 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.9}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch07/7.9}}
+
+必须用分号终止某些 ECMAScript 语句（[[ES5/statements#x12.3|空语句]]、[[ES5/statements#x12.2|变量语句]]、[[ES5/statements#x12.4|表达式语句]]、[[ES5/statements#x12.6.1|'''do-while''' 语句]]、[[ES5/statements#x12.7|'''continue''' 语句]]、[[ES5/statements#x12.8|'''break''' 语句]]、[[ES5/statements#x12.9|'''return''' 语句]]、[[ES5/statements#x12.13|'''throw''' 语句]]）。这些分号总是明确地显示在源文本里。然而，为了方便起见，某些情况下这些分号可以在源文本里省略。描述这种情况会说：这种情况下给源代码的 [[#Token|Token]] 流自动插入分号。
+
+=== {{anchor|x7.9.1}}{{anchor|automatic-semicolon-insertion}}自动分号插入规则 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.9.1}}
+
+
+分号插入有三个基本规则：
+
+# 从左到右解析程序，当遇到一个不符合任何文法产生式的 [[#Token|Token]]（叫做<b title="offending token">违规Token</b>），那么只要满足下面条件之一就在 '''违规Token''' 前面自动插入分号。
+#* 至少一个 ''[[#LineTerminator|LineTerminator]]'' 分割了 '''违规Token''' 和前一个 [[#Token|Token]]。
+#* '''违规Token''' 是 '''}'''。
+# 从左到右解析程序，[[#Token|Token]] 输入流已经结束，当解析器无法将输入 [[#Token|Token]] 流解析成单个完整 ECMAScript ''[[ES5/program#Program|Program]]''，那么就在输入流的结束位置自动插入分号。
+# 从左到右解析程序，遇到一个某些文法产生式允许的 [[#Token|Token]]，但是此产生式是受限产生式，受限产生式的里紧跟在 [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] 后的第一个终结符或非终结符的 [[#Token|Token]] 叫做受限的 [[#Token|Token]]，当至少一个 ''[[#LineTerminator|LineTerminator]]'' 分割了受限的 [[#Token|Token]] 和前一个 [[#Token|Token]]，那么就在受限 [[#Token|Token]] 前面自动插入分号。
+
+然而，上述规则有一个附加的优先条件：如果插入分号后解析结果是[[ES5/statements#x12.3|空语句]]，或如果插入分号后它成为 [[ES5/statements#x12.6.3|'''for''' 语句]] 头部的两个分号之一，那么不会自动插入分号。
+
+{{note| 文法里的受限产生式只限以下：}}
+
+  '''''[[ES5/expressions#PostfixExpression|PostfixExpression]]''''' :
+    ''[[ES5/expressions#LeftHandSideExpression|LeftHandSideExpression]]'' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] '''++''' 
+    ''[[ES5/expressions#LeftHandSideExpression|LeftHandSideExpression]]'' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] '''--'''
+
+  '''''[[ES5/statements#ContinueStatement|ContinueStatement]]''''' :
+    '''continue''' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] ''[[#Identifier|Identifier]]'' ''';'''
+
+  '''''[[ES5/statements#BreakStatement|BreakStatement]]''''' :
+    '''break''' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] ''[[#Identifier|Identifier]]'' ''';'''
+
+  '''''[[ES5/statements#ReturnStatement|ReturnStatement]]''''' :
+    '''return''' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] ''[[ES5/expressions#Expression|Expression]]'' ''';'''
+
+  '''''[[ES5/statements#ThrowStatement|ThrowStatement]]''''' :
+    '''throw''' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] ''[[ES5/expressions#Expression|Expression]]'' ''';'''
+
+这些受限产生式的实际效果如下：
+
+当遇到一个被解析器作为[[ES5/expressions#x11.3|后缀运算符]]来对待的 '''++''' 或 '''--'''，并且在 '''++''' 或 '''--''' 与其前面的 [[#Token|Token]] 之间出现至少一个  ''{{toanchor|LineTerminator}}''，这时分号会被自动插入到 '''++''' 或 '''--''' 的前面。
+
+当遇到 '''continue'''、'''break'''、'''return'''、'''throw''' 这些 [[#Token|Token]]，并且在下一个 [[#Token|Token]] 前面遇到 ''{{toanchor|LineTerminator}}'' 时，在 '''continue'''、'''break'''、'''return'''、'''throw''' 后面自动插入一个分号。
+
+这对 ECMAScript 程序员的实际影响是：
+
+[[ES5/expressions#x11.3|后缀运算符]] '''++''' 或 '''--''' 和它的操作数应该出现在同一行。
+
+[[ES5/statements#x12.9|'''return''' 语句]] 或 [[ES5/statements#x12.13|'''throw''' 语句]] 的 ''[[ES5/expressions#Expression|Expression]]'' 开始位置应该和 '''return''' 或 '''throw''' 这些 [[#Token|Token]] 本身处于同一行。
+
+[[ES5/statements#x12.8|'''break''' 语句]] 或 [[ES5/statements#x12.7|'''continue''' 语句]] 的 ''[[#Identifier|Identifier]]'' 应该和 '''break''' 或 '''continue''' 这些 [[#Token|Token]] 本身处于同一行。
+
+=== {{anchor|x7.9.2}}自动分号插入的例子 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-7.9.2}}
+
+
+源代码：
+
+  { 1 2 } 3
+
+即使在自动分号插入规则下，它也不符合 ECMAScript 文法。做为对比，源代码：
+
+  { 1
+  2 } 3
+
+它还是不符合 ECMAScript 文法，但是它会被自动分号插入成为一下形式：
+
+  { 1
+  ;2 ;} 3;
+
+这符合 ECMAScript 文法。
+
+
+源代码：
+
+  for (a; b
+  )
+
+不符合 ECMAScript 文法，并且不会被自动分号插入所更改，因为是 [[ES5/statements#x12.6.3|'''for''' 语句]] 头部需要分号。自动分号插入永远不会插入成 [[ES5/statements#x12.6.3|'''for''' 语句]] 头部的两个分号之一。
+
+
+源代码：
+
+  return
+  a + b
+
+会被自动分号插入转换成以下形式：
+
+  return;
+  a + b;
+
+{{note| 表达式 '''a + b''' 不会被当做是 '''return''' 语句要返回的值，因为有一个 '''''LineTerminator''''' 分割了它和 '''return'''。}}
+
+
+源代码：
+
+  a = b
+  ++c
+
+会被自动分号插入转换成以下形式：
+
+  a = b;
+  ++c;
+{{note|'''++''' 不会被当做应用于变量 '''b''' 的后缀运算符，因为 '''b''' 和 '''++''' 之间出现了一个 '''''LineTerminator'''''。}}
+
+
+源代码：
+
+  if (a > b)
+  else c = d
+
+它不符合 ECMAScript 文法，'''else''' 这个 [[#Token|Token]] 前不会被自动插入分号，即使没有文法产生式适用这一位置，因为自动插入分号不该解析成[[ES5/statements#x12.3|空语句]]。
+
+
+源代码：
+
+  a = b + c
+  (d + e).print()
+
+它不会被自动分号插入改变，因为第二行开始位置的括号表达式可以解释成函数调用的参数列表：
+
+  a = b + c(d + e).print()
+
+在赋值语句必须用左括号开头的情况下，程序员在前面语句的结束位置明确地提供一个分号是个好主意，而不是依赖于自动分号插入。
