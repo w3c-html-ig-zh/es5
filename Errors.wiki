@@ -1,0 +1,23 @@
+== 错误 {{anchor|x16}}==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-16}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch16}}
+
+{{anchor|early-error}}实现必须在相关的ECMAScript语言结构被解释执行时报告大部分错误。'''早期错误'''是一个在程序中的任何结构被解释执行之前所包含的可检测且可报告的错误。实现必须在程序首次解释执行之前报告'''早期错误'''。'''eval''' 代码中的'''早期错误'''在 '''eval''' 被调用时报告，但这是在　'''eval''' 代码中的结构被解释执行之前做的。'''早期错误'''之外的任何错误都是运行时错误。
+
+实现必须将下面的错误类型作为早期错误来处理：
+* 任何语法错误 
+* 试图在定义一个 ''[[ES5/expressions#ObjectLiteral|ObjectLiteral]]'' 时，将多个 '''get''' 或 '''set''' 访问器属性分配到同一个名字上。
+* 试图在定义一个 ''[[ES5/expressions#ObjectLiteral|ObjectLiteral]]'' 时，同时将数据属性和访问器属性（'''get''' 或 '''set'''）分配到同一个名字上。
+* 正则表达式字面量中因缺少实现定义的语法扩展而产生的错误。
+* 试图在[[ES5/execution#strict-mode-code|严格模式代码]]中定义一个 ''[[ES5/expressions#ObjectLiteral|ObjectLiteral]]'' 时，将多个数据属性分配到同一个名字上。
+* ''[[ES5/statements#WithStatement|WithStatement]]'' 出现在[[ES5/execution#strict-mode-code|严格模式代码]]中。
+* 在[[ES5/execution#strict-mode-code|严格模式代码]]中定义的 [[ES5/functions#FunctionDeclaration|FunctionDeclaration]] 和 [[ES5/functions#FunctionExpression|FunctionExpression]]，它们的 ''[[ES5/functions#FormalParameterList|FormalParameterList]]'' 中多次出现同一个 ''[[ES5/lexical#Identifier|Identifier]]''。
+* '''return'''、'''break'''、'''continue''' 使用不当。 
+* 试图在早期已经确定为非[[ES5/types#Reference|引用类型]]的任意值上调用 [[ES5/types#PutValue|PutValue]]（例如，执行赋值语句 3 = 4）。{{v8 partial||这种情况将产生运行时错误。}} {{ie partial||这种情况将产生运行时错误。}}
+
+即使编译器可以证实一个结构会在任何情况下都无法无误地执行，实现也不该将其它种类的错误当做'''早期错误'''来对待。在这种情况下实现可以发出一个早期警告，直到相关的结构被真正地解释执行到后再报错。
+
+实现应报出所有指定的错误，但以下情况除外：
+* 实现可以扩展程序的语法和正则表达式的 pattern 或 flags 语法。当程序的语法或正则表达式的 pattern 或 flags 语法遇到一个实现了程序语法定义扩展或正则表达式语法扩展时，所有允许抛出 [[ES5/builtins#SyntaxError|SyntaxError]] 的操作（例如调用 [[ES5/builtins#x15.1.2|eval]]、使用正则表达式字面量、使用 [[ES5/builtins#x15.3|Function]] 或 [[ES5/builtins#x15.10|RegExp]] 构造器）都允许使用实现定义的行为来替代 [[ES5/builtins#SyntaxError|SyntaxError]] 的抛出。
+* 实现可以提供超出这份规范描述的额外类型、值、对象、属性、函数。这可能导致结构（例如访问一个全局变量）得到实现定义的行为，从而取代原有的错误（比如 [[ES5/builtins#ReferenceError|ReferenceError]]）的抛出。
+* 当 <var>fractionDigits</var> 或 <var>precision</var> 参数超出了指定的范围，实现可以为 [[ES5/builtins#x15.7.4.5|toFixed]]、[[ES5/builtins#x15.7.4.6|toExponential]]、[[ES5/builtins#x15.7.4.7|toPrecision]]，这几个函数定义抛出 [[ES5/builtins#RangeError|RangeError]] 之外的行为。
