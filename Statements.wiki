@@ -1,0 +1,723 @@
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12}}
+
+
+
+
+语法：
+
+  ''<b id="Statement">Statement</b>'' :
+    ''{{toanchor|Block}}''
+    ''{{toanchor|VariableStatement}}''
+    ''{{toanchor|EmptyStatement}}''
+    ''{{toanchor|ExpressionStatement}}''
+    ''{{toanchor|IfStatement}}''
+    ''{{toanchor|IterationStatement}}''
+    ''{{toanchor|ContinueStatement}}''
+    ''{{toanchor|BreakStatement}}''
+    ''{{toanchor|ReturnStatement}}''
+    ''{{toanchor|WithStatement}}''
+    ''{{toanchor|LabelledStatement}}''
+    ''{{toanchor|SwitchStatement}}''
+    ''{{toanchor|ThrowStatement}}''
+    ''{{toanchor|TryStatement}}''
+    ''{{toanchor|DebuggerStatement}}''
+
+
+语义：
+
+一个 ''{{toanchor|Statement}}'' 可以是 ''{{toanchor|LabelledStatement}}'' 的一部分，这个
+''{{toanchor|LabelledStatement}}'' 自身也可以是 ''{{toanchor|LabelledStatement}}'' 的一部分，以
+此类推。当描述个别语句时引入标签的这种方式统称为 <b id="current-label-set">“当前标签组”</b>。一个 ''{{toanchor|LabelledStatement}}'' 介绍了一个标签到一个 '''标签组'''，此外没有其他语义。一个 ''{{toanchor|IterationStatement}}'' 或 ''{{toanchor|SwitchStatement}}'' 的标签组最初包含单个 '''empty''' 元素。任何其他语句的标签组最初是空的。
+
+{{note| 已知几个广泛使用的 ECMAScript 实现支持 '''''FunctionDeclaration''''' 当作语句使用。然而，在实现之间这种 '''''FunctionDeclaration''''' 应用的语义也有严重且不兼容的差异。由于这些不兼容的差异，将 '''''FunctionDeclaration''''' 当作 '''''Statement''''' 使用的结果是代码在实现之间的可移植性不可靠。建议 ECMAScript 实现禁止这样运用 '''''FunctionDeclaration'''''，或遇到这样的运用是发出一个警告。ECMAScript 的未来版本可能定义替代的兼容方案以在 '''''Statement''''' 上下文中声明函数。}}
+
+
+== {{anchor|x12.1}}块 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L1705|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.1}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.1}}
+
+
+
+
+语法：
+
+  ''<b id="Block">Block</b>'' :
+    '''{''' ''{{toanchor|StatementList}}''<sub>opt</sub> '''}'''
+
+  ''<b id="StatementList">StatementList</b>'' :
+    ''{{toanchor|Statement}}''
+    ''{{toanchor|StatementList}}'' ''{{toanchor|Statement}}''
+
+
+语义：
+
+产生式 ''{{toanchor|Block}}'' ''':''' '''{''' '''}''' 按照下面的过程执行 :
+
+# 返回 ('''normal''', '''empty''', '''empty''')。
+
+产生式 ''{{toanchor|Block}}'' ''':''' '''{''' ''{{toanchor|StatementList}}'' '''}''' 按照下面的过程执行 :
+
+# 返回解释执行 ''{{toanchor|StatementList}}'' 的结果。
+
+产生式 ''{{toanchor|StatementList}}'' ''':''' ''{{toanchor|Statement}}'' 按照下面的过程执行 :
+
+# 令 <var>s</var> 为解释执行 ''{{toanchor|Statement}}'' 的结果。
+# 如果有一个异常被抛出，返回 ('''throw''', <var>V</var>, '''empty''')，这里的 <var>V</var> 是异常。( 仿佛没有抛出异常一样继续运行。)
+# 返回 <var>s</var>。
+
+产生式 ''{{toanchor|StatementList}}'' ''':''' ''{{toanchor|StatementList}} {{toanchor|Statement}}'' 按照下面的过程执行 :
+
+# 令 <var>sl</var> 为解释执行 ''{{toanchor|StatementList}}'' 的结果。
+# 如果 <var>sl</var> 是个[[ES5/types#abrupt-completion|非常规完结]]，返回 <var>sl</var>。
+# 令 <var>s</var> 为解释执行 ''{{toanchor|Statement}}'' 的结果。
+# 如果有一个异常被抛出，返回 ('''throw''', <var>V</var>, '''empty''')，这里的 <var>V</var> 是异常。 ( 仿佛没有抛出异常一样继续运行。)
+# 如果 <var>s</var>'''.value''' 是 '''empty''' ，令 <var>V</var> = <var>sl</var>'''.value''', 否则令 <var>V</var> = <var>s</var>'''.value'''。
+# 返回 (<var>s</var>'''.type''', <var>V</var>, <var>s</var>'''.target''')。
+
+== {{anchor|x12.2}}变量语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L1764|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.2}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.2}}
+
+
+
+
+语法：
+
+    ''<b id="VariableStatement">VariableStatement</b>'' :
+        '''var''' ''{{toanchor|VariableDeclarationList}}'' ''';'''
+
+    ''<b id="VariableDeclarationList">VariableDeclarationList</b>'' :
+        ''{{toanchor|VariableDeclaration}}''
+        ''{{toanchor|VariableDeclarationList}}'' ''',''' ''{{toanchor|VariableDeclaration}}''
+
+    ''<b id="VariableDeclarationListNoIn">VariableDeclarationListNoIn</b>'' :
+        ''{{toanchor|VariableDeclarationNoIn}}''
+        ''{{toanchor|VariableDeclarationListNoIn}}'' ''',''' ''{{toanchor|VariableDeclarationNoIn}}''
+
+    ''<b id="VariableDeclaration">VariableDeclaration</b>'' :
+        ''[[ES5/lexical#Identifier|Identifier]]'' ''{{toanchor|Initialiser}}''{{opt}}
+
+    ''<b id="VariableDeclarationNoIn">VariableDeclarationNoIn</b>'' :
+        ''[[ES5/lexical#Identifier|Identifier]]'' ''{{toanchor|InitialiserNoIn}}''{{opt}}
+
+    ''<b id="Initialiser">Initialiser</b>'' :
+        '''=''' ''[[ES5/expressions#AssignmentExpression|AssignmentExpression]]''
+
+    ''<b id="InitialiserNoIn">InitialiserNoIn</b>'' :
+        '''=''' ''[[ES5/expressions#AssignmentExpressionNoIn|AssignmentExpressionNoIn]]''
+
+一个变量语句声明依 [[ES5/execution#declaration-binding-instantiation|10.5]] 中定义创建的变量。当创建变量时初始化为 '''undefined'''。当 ''{{toanchor|VariableStatement}}'' 被执行时变量关联的 ''{{toanchor|Initialiser}}'' 会被分配 ''[[ES5/expressions#AssignmentExpression|AssignmentExpression]]'' 的值，而不是在变量创建时。
+
+
+语义：
+
+产生式 ''{{toanchor|VariableStatement}}'' ''':''' '''var'''
+''{{toanchor|VariableDeclarationList}}'' ''';''' 按照下面的过程执行 :
+
+# 解释执行 ''{{toanchor|VariableDeclarationList}}''。
+# 返回 ('''normal''', '''empty''', '''empty''')。
+
+产生式 ''{{toanchor|VariableDeclarationList}}'' ''':''' ''{{toanchor|VariableDeclaration}}'' 按照下面的过程执行 :
+
+# 解释执行 ''{{toanchor|VariableDeclaration}}''。
+
+产生式 ''{{toanchor|VariableDeclarationList}}'' ''':''' ''{{toanchor|VariableDeclarationList}}'' ''',''' ''{{toanchor|VariableDeclaration}}'' 按照下面的过程执行 :
+
+# 解释执行 ''{{toanchor|VariableDeclarationList}}''。
+# 解释执行 ''{{toanchor|VariableDeclaration}}''。
+
+产生式 ''{{toanchor|VariableDeclaration}}'' ''':''' ''[[ES5/lexical#Identifier|Identifier]]'' 按照下面的过程执行 :
+
+# 返回一个包含跟 ''[[ES5/lexical#Identifier|Identifier]]'' 完全相同的字符序列的字符串值。
+
+产生式 ''{{toanchor|VariableDeclaration}}'' ''':''' ''[[ES5/lexical#Identifier|Identifier]]'' ''{{toanchor|Initialiser}}'' 按照下面的过程执行 :
+
+# 令 <var>lhs</var> 为解释执行 ''[[ES5/lexical#Identifier|Identifier]]'' 的结果，如 [[ES5/expressions#identifier-reference|11.1.2]] 所述。
+# 令 <var>rhs</var> 为解释执行 ''{{toanchor|Initialiser}}'' 的结果。
+# 令 <var>value</var> 为 [[ES5/types#GetValue|GetValue]](<var>rhs</var>)。
+# 调用 [[ES5/types#PutValue|PutValue]](<var>lhs</var>, <var>value</var>)。
+# 返回一个包含跟 ''[[ES5/lexical#Identifier|Identifier]]'' 完全相同的字符序列的字符串值。
+
+{{note| '''''VariableDeclaration''''' 的字符串值用在 '''for-in 语句''' （12.6.4） 的解释执行。}}
+
+如果 ''{{toanchor|VariableDeclaration}}'' 嵌套在 [[ES5/statements#WithStatement|with]] 语句里并且 ''{{toanchor|VariableDeclaration}}'' 里的标识符与 [[ES5/statements#WithStatement|with]] 语句的[[ES5/execution#object-environment-record|对象式环境记录项]]关联的[[ES5/execution#binding-object|绑定对象]]的一个属性名相同，则第 4 步将给这个属性分配值，而不是为 ''[[ES5/lexical#Identifier|Identifier]]'' 的 [[ES5/execution#VariableEnvironment|VariableEnvironment]] 绑定分配值。
+
+
+产生式 ''{{toanchor|Initialiser}}'' ''':''' '''=''' ''[[ES5/expressions#AssignmentExpression|AssignmentExpression]]'' 按照下面的过程执行 :
+
+# 返回解释执行 ''[[ES5/expressions#AssignmentExpression|AssignmentExpression]]'' 的结果。
+
+产生式 ''{{toanchor|VariableDeclarationListNoIn}}'', ''{{toanchor|VariableDeclarationNoIn}}'', ''{{toanchor|InitialiserNoIn}}'' 解释执行的方式与产生式 ''{{toanchor|VariableDeclarationList}}'', ''{{toanchor|VariableDeclaration}}''，''{{toanchor|Initialiser}}'' 相同，除了他们包含的 ''{{toanchor|VariableDeclarationListNoIn}}'', ''{{toanchor|VariableDeclarationNoIn}}'', ''{{toanchor|InitialiserNoIn}}'', ''[[ES5/expressions#AssignmentExpressionNoIn|AssignmentExpressionNoIn]]'' 会分别替代 ''{{toanchor|VariableDeclarationList}}'', ''{{toanchor|VariableDeclaration}}'', ''{{toanchor|Initialiser}}'', ''[[ES5/expressions#AssignmentExpression|AssignmentExpression]]'' 来解释执行。
+
+=== {{anchor|x12.2.1}}严格模式的限制 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.2.1}}
+
+如果一个 ''{{toanchor|VariableDeclaration}}'' 或 ''{{toanchor|VariableDeclarationNoIn}}'' 出现在[[ES5/execution#strict-mode-code|严格模式代码]]里并且其 ''[[ES5/lexical#Identifier|Identifier]]'' 是 '''"eval"''' 或 '''"arguments"'''，那么这是个 '''SyntaxError'''。 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2943|}}
+
+== {{anchor|x12.3}}空语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L1381|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.3}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.3}}
+
+语法 :
+
+  ''<b id="EmptyStatement">EmptyStatement</b>'' :
+    ''';'''
+
+
+语义：
+
+产生式 ''{{toanchor|EmptyStatement}}'' ''':''' ''';''' 按照下面的过程执行 :
+
+# 返回 ('''normal''', '''empty''', '''empty''')。
+
+== {{anchor|x12.4}}表达式语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2126|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.4}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.4}}
+
+
+
+
+语法：
+  ''<b id="ExpressionStatement">ExpressionStatement</b>'' :
+    &#x5b;[[ES5/notation#lookahead-not-in|lookahead ?]] {'''{''', '''function'''}] ''[[ES5/expressions#Expression|Expression]]'' ''';'''
+
+{{note| 一个 '''''ExpressionStatement''''' 不能用一个开大括号开始，因为这可能会使它和 '''''Block''''' 混淆。此外，'''''ExpressionStatement''''' 不能用 '''function''' 关键字开始，因为这可能会使它和 '''''FunctionDeclaration''''' 混淆。}}
+
+语义：
+
+产生式 ''{{toanchor|ExpressionStatement}}'' ''':''' &#x5b;[[ES5/notation#lookahead-not-in|lookahead ?]] {'''{''', '''function'''}] ''[[ES5/expressions#Expression|Expression]]'' ''';''' 按照下面的过程执行 :
+
+# 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+# 返回 (<var>normal</var>, [[ES5/types#GetValue|GetValue]](<var>exprRef</var>), '''empty''')。
+
+== {{anchor|x12.5}}if 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2195|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.5}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.5}}
+
+
+
+
+语法：
+
+  ''<b id="IfStatement">IfStatement</b>'' :
+    '''if (''' ''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|Statement}}'' '''else''' ''{{toanchor|Statement}}''
+    '''if (''' ''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|Statement}}''
+
+每个 '''else''' 选择与它相关联的 '''if''' 是不确定的，应与此 '''else''' 最近的并且原本没有与其对应的 '''else''' 的可能的 '''if''' 对应。
+
+
+语义：
+
+产生式 ''{{toanchor|IfStatement}}'' ''':''' '''if''' '''(''' ''[[ES5/expressions#Expression|Expression]]'' ''')'''
+''{{toanchor|Statement}}'' '''else''' ''{{toanchor|Statement}}'' 按照下面的过程执行 :
+
+# 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果 .
+# 如果 [[ES5/conversion#to-boolean|ToBoolean]]([[ES5/types#GetValue|GetValue]](<var>exprRef</var>)) 为 '''true''' ，则
+## 返回解释执行第一个 ''{{toanchor|Statement}}'' 的结果。
+# 否则,
+## 返回解释执行第二个 ''{{toanchor|Statement}}'' 的结果。
+
+
+产生式 ''{{toanchor|IfStatement}}'' ''':''' '''if''' '''(''' ''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|Statement}}'' 按照下面的过程执行 :
+
+# 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+# 如果 [[ES5/conversion#to-boolean|ToBoolean]]([[ES5/types#GetValue|GetValue]] (<var>exprRef</var>)) 为 '''false''' 则返回 ('''normal''', '''empty''', '''empty''').
+# 返回解释执行 ''{{toanchor|Statement}}'' 的结果。
+
+== {{anchor|x12.6}}迭代语句 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.6}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.6}}
+
+
+
+
+语法：
+
+  ''<b id="IterationStatement">IterationStatement</b>'' :
+    '''do''' ''{{toanchor|Statement}}'' '''while (''' ''[[ES5/expressions#Expression|Expression]]'' ''') ;''' 
+    '''while (''' ''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|Statement}}''
+    '''for (''' ''[[ES5/expressions#ExpressionNoIn|ExpressionNoIn]]''{{opt}} ''';''' ''[[ES5/expressions#Expression|Expression]]''{{opt}} ''';''' ''[[ES5/expressions#Expression|Expression]]''{{opt}} ''')''' ''{{toanchor|Statement}}''
+    '''for ( var''' ''{{toanchor|VariableDeclarationListNoIn}}'' ''';''' ''[[ES5/expressions#Expression|Expression]]''{{opt}} ''';''' ''[[ES5/expressions#Expression|Expression]]''{{opt}} ''')''' ''{{toanchor|Statement}}''
+    '''for (''' ''[[ES5/expressions#LeftHandSideExpression|LeftHandSideExpression]]'' '''in''' ''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|Statement}}''
+    '''for ( var''' ''{{toanchor|VariableDeclarationNoIn}}'' '''in''' ''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|Statement}}''
+
+=== {{anchor|x12.6.1}}do-while 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2558|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.6.1}}
+
+产生式 '''do''' ''{{toanchor|Statement}}'' '''while''' '''(''' ''[[ES5/expressions#Expression|Expression]]'' ''') ;''' 按照下面的过程执行 :
+
+# 令 <var>V</var> = '''empty'''。
+# 令 <var>iterating</var> 为 '''true'''。
+# 只要 <var>iterating</var> 为 '''true'''，就重复 
+## 令 <var>stmt</var> 为解释执行 ''{{toanchor|Statement}}'' 的结果。
+## 如果 <var>stmt</var>'''.value''' 不是 '''empty'''，令 <var>V</var> = <var>stmt</var>'''.value'''。
+## 如果 <var>stmt</var>'''.type''' 不是 '''continue''' || <var>stmt</var>'''.target''' 不在[[#current-label-set|当前标签组]]，则 
+### 如果 <var>stmt</var>'''.type''' 是 '''break''' 并且 <var>stmt</var>'''.target''' 在[[#current-label-set|当前标签组]]内，返回 ('''normal''', <var>V</var>, '''empty''')。
+### 如果 <var>stmt</var> 是个[[ES5/types#abrupt-completion|非常规完结]]，返回 <var>stmt</var>。
+## 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+## 如果 [[ES5/conversion#to-boolean|ToBoolean]]([[ES5/types#GetValue|GetValue]](<var>exprRef</var>)) 是 '''false'''，设定 <var>iterating</var> 为 '''false'''。
+# 返回 ('''normal''', <var>V</var>, '''empty''')。
+
+=== {{anchor|x12.6.2}}while 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2586|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.6.2}}
+
+产生式 ''{{toanchor|IterationStatement}}'' ''':''' '''while''' '''('''
+''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|Statement}}'' 按照下面的过程执行 :
+
+# 令 <var>V</var> = '''empty'''。
+# 重复 
+## 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+## 如果 [[ES5/conversion#to-boolean|ToBoolean]]([[ES5/types#GetValue|GetValue]](<var>exprRef</var>)) 是 '''false'''，返回 ('''normal''', <var>V</var>, '''empty''')。
+## 令 <var>stmt</var> 为解释执行 ''{{toanchor|Statement}}'' 的结果。
+## 如果 <var>stmt</var>'''.value''' 不是 '''empty'''，令 <var>V</var> = <var>stmt</var>'''.value'''。
+## 如果 <var>stmt</var>'''.type''' 不是 '''continue''' || <var>stmt</var>'''.target''' 不在[[#current-label-set|当前标签组]]内，则 
+### 如果 <var>stmt</var>'''.type''' 是 '''break''' 并且 <var>stmt</var>'''.target''' 在[[#current-label-set|当前标签组]]内，则 
+#### 返回 ('''normal''', <var>V</var>, '''empty''')。
+### 如果 <var>stmt</var> 是一个[[ES5/types#abrupt-completion|非常规完结]]，返回 <var>stmt</var>。
+
+=== {{anchor|x12.6.3}}for 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2690|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.6.3}}
+
+产生式 
+''{{toanchor|IterationStatement}}'' ''':''' '''for''' '''('''
+''[[ES5/expressions#ExpressionNoIn|ExpressionNoIn]]''<sub>opt</sub> ''';''' ''[[ES5/expressions#Expression|Expression]]''<sub>opt</sub>
+''';''' ''[[ES5/expressions#Expression|Expression]]''<sub>opt</sub> ''')''' ''{{toanchor|Statement}}''
+按照下面的过程执行 :
+
+# 如果 ''[[ES5/expressions#ExpressionNoIn|ExpressionNoIn]]'' 存在，则
+## 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#ExpressionNoIn|ExpressionNoIn]]'' 的结果。
+## 调用 [[ES5/types#GetValue|GetValue]](<var>exprRef</var>)。（不会用到此值。)
+# 令 <var>V</var> = '''empty'''。
+# 重复 
+## 如果第一个 ''[[ES5/expressions#Expression|Expression]]'' 存在，则 
+### 令 <var>testExprRef</var> 为解释执行第一个 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+### 如果 [[ES5/conversion#to-boolean|ToBoolean]]([[ES5/types#GetValue|GetValue]](<var>testExprRef</var>)) 是 '''false'''，返回 ('''normal''', <var>V</var>, '''empty''')。
+## 令 <var>stmt</var> 为解释执行 ''{{toanchor|Statement}}'' 的结果。
+## 如果 <var>stmt</var>'''.value''' 不是 '''empty'''，令 <var>V</var> = <var>stmt</var>'''.value'''。
+## 如果 <var>stmt</var>'''.type''' 是 '''break''' 并且 <var>stmt</var>'''.target''' 在[[#current-label-set|当前标签组]]内，返回 ('''normal''', <var>V</var>, '''empty''')。
+## 如果 <var>stmt</var>'''.type''' 不是 '''continue''' || <var>stmt</var>'''.target''' 不在[[#current-label-set|当前标签组]]内，则 
+### 如果 <var>stmt</var> 是个[[ES5/types#abrupt-completion|非常规完结]]，返回 <var>stmt</var>。
+## 如果第二个 ''[[ES5/expressions#Expression|Expression]]'' 存在，则 
+### 令 <var>incExprRef</var> 为解释执行第二个 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+### 调用 [[ES5/types#GetValue|GetValue]](<var>incExprRef</var>)。（不会用到此值。）
+
+产生式 
+''{{toanchor|IterationStatement}}'' ''':''' '''for''' '''(''' '''var''' ''{{toanchor|VariableDeclarationListNoIn}}'' ''';''' ''[[ES5/expressions#Expression|Expression]]''<sub>opt</sub> ''';''' ''[[ES5/expressions#Expression|Expression]]''<sub>opt</sub> ''')''' ''{{toanchor|Statement}}''
+按照下面的过程执行 :
+
+# 解释执行 ''{{toanchor|VariableDeclarationListNoIn}}''。
+# 令 <var>V</var> = '''empty'''。
+# 重复 
+## 如果第一个 ''[[ES5/expressions#Expression|Expression]]'' 存在，则 
+### 令 <var>testExprRef</var> 为解释执行第一个 ''[[ES5/expressions#Expression|Expression]]'' 的结果 .
+### 如果 [[ES5/conversion#to-boolean|ToBoolean]]([[ES5/types#GetValue|GetValue]](<var>testExprRef</var>)) 是 '''false'''，则返回 ('''normal''', <var>V</var>, '''empty''')。
+## 令 <var>stmt</var> 为解释执行 ''{{toanchor|Statement}}'' 的结果。
+## 如果 <var>stmt</var>'''.value''' 不是 '''empty'''，令 <var>V</var> = <var>stmt</var>'''.value'''。
+## 如果 <var>stmt</var>'''.type''' 是 '''break''' 并且 <var>stmt</var>'''.target''' 在[[#current-label-set|当前标签组]]内，返回 ('''normal''', <var>V</var>, '''empty''')。
+## 如果 <var>stmt</var>'''.type''' 不是 '''continue''' || <var>stmt</var>'''.target''' 不在[[#current-label-set|当前标签组]]内，则 
+### 如果 <var>stmt</var> 是个[[ES5/types#abrupt-completion|非常规完结]]，返回 <var>stmt</var>。
+## 如果第二个 ''[[ES5/expressions#Expression|Expression]]'' 存在，则
+### 令 <var>incExprRef</var> 为解释执行第二个 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+### 调用 [[ES5/types#GetValue|GetValue]](<var>incExprRef</var>)。（不会用到此值。）
+
+=== {{anchor|x12.6.4}}{{anchor|for-in-statement}}for-in 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2618|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.6.4}}
+
+产生式 ''{{toanchor|IterationStatement}}'' ''':''' '''for''' '''(''' ''' ''' ''[[ES5/expressions#LeftHandSideExpression|LeftHandSideExpression]]'' '''in''' ''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|Statement}}'' 按照下面的过程执行 :
+
+# 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+# 令 <var>experValue</var> 为 [[ES5/types#GetValue|GetValue]](<var>exprRef</var>)。
+# 如果 <var>experValue</var> 是 '''null''' 或 '''undefined'''，返回 ('''normal''', '''empty''', '''empty''')。
+# 令 <var>obj</var> 为 [[ES5/conversion#to-object|ToObject]](<var>experValue</var>)。
+# 令 <var>V</var> = '''empty'''。
+# 重复 
+## 令 <var>P</var> 为 <var>obj</var> 的下一个 [[ES5/types#Enumerable|<nowiki>[[Enumerable]]</nowiki>]] 特性为 '''true''' 的属性的名。如果不存在这样的属性，返回 ('''normal''', <var>V</var>, '''empty''')。
+## 令 <var>lhsRef</var> 为解释执行 ''[[ES5/expressions#LeftHandSideExpression|LeftHandSideExpression]]'' 的结果（它可能解释执行多次）。
+## 调用 [[ES5/types#PutValue|PutValue]](<var>lhsRef</var>, <var>P</var>)。
+## 令 <var>stmt</var> 为解释执行 ''{{toanchor|Statement}}'' 的结果。
+## 如果 <var>stmt</var>'''.value''' 不是 '''empty'''，令 <var>V</var> = <var>stmt</var>'''.value'''。
+## 如果 <var>stmt</var>'''.type''' 是 '''break''' 并且 <var>stmt</var>'''.target''' 在[[#current-label-set|当前标签组]]内，返回 ('''normal''', <var>V</var>, '''empty''')。
+## 如果 <var>stmt</var>'''.type''' 不是 '''continue''' || <var>stmt</var>'''.target''' 不在[[#current-label-set|当前标签组]]内，则 
+### 如果 <var>stmt</var> 是[[ES5/types#abrupt-completion|非常规完结]]，返回 <var>stmt</var>。
+
+产生式 
+''{{toanchor|IterationStatement}}'' ''':''' '''for''' '''(''' '''var''' ''{{toanchor|VariableDeclarationNoIn}}'' '''in''' ''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|Statement}}''
+按照下面的过程执行 :
+
+# 令 <var>varName</var> 为解释执行 ''{{toanchor|VariableDeclarationNoIn}}'' 的结果。
+# 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+# 令 <var>experValue</var> 为 [[ES5/types#GetValue|GetValue]](<var>exprRef</var>)。
+# 如果 <var>experValue</var> 是 '''null''' 或 '''undefined'''，返回 ('''normal''', '''empty''', '''empty''')。
+# 令 <var>obj</var> 为 [[ES5/conversion#to-object|ToObject]](<var>experValue</var>)。
+# 令 <var>V</var> = '''empty'''。
+# 重复 
+## 令 <var>P</var> 为 <var>obj</var> 的下一个 [[ES5/types#Enumerable|<nowiki>[[Enumerable]]</nowiki>]] 特性为 '''true''' 的属性的名。如果不存在这样的属性，返回 ('''normal''', <var>V</var>, '''empty''')。
+## 令 <var>varRef</var> 为解释执行 <var>varName</var> 的结果，仿佛它是个标示符引用（[[ES5/expressions#identifier-reference|11.1.2]]）。它可能解释执行多次。
+## 调用 [[ES5/types#PutValue|PutValue]](<var>varRef</var>, <var>P</var>)。
+## 令 <var>stmt</var> 为解释执行 ''{{toanchor|Statement}}'' 的结果。
+## 如果 <var>stmt</var>'''.value''' 不是 '''empty'''，令 <var>V</var> = <var>stmt</var>'''.value'''。
+## 如果 <var>stmt</var>'''.type''' 是 '''break''' 并且 <var>stmt</var>'''.target''' 在[[#current-label-set|当前标签组]]内，返回 ('''normal''', <var>V</var>, '''empty''')。
+## 如果 <var>stmt</var>'''.type''' 不是 '''continue''' || <var>stmt</var>'''.target''' 不在[[#current-label-set|当前标签组]]内，则 
+### 如果 <var>stmt</var> 是[[ES5/types#abrupt-completion|非常规完结]]，返回 <var>stmt</var>。
+
+枚举的属性（第一个算法中的 '''第6.1步'''、第二个算法中的 '''第7.1步'''）的机制和顺序并没有指定。在枚举过程中枚举的对象属性可能被删除。如果在枚举过程中，删除了还没有被访问到的属性，那么它将不会被访问到。如果在枚举过程中添加新属性到列举的对象，新增加的属性也无法保证被当前执行中的枚举访问到。在任何枚举中对同一个属性名称的访问不得超过一次。{{extra note||低版本IE会枚举到过程中添加的属性，现代浏览器不会。}}
+
+从对象中枚举属性时也包括对象的原型链。但如果一个原型中的属性是“'''被遮住的'''”（原型链中靠前的对象有同样的属性名）就不会枚举。当一个原型对象的属性被原型链中靠前的对象属性遮住时就不考虑它的[[ES5/types#Enumerable|<nowiki>[[Enumerable]]</nowiki>]]特性。{{v8 partial||v8中被遮住的属性也会被枚举出来。}} {{ie partial||ie中被遮住的属性也会被枚举出来。}}
+
+{{note| 见 11.13.1 的注。}}
+
+== {{anchor|x12.7}}continue 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2217|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.7}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.7}}
+
+
+
+
+语法：
+
+  ''<b id="ContinueStatement">ContinueStatement</b>'' :
+    '''continue ;'''
+    '''continue''' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] ''[[ES5/lexical#Identifier|Identifier]]'' ''';'''
+
+语义：
+
+如果以下任意一个为真，那么程序被认为是语法错误的：
+
+* 程序包含一个不带可选的 ''[[ES5/lexical#Identifier|Identifier]]'' 的 '''continue''' 语句，没有直接或间接（不跨越函数边界）的嵌套在 ''{{toanchor|IterationStatement}}'' 里。
+* 程序包含一个有可选的 ''[[ES5/lexical#Identifier|Identifier]]'' 的 '''continue''' 语句，这个 ''[[ES5/lexical#Identifier|Identifier]]'' 没有出现在 ''{{toanchor|IterationStatement}}'' 中闭合[[#current-label-set|标签组]]里（不跨越函数边界）。
+
+一个没有 ''[[ES5/lexical#Identifier|Identifier]]'' 的 ''{{toanchor|ContinueStatement}}'' 按照下面的过程执行 :
+
+# 返回 ('''continue''', '''empty''', '''empty''')。
+
+一个有可选的 ''[[ES5/lexical#Identifier|Identifier]]'' 的 ''{{toanchor|ContinueStatement}}'' 按照下面的过程执行 :
+
+# 返回 ('''continue''', '''empty''', ''[[ES5/lexical#Identifier|Identifier]]'')。
+
+== {{anchor|x12.8}}break 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2248}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.8}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.8}}
+
+
+
+
+语法：
+
+  ''<b id="BreakStatement">BreakStatement</b>'' :
+    '''break ;'''
+    '''break''' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] ''[[ES5/lexical#Identifier|Identifier]]'' ''';'''
+
+语义：
+
+如果以下任意一个为真，那么程序被认为是语法错误的：
+
+* 程序包含一个不带可选的 ''[[ES5/lexical#Identifier|Identifier]]'' 的 '''break''' 语句，没有直接或间接（不跨越函数边界）的嵌套在 ''{{toanchor|IterationStatement}}'' 或 ''{{toanchor|SwitchStatement}}'' 里。
+* 程序包含一个有可选的 ''[[ES5/lexical#Identifier|Identifier]]'' 的 '''break''' 语句，这个 ''[[ES5/lexical#Identifier|Identifier]]'' 没有出现在 ''{{toanchor|Statement}}'' 中闭合[[#current-label-set|标签组]]里（不跨越函数边界）。
+
+一个没有 ''[[ES5/lexical#Identifier|Identifier]]'' 的 ''{{toanchor|BreakStatement}}'' 按照下面的过程执行 :
+
+# 返回 ('''break''', '''empty''', '''empty''')。
+
+一个有可选的 ''[[ES5/lexical#Identifier|Identifier]]'' 的 ''{{toanchor|BreakStatement}}'' 按照下面的过程执行 :
+
+# 返回 ('''break''', '''empty''', ''[[ES5/lexical#Identifier|Identifier]]'')。
+
+== {{anchor|x12.9}}return 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2285|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.9}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.9}}
+
+
+
+
+语法：
+
+  ''<b id="ReturnStatement">ReturnStatement</b>'' :
+    '''return ;'''
+    '''return''' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] ''[[ES5/expressions#Expression|Expression]]'' ''';'''
+
+语义：
+
+在一个 ECMAScript 程序中包含的 '''return''' 语句没有在 ''[[ES5/functions#FunctionBody|FunctionBody]]'' 里面，那么就是语法错误的。一个 '''return''' 语句导致函数停止执行，并返回一个值给调用者。如果省略 ''[[ES5/expressions#Expression|Expression]]''，返回值是 '''undefined'''。否则，返回值是 ''[[ES5/expressions#Expression|Expression]]'' 的值。
+
+产生式 ''{{toanchor|ReturnStatement}}'' ''':''' '''return''' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] ''[[ES5/expressions#Expression|Expression]]''<sub>opt</sub> ''';''' 按照下面的过程执行 :
+
+# 如果 ''[[ES5/expressions#Expression|Expression]]'' 不存在，返回 ('''return''', '''undefined''', '''empty''')。
+# 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+# 返回 ('''return''', [[ES5/types#GetValue|GetValue]](<var>exprRef</var>), '''empty''')。
+
+== {{anchor|x12.10}}{{anchor|with-statement}}with 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2334|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.10}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.10}}
+
+
+
+
+语法：
+
+  ''<b id="WithStatement">WithStatement</b>'' :
+    '''with (''' ''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|Statement}}''
+
+'''with''' 语句为计算对象给当前执行上下文的[[ES5/execution#lexical-environment|词法环境]]添加一个[[ES5/execution#object-environment-record|对象环境记录项]]。然后，用这个增强的[[ES5/execution#lexical-environment|词法环境]]执行一个语句。最后，恢复到原来的[[ES5/execution#lexical-environment|词法环境]]。
+
+语义 :
+
+产生式 ''{{toanchor|WithStatement}}'' ''':''' '''with''' '''(''' ''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|Statement}}'' 按照下面的过程执行 :
+
+# 令 <var>val</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+# 令 <var>obj</var> 为 [[ES5/conversion#to-object|ToObject]]([[ES5/types#GetValue|GetValue]](<var>val</var>))。
+# 令 <var>oldEnv</var> 为运行中的执行上下文的[[ES5/execution#LexicalEnvironment|词法环境组件]]。
+# 令 <var>newEnv</var> 为以 <var>obj</var> 和 <var>oldEnv</var> 为参数调用 [[ES5/execution#NewObjectEnvironment|NewObjectEnvironment]] 的结果。
+# 设定 <var>newEnv</var> 的 <var>provideThis</var> 标志为 '''true'''。
+# 设定运行中的执行上下文的[[ES5/execution#LexicalEnvironment|词法环境组件]]为 <var>newEnv</var>。
+# 令 <var>C</var> 为解释执行 ''{{toanchor|Statement}}'' 的结果，但如果解释执行是由异常抛出，则令 <var>C</var> 为 ('''throw''', <var>V</var>, '''empty''')，这里的 <var>V</var> 是异常。（现在继续执行，仿佛没有抛出异常。)
+# 设定运行中的执行上下文的[[ES5/execution#LexicalEnvironment|词法环境组件]]为 <var>oldEnv</var>。
+# 返回 <var>C</var>。
+
+{{note| 无论控制是从嵌入的 '''''Statement''''' 怎样离开的，不论是正常离开还是以'''非常规完结'''或异常，'''词法环境组件'''总是恢复到它之前的状态。}}
+
+=== {{anchor|x12.10.1}}严格模式的限制 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.10.1}}
+
+严格模式代码中不能包含 ''{{toanchor|WithStatement}}''。出现 ''{{toanchor|WithStatement}}'' 的上下文被当作一个 '''SyntaxError'''。 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2341|}}
+
+== {{anchor|x12.11}}switch 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2397|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.11}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.11}}
+
+
+
+
+语法：
+
+  ''<b id="SwitchStatement">SwitchStatement</b>'' :
+    '''switch (''' ''[[ES5/expressions#Expression|Expression]]'' ''')''' ''{{toanchor|CaseBlock}}''
+
+  ''<b id="CaseBlock">CaseBlock</b>'' :
+    '''{''' ''{{toanchor|CaseClauses}}''{{opt}} '''}''' 
+    '''{''' ''{{toanchor|CaseClauses}}''{{opt}} ''{{toanchor|DefaultClause}}'' ''{{toanchor|CaseClauses}}''{{opt}} '''}'''
+
+  ''<b id="CaseClauses">CaseClauses</b>'' :
+    ''{{toanchor|CaseClause}}''
+    ''{{toanchor|CaseClauses}}'' ''{{toanchor|CaseClause}}''
+
+  ''<b id="CaseClause">CaseClause</b>'' :
+    '''case''' ''[[ES5/expressions#Expression|Expression]]'' ''':''' ''{{toanchor|StatementList}}''{{opt}}
+
+  ''<b id="DefaultClause">DefaultClause</b>'' :
+    '''default :''' ''{{toanchor|StatementList}}''{{opt}}
+
+语义：
+
+产生式 ''{{toanchor|SwitchStatement}}'' ''':''' '''switch''' '''(''' ''[[ES5/expressions#Expression|Expression]]''
+''')''' ''{{toanchor|CaseBlock}}'' 按照下面的过程执行 :
+
+# 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+# 令 <var>R</var> 为以 [[ES5/types#GetValue|GetValue]](<var>exprRef</var>) 作为参数解释执行 ''{{toanchor|CaseBlock}}'' 的结果。
+# 如果 <var>R</var>'''.type''' 是 '''break''' 并且 <var>R</var>'''.target''' 在[[#current-label-set|当前标签组]]内，返回 ('''normal''', <var>R</var>'''.value''', '''empty''')。
+# 返回 <var>R</var>。
+
+产生式 ''{{toanchor|CaseBlock}}'' ''':''' '''{''' ''{{toanchor|CaseClauses}}''<sub>opt</sub> '''}''' 以一个给定输入参数 <var>input</var>, 按照下面的过程执行 :
+
+# 令 <var>V</var> = '''empty'''。
+# 令 <var>A</var> 为以源代码中顺序排列的 ''{{toanchor|CaseClause}}'' 列表。
+# 令 <var>searching</var> 为 '''true'''。
+# 只要 <var>searching</var> 为 '''true'''，就重复 
+## 令 <var>C</var> 为 <var>A</var> 里的下一个 ''{{toanchor|CaseClause}}''。 如果没有 ''{{toanchor|CaseClause}}'' 了，返回 ('''normal''', <var>V</var>, '''empty''')。
+## 令 <var>clauseSelector</var> 为解释执行 <var>C</var> 的结果。
+## 如果 <var>input</var> 和 <var>clauseSelector</var> 是 [[ES5/expressions#strict-equality-comparison|===]] 操作符定义的相等，则 
+### 设定 <var>searching</var> 为 '''false'''。
+### 如果 <var>C</var> 有一个 ''{{toanchor|StatementList}}'', 则 
+#### 令 <var>R</var> 为解释执行 <var>C</var> 的 ''{{toanchor|StatementList}}'' 的结果。
+#### 如果 <var>R</var> 是个[[ES5/types#abrupt-completion|非常规完结]]，则返回 <var>R</var>。
+#### 令 <var>V</var> = <var>R</var>'''.value'''
+# 重复 
+## 令 <var>C</var> 为 <var>A</var> 里的下一个 ''{{toanchor|CaseClause}}''。 如果没有 ''{{toanchor|CaseClause}}'' 了，返回 ('''normal''', <var>V</var>, '''empty''')。
+## 如果 <var>C</var> 有一个 ''{{toanchor|StatementList}}''，则 
+### 令 <var>R</var> 为解释执行 <var>C</var> 的 ''{{toanchor|StatementList}}'' 的结果。
+### 如果 <var>R</var>'''.value''' 不是 '''empty'''，则令 <var>V</var> = <var>R</var>'''.value'''。
+### 如果 <var>R</var> 是个[[ES5/types#abrupt-completion|非常规完结]]，则返回 (<var>R</var>'''.type''', <var>V</var>, <var>R</var>'''.target''')。
+
+产生式 ''{{toanchor|CaseBlock}}'' ''':''' '''{''' ''{{toanchor|CaseClauses}}''<sub>opt</sub>
+''{{toanchor|DefaultClause}}'' ''{{toanchor|CaseClauses}}''<sub>opt</sub> '''}''' 以一个给定输入
+参数 <var>input</var>，按照下面的过程执行 :
+
+# 令 <var>V</var> = '''empty'''。
+# 令 <var>A</var> 为第一个 ''{{toanchor|CaseClauses}}'' 中以源代码中顺序排列的 ''{{toanchor|CaseClause}}'' 列表。
+# 令 <var>B</var> 为第二个 ''{{toanchor|CaseClauses}}'' 中以源代码中顺序排列的 ''{{toanchor|CaseClause}}'' 列表。
+# 令 <var>found</var> 为 '''false'''。
+# 重复，使 <var>C</var> 为 <var>A</var> 中的依次每个 ''{{toanchor|CaseClause}}''。
+## 如果 <var>found</var> 是 '''false'''，则 
+### 令 <var>clauseSelector</var> 为解释执行 <var>C</var> 的结果 .
+### 如果 <var>input</var> 和 <var>clauseSelector</var> 是 [[ES5/expressions#strict-equality-comparison|===]] 操作符定义的相等，则设定 <var>found</var> 为 '''true'''。
+## 如果 <var>found</var> 是 '''true'''，则 
+### 如果 <var>C</var> 有一个 ''{{toanchor|StatementList}}''，则 
+#### 令 <var>R</var> 为解释执行 <var>C</var> 的 ''{{toanchor|StatementList}}'' 的结果。
+#### 如果 <var>R</var>'''.value''' 不是 '''empty'''，则令 <var>V</var> = <var>R</var>'''.value'''。
+#### <var>R</var> 是个[[ES5/types#abrupt-completion|非常规完结]]，则返回 (<var>R</var>'''.type''', <var>V</var>, <var>R</var>'''.target''')。
+# 令 <var>foundInB</var> 为 '''false'''。
+# 如果 <var>found</var> 是 '''false'''，则 
+## 只要 <var>foundInB</var> 为 '''false''' 并且所有 <var>B</var> 中的元素都没有被处理，就重复 
+### 令 <var>C</var> 为 <var>B</var> 里的下一个 ''{{toanchor|CaseClause}}''。
+### 令 <var>clauseSelector</var> 为解释执行 <var>C</var> 的结果。
+### 如果 <var>input</var> 和 <var>clauseSelector</var> 是 [[ES5/expressions#strict-equality-comparison|===]] 操作符定义的相等，则 
+#### 设定 <var>foundInB</var> 为 '''true'''。
+#### 如果 <var>C</var> 有一个 ''{{toanchor|StatementList}}''，则 
+##### 令 <var>R</var> 为解释执行 <var>C</var> 的 ''{{toanchor|StatementList}}'' 的结果。
+##### 如果 <var>R</var>'''.value''' 不是 '''empty'''，则令 <var>V</var> = <var>R</var>'''.value'''。
+##### <var>R</var> 是个[[ES5/types#abrupt-completion|非常规完结]]，则返回 (<var>R</var>'''.type''', <var>V</var>, <var>R</var>'''.target''')。
+# 如果 <var>foundInB</var> 是 '''false''' 并且 ''{{toanchor|DefaultClause}}'' 有个 ''{{toanchor|StatementList}}''，则 
+## 令 <var>R</var> 为解释执行 ''{{toanchor|DefaultClause}}'' 的 ''{{toanchor|StatementList}}'' 的结果。
+## 如果 <var>R</var>'''.value''' 不是 '''empty'''，则令 <var>V</var> = <var>R</var>'''.value'''。
+## 如果 <var>R</var> 是个[[ES5/types#abrupt-completion|非常规完结]]，则返回 (<var>R</var>'''.type''', <var>V</var>, <var>R</var>'''.target''')。
+# 重复（注 : 如果已执行步骤 7.a.i, 此循环不从 B 的开头开始。）
+## 令 <var>C</var> 为 <var>B</var> 的下一个 ''{{toanchor|CaseClause}}''。如果没有 ''{{toanchor|CaseClause}}'' 了，返回 ('''normal''', <var>V</var>, '''empty''')。
+## 如果 <var>C</var> 有个 ''{{toanchor|StatementList}}''，则 
+### 令 <var>R</var> 为解释执行 <var>C</var> 的 ''{{toanchor|StatementList}}'' 的结果。
+### 如果 <var>R</var>'''.value''' 不是 '''empty'''，则令 <var>V</var> = <var>R</var>'''.value'''。
+### 如果 <var>R</var> 是个[[ES5/types#abrupt-completion|非常规完结]]，则返回 (<var>R</var>'''.type''', <var>V</var>, <var>R</var>'''.target''')。
+
+产生式 ''{{toanchor|CaseClause}}'' ''':''' '''case''' ''[[ES5/expressions#Expression|Expression]]'' ''':''' ''{{toanchor|StatementList}}''<sub>opt</sub> 按照下面的过程执行 :
+
+# 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+# 返回 [[ES5/types#GetValue|GetValue]](<var>exprRef</var>)。
+
+{{note| 解释执行 '''''CaseClause''''' 不会运行相关的 '''''StatementList'''''。它只简单的解释执行 '''''Expression''''' 并返回值，这里的 '''''CaseBlock''''' 算法用于确定 '''''StatementList''''' 开始执行。}}
+
+== {{anchor|x12.12}}标签语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2126|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.12}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.12}}
+
+
+
+
+语法：
+
+  ''<b id="LabelledStatement">LabelledStatement</b>'' :
+    ''[[ES5/lexical#Identifier|Identifier]]'' ''':''' ''{{toanchor|Statement}}''
+
+语义：
+
+一个 ''{{toanchor|Statement}}'' 可以由一个标签作为前缀。标签语句仅与标签化的 '''break''' 和 '''continue''' {{extra note||continue只能用于循环语句的标签。}} 语句一起使用。ECMAScript 没有 '''goto''' 语句。
+
+如果一个 ECMAScript 程序包含有相同 ''[[ES5/lexical#Identifier|Identifier]]'' 作为标签的 ''{{toanchor|LabelledStatement}}'' 闭合的 ''{{toanchor|LabelledStatement}}''，那么认为它是是语法错误的。这不适用于直接或间接嵌套在标签语句里面的 ''[[#ES5/functions#FunctionDeclaration|FunctionDeclaration]]'' 的函数体里出现标签的情况。
+
+产生式 ''[[ES5/lexical#Identifier|Identifier]]'' : ''{{toanchor|Statement}}'' 的解释执行方式是，先添加 ''[[ES5/lexical#Identifier|Identifier]]'' 到 ''{{toanchor|Statement}}'' 的[[#current-label-set|标签组]]，再解释执行 ''{{toanchor|Statement}}''。如果 ''{{toanchor|LabelledStatement}}'' 自身有一个非空标签组，这些标签还是会添加到解释执行前的 ''{{toanchor|Statement}}'' 的标签组里。如果 ''{{toanchor|Statement}}'' 的解释执行结果是 ('''break''', <var>V</var>, <var>L</var>)，这里的 <var>L</var> 等于 ''[[ES5/lexical#Identifier|Identifier]]''，则产生式的结果是 ('''normal''', <var>V</var>, '''empty''')。
+
+在解释执行 ''{{toanchor|LabelledStatement}}'' 之前，认为包含的 ''{{toanchor|Statement}}'' 拥有一个空标签组，除非它是 ''{{toanchor|IterationStatement}}'' 或 ''{{toanchor|SwitchStatement}}''，这种情况下认为它拥有一个包含单个元素 '''empty''' 的标签组。
+
+== {{anchor|x12.13}}throw 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2425|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.13}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.13}}
+
+
+
+
+语法：
+
+  ''<b id="ThrowStatement">ThrowStatement</b>'' :
+    '''throw''' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] ''[[ES5/expressions#Expression|Expression]]'' ''';'''
+
+
+语义：
+
+产生式 ''{{toanchor|ThrowStatement}}'' ''':''' '''throw''' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] ''[[ES5/expressions#Expression|Expression]]'' ''';''' 按照下面的过程执行 :
+
+# 令 <var>exprRef</var> 为解释执行 ''[[ES5/expressions#Expression|Expression]]'' 的结果。
+# 返回 ('''throw''', [[ES5/types#GetValue|GetValue]](<var>exprRef</var>), '''empty''')。
+
+== {{anchor|x12.14}}try 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2444|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.14}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.14}}
+
+
+
+
+语法：
+
+  ''<b id="TryStatement">TryStatement</b>'' :
+    '''try''' ''{{toanchor|Block}}'' ''{{toanchor|Catch}}''
+    '''try''' ''{{toanchor|Block}}'' ''{{toanchor|Finally}}''
+    '''try''' ''{{toanchor|Block}}'' ''{{toanchor|Catch}}'' ''{{toanchor|Finally}}''
+
+  ''<b id="Catch">Catch</b>'' :
+    '''catch (''' ''[[ES5/lexical#Identifier|Identifier]]'' ''')''' ''{{toanchor|Block}}''
+
+  ''<b id="Finally">Finally</b>'' :
+    '''finally''' ''{{toanchor|Block}}''
+
+'''try''' 语句包裹一个可以出现特殊状况，如果运行时错误或 '''throw''' 语句的代码块。'''catch''' 子句提供了异常处理代码。如果 '''catch''' 子句捕获到一个异常，这个异常会绑定到它的 '''[[ES5/lexical#Identifier|Identifier]]''' 上。
+
+语义：
+
+产生式 ''{{toanchor|TryStatement}}'' ''':''' '''try''' ''{{toanchor|Block}}'' ''{{toanchor|Catch}}'' 按照下面的过程执行 :
+
+# 令 <var>B</var> 为解释执行 ''{{toanchor|Block}}'' 的结果。
+# 如果 <var>B</var>'''.type''' 不是 '''throw'''，返回 <var>B</var>。
+# 返回一参数 <var>B</var> 解释执行 ''{{toanchor|Catch}}'' 的结果。
+
+产生式 ''{{toanchor|TryStatement}}'' ''':''' '''try''' ''{{toanchor|Block}}'' ''{{toanchor|Finally}}'' 按照下面的过程执行 : {{extra note||如果try语句块和finally语句块同时包含return，则使用finally的。}} {{extra note||不带catch的try语句不会捕获异常。}}
+
+# 令 <var>B</var> 为解释执行 ''{{toanchor|Block}}'' 的结果。
+# 令 <var>F</var> 为解释执行 ''{{toanchor|Finally}}'' 的结果。
+# 如果 <var>F</var>'''.type''' 是 '''normal'''，返回 <var>B</var>。
+# 返回 <var>F</var>。
+
+产生式 ''{{toanchor|TryStatement}}'' ''':''' '''try''' ''{{toanchor|Block}}'' ''{{toanchor|Catch}}'' ''{{toanchor|Finally}}'' 按照下面的过程执行 :
+
+# 令 <var>B</var> 为解释执行 ''{{toanchor|Block}}'' 的结果。
+# 如果 <var>B</var>'''.type''' 是 '''throw'''，则 
+## 令 <var>C</var> 为以参数 <var>B</var> 解释执行 ''{{toanchor|Catch}}'' 的结果。
+# 否则，<var>B</var>'''.type''' 不是 '''throw'''，
+## 令 <var>C</var> 为 <var>B</var>。
+# 令 <var>F</var> 为解释执行 ''{{toanchor|Finally}}'' 的结果。
+# 如果 <var>F</var>'''.type''' 是 '''normal'''，返回 <var>C</var>。
+# 返回 <var>F</var>。
+
+产生式 ''{{toanchor|Catch}}'' ''':''' '''catch''' '''( ''' ''[[ES5/lexical#Identifier|Identifier]]'' ''')''' ''{{toanchor|Block}}'' 按照下面的过程执行 :
+
+# 令 <var>C</var> 为传给这个产生式的参数。
+# 令 <var>oldEnv</var> 为运行中执行上下文的[[ES5/execution#LexicalEnvironment|词法环境组件]]。
+# 令 <var>catchEnv</var> 为以 <var>oldEnv</var> 为参数调用 [[ES5/execution#NewDeclarativeEnvironment|NewDeclarativeEnvironment]] 的结果。 {{extra note||这个步骤产生一个新的词法环境，所以Identifier即使与原来的词法环境中的变量名冲突也不会破坏原来的数据。}}
+# 以 ''[[ES5/lexical#Identifier|Identifier]]'' 字符串值为参数调用 <var>catchEnv</var> 的 [[ES5/execution#CreateMutableBinding|CreateMutableBinding]] 具体方法。
+# 以 ''[[ES5/lexical#Identifier|Identifier]]''、<var>C</var>、<var>false</var> 为参数调用 <var>catchEnv</var> 的 [[ES5/execution#SetMutableBinding|SetMutableBinding]] 具体方法。注：这种情况下最后一个参数无关紧要。
+# 设定运行中执行上下文的[[ES5/execution#LexicalEnvironment|词法环境组件]]为 <var>catchEnv</var>。
+# 令 <var>B</var> 为解释执行 ''{{toanchor|Block}}'' 的结果。
+# 设定运行中执行上下文的[[ES5/execution#LexicalEnvironment|词法环境组件]]为 <var>oldEnv</var>。
+# 返回 <var>B</var>。
+
+{{note| 不管控制是怎样退出 '''''Block''''' 的，'''词法环境组件'''总是会恢复到其之前的状态。}}
+
+产生式 ''{{toanchor|Finally}}'' ''': finally''' ''{{toanchor|Block}}'' 按照下面的过程执行 :
+
+# 返回解释执行 ''{{toanchor|Block}}'' 的结果。
+
+=== {{anchor|x12.14.1}}严格模式的限制 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2490|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.14.1}}
+
+如果一个有 ''{{toanchor|Catch}}'' 的 ''{{toanchor|TryStatement}}'' 出现在 [[ES5/execution#strict-mode-code|严格模式代码]]里，并且 ''{{toanchor|Catch}}'' 产生式的 ''[[ES5/lexical#Identifier|Identifier]]'' 是 "'''eval'''" 或 "'''arguments'''"，那么这是个 '''SyntaxError'''。
+
+== {{anchor|x12.15}}debugger 语句 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3467|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-12.15}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch12/12.15}}
+
+
+
+
+语法：
+
+  ''<b id="DebuggerStatement">DebuggerStatement</b>'' :
+    '''debugger ;'''
+
+语义：
+
+解释执行 ''{{toanchor|DebuggerStatement}}'' 产生式可允许让一个实现在调试器下运行时设置断点。如果调试器不存在或是非激活状态，这个语句没有可观测效果。
+
+产生式 ''{{toanchor|DebuggerStatement}}'' ''':''' '''debugger ;''' 按照下面的过程执行 :
+
+# 如果一个实现定义了可用的调试工具并且是开启的，则 
+## 执行实现定义的调试动作。
+## 令 <var>result</var> 为实现定义的[[ES5/types#Completion|完结]]值。
+# 否则 
+## 令 <var>result</var> 为 ('''normal''', '''empty''', '''empty''')。
+# 返回 <var>result</var>。
