@@ -1,0 +1,1329 @@
+
+== 附录 A 文法摘要 ==
+=== {{anchor|A.1}}A.1 词法 === 
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-A.1}}
+
+
+  ''<b id="SourceCharacter">SourceCharacter</b>'' ::
+    any Unicode code unit
+
+  ''<b id="InputElementDiv">InputElementDiv</b>'' ::
+    ''{{toanchor|WhiteSpace}}''
+    ''{{toanchor|LineTerminator}}''
+    ''{{toanchor|Comment}}''
+    ''{{toanchor|Token}}''
+    ''{{toanchor|DivPunctuator}}''
+
+  ''<b id="InputElementRegExp">InputElementRegExp</b>'' ::
+    ''{{toanchor|WhiteSpace}}''
+    ''{{toanchor|LineTerminator}}''
+    ''{{toanchor|Comment}}''
+    ''{{toanchor|Token}}''
+    ''{{toanchor|RegularExpressionLiteral}}''
+
+  ''<b id="WhiteSpace">WhiteSpace</b>'' ::
+    <TAB>
+    <VT>
+    <FF>
+    <SP>
+    <NBSP>
+    <BOM>
+    <USP>
+
+  ''<b id="LineTerminator">LineTerminator</b>'' ::
+    <LF>
+    <CR>
+    <LS>
+    <PS>
+
+  ''<b id="LineTerminatorSequence">LineTerminatorSequence</b>'' ::
+    <LF>
+    <CR> &#91;[[ES5/notation#lookahead-not-in|lookahead ?]] <LF> ]
+    <LS>
+    <PS>
+    <CR><LF>
+
+  ''<b id="Comment">Comment</b>'' ::
+    ''{{toanchor|MultiLineComment}}''
+    ''{{toanchor|SingleLineComment}}''
+
+  ''<b id="MultiLineComment">MultiLineComment</b>'' ::
+    '''/*''' ''{{toanchor|MultiLineCommentChars}}''{{opt}} '''*/'''
+
+  ''<b id="MultiLineCommentChars">MultiLineCommentChars</b>'' ::
+    ''{{toanchor|MultiLineNotAsteriskChar}}'' ''{{toanchor|MultiLineCommentChars}}''{{opt}}
+    '''*''' ''{{toanchor|PostAsteriskCommentChars}}''{{opt}}
+
+  ''<b id="PostAsteriskCommentChars">PostAsteriskCommentChars</b>'' ::
+    ''{{toanchor|MultiLineNotForwardSlashorAsteriskChar}}'' ''{{toanchor|MultiLineCommentChars}}''{{opt}}
+    '''*''' ''{{toanchor|PostAsteriskCommentChars}}''{{opt}}
+
+  ''<b id="MultiLineNotAsteriskChar">MultiLineNotAsteriskChar</b>'' ::
+    ''{{toanchor|SourceCharacter}}'' '''but not *'''
+
+  ''<b id="MultiLineNotForwardSlashorAsteriskChar">MultiLineNotForwardSlashorAsteriskChar</b>'' ::
+    ''{{toanchor|SourceCharacter}}'' '''but not one of / or *'''
+
+  ''<b id="SingleLineComment">SingleLineComment</b>'' ::
+    '''//''' ''{{toanchor|SingleLineCommentChars}}''{{opt}}
+
+  ''<b id="SingleLineCommentChars">SingleLineCommentChars</b>'' ::
+    ''{{toanchor|SingleLineCommentChar}}'' ''{{toanchor|SingleLineCommentChars}}''{{opt}}
+
+  ''<b id="SingleLineCommentChar">SingleLineCommentChar</b>'' ::
+    ''{{toanchor|SourceCharacter}}'' '''but not''' ''{{toanchor|LineTerminator}}''
+
+  ''<b id="Token">Token</b>'' ::
+    ''{{toanchor|IdentifierName}}''
+    ''{{toanchor|Punctuator}}''
+    ''{{toanchor|NumericLiteral}}''
+    ''{{toanchor|StringLiteral}}''
+
+  ''<b id="Identifier">Identifier</b>'' ::
+    ''{{toanchor|IdentifierName}}'' '''but not''' ''{{toanchor|ReservedWord}}''
+
+  ''<b id="IdentifierName">IdentifierName</b>'' ::
+    ''{{toanchor|IdentifierStart}}''
+    ''{{toanchor|IdentifierName}}'' ''{{toanchor|IdentifierPart}}''
+
+  ''<b id="IdentifierStart">IdentifierStart</b>'' ::
+    ''{{toanchor|UnicodeLetter}}''
+    '''$'''
+    '''_''' 
+    '''\''' ''{{toanchor|UnicodeEscapeSequence}}''
+
+  ''<b id="IdentifierPart">IdentifierPart</b>'' ::
+    ''{{toanchor|IdentifierStart}}''
+    ''{{toanchor|UnicodeCombiningMark}}''
+    ''{{toanchor|UnicodeDigit}}''
+    ''{{toanchor|UnicodeConnectorPunctuation}}''
+    <ZWNJ>
+    <ZWJ>
+
+  ''<b id="UnicodeLetter">UnicodeLetter</b>''
+    any character in the Unicode categories 
+    “[http://www.fileformat.info/info/unicode/category/Lu/list.htm Uppercase letter (Lu)]”, “[http://www.fileformat.info/info/unicode/category/Ll/list.htm Lowercase letter (Ll)]”, 
+    “[http://www.fileformat.info/info/unicode/category/Lt/list.htm Titlecase letter (Lt)]”, “[http://www.fileformat.info/info/unicode/category/Lm/list.htm Modifier letter (Lm)]”,
+    “[http://www.fileformat.info/info/unicode/category/Lo/list.htm Other letter (Lo)]”,or “[http://www.fileformat.info/info/unicode/category/Nl/list.htm Letter number (Nl)]”.
+
+  ''<b id="UnicodeCombiningMark">UnicodeCombiningMark</b>''
+    any character in the Unicode categories “[http://www.fileformat.info/info/unicode/category/Mn/list.htm Non-spacing mark (Mn)]”
+    or “[http://www.fileformat.info/info/unicode/category/Mc/list.htm Combining spacing mark (Mc)]”
+
+  ''<b id="UnicodeDigit">UnicodeDigit</b>''
+    any character in the Unicode category “[http://www.fileformat.info/info/unicode/category/Nd/list.htm Decimal number (Nd)]”
+
+  ''<b id="UnicodeConnectorPunctuation">UnicodeConnectorPunctuation</b>''
+    any character in the Unicode category “[http://www.fileformat.info/info/unicode/category/Pc/list.htm Connector punctuation (Pc)]”
+
+  ''<b id="ReservedWord">ReservedWord</b>'' ::
+    ''{{toanchor|Keyword}}''
+    ''{{toanchor|FutureReservedWord}}''
+    ''{{toanchor|NullLiteral}}''
+    ''{{toanchor|BooleanLiteral}}''
+
+  ''<b id="Keyword">Keyword</b>'' :: '''one of'''
+    '''break     do        instanceof  typeof'''
+    '''case      else      new         var'''
+    '''catch     finally   return      void'''
+    '''continue  for       switch      while'''
+    '''debugger  function  this        with'''
+    '''default   if        throw'''
+    '''delete    in        try'''
+
+  ''<b id="FutureReservedWord">FutureReservedWord</b>'' :: '''one of'''
+    '''class  enum    extends  super''' 
+    '''const  export  import'''
+  在[[ES5/execution#strict-mode-code|严格模式]]下还会考虑以下保留字
+    '''implements  let      private    public'''
+    '''interface   package  protected  static'''
+    '''yield''' 
+
+  ''<b id="Punctuator">Punctuator</b>'' :: '''one of'''
+    '''{     }     (      )    [     ]'''
+    '''.     ;      ,     <    >     <='''
+    '''>     =      ==    !=   ===   !=='''
+    '''+     -      *     %    ++    --'''
+    '''<<    >>     >>>   &    |     ^'''
+    '''!     ~      &&    ||   ?     :'''
+    '''=     +=     -=    *=   %=    <<='''
+    '''>>=   >>>=   &=    |=   ^=''' 
+
+  ''<b id="DivPunctuator">DivPunctuator</b>'' ::'''one of'''
+    '''/ /='''
+
+  ''<b id="Literal">Literal</b>'' ::
+    ''{{toanchor|NullLiteral}}''
+    ''{{toanchor|BooleanLiteral}}''
+    ''{{toanchor|NumericLiteral}}''
+    ''{{toanchor|StringLiteral}}''
+    ''{{toanchor|RegularExpressionLiteral}}''
+
+  ''<b id="NullLiteral">NullLiteral</b>'' ::
+    '''null'''
+
+  ''<b id="BooleanLiteral">BooleanLiteral</b>'' ::
+    '''true'''
+    '''false'''
+
+  ''<b id="NumericLiteral">NumericLiteral</b>'' ::
+    ''{{toanchor|DecimalLiteral}}''
+    ''{{toanchor|HexIntegerLiteral}}''
+
+  ''<b id="DecimalLiteral">DecimalLiteral</b>'' ::
+    ''{{toanchor|DecimalIntegerLiteral}}'' '''.''' ''{{toanchor|DecimalDigits}}''{{opt}} ''{{toanchor|ExponentPart}}''{{opt}}
+    '''.''' ''{{toanchor|DecimalDigits}}'' ''{{toanchor|ExponentPart}}''{{opt}}
+    ''{{toanchor|DecimalIntegerLiteral}}'' ''{{toanchor|ExponentPart}}''{{opt}}
+
+  ''<b id="DecimalIntegerLiteral">DecimalIntegerLiteral</b>'' ::
+    '''0''' 
+    ''{{toanchor|NonZeroDigit}}'' ''{{toanchor|DecimalDigits}}''{{opt}}
+
+  ''<b id="DecimalDigits">DecimalDigits</b>'' ::
+    ''{{toanchor|DecimalDigit}}''
+    ''{{toanchor|DecimalDigits}}'' ''{{toanchor|DecimalDigit}}''
+
+  ''<b id="DecimalDigit">DecimalDigit</b>'' :: '''one of'''
+    '''0 1 2 3 4 5 6 7 8 9'''
+
+  ''<b id="NonZeroDigit">NonZeroDigit</b>'' :: '''one of'''
+    '''1 2 3 4 5 6 7 8 9'''
+
+  ''<b id="ExponentPart">ExponentPart</b>'' ::
+    ''{{toanchor|ExponentIndicator}}'' ''{{toanchor|SignedInteger}}''
+
+  ''<b id="ExponentIndicator">ExponentIndicator</b>'' :: '''one of'''
+    '''e E'''
+
+  ''<b id="SignedInteger">SignedInteger</b>'' ::
+    ''{{toanchor|DecimalDigits}}''
+    '''+''' ''{{toanchor|DecimalDigits}}''
+    '''-''' ''{{toanchor|DecimalDigits}}''
+
+  ''<b id="HexIntegerLiteral">HexIntegerLiteral</b>'' ::
+    '''0x''' ''{{toanchor|HexDigit}}''
+    '''0X''' ''{{toanchor|HexDigit}}''
+    ''{{toanchor|HexIntegerLiteral}}'' ''{{toanchor|HexDigit}}''
+
+  ''<b id="HexDigit">HexDigit</b>'' :: '''one of'''
+    '''0 1 2 3 4 5 6 7 8 9 a b c d e f A B C D E F'''
+
+  ''<b id="StringLiteral">StringLiteral</b>'' ::
+    "''{{toanchor|DoubleStringCharacters}}''{{opt}} "
+    '''{{toanchor|SingleStringCharacters}}''{{opt}} '
+
+  ''<b id="DoubleStringCharacters">DoubleStringCharacters</b>'' ::
+    ''{{toanchor|DoubleStringCharacter}}'' ''{{toanchor|DoubleStringCharacters}}''{{opt}}
+
+  ''<b id="SingleStringCharacters">SingleStringCharacters</b>'' ::
+    ''{{toanchor|SingleStringCharacter}}'' ''{{toanchor|SingleStringCharacters}}''{{opt}}
+
+  ''<b id="DoubleStringCharacter">DoubleStringCharacter</b>'' ::
+    ''{{toanchor|SourceCharacter}}'' '''but not one of " or \ or''' ''{{toanchor|LineTerminator}}''
+    '''\''' ''{{toanchor|EscapeSequence}}''
+    ''{{toanchor|LineContinuation}}''
+
+  ''<b id="SingleStringCharacter">SingleStringCharacter</b>'' ::
+    ''{{toanchor|SourceCharacter}}'' '''but not one of ' or \ or''' ''{{toanchor|LineTerminator}}''
+    '''\''' ''{{toanchor|EscapeSequence}}''
+    ''{{toanchor|LineContinuation}}''
+
+  ''<b id="LineContinuation">LineContinuation</b>'' ::
+    '''\''' ''{{toanchor|LineTerminatorSequence}}''
+
+  ''<b id="EscapeSequence">EscapeSequence</b>'' ::
+    ''{{toanchor|CharacterEscapeSequence}}''
+    '''0''' &#91;[[ES5/notation#lookahead-not-in|lookahead ?]] ''{{toanchor|DecimalDigit}}'']
+    ''{{toanchor|HexEscapeSequence}}''
+    ''{{toanchor|UnicodeEscapeSequence}}''
+
+  ''<b id="CharacterEscapeSequence">CharacterEscapeSequence</b>'' ::
+    ''{{toanchor|SingleEscapeCharacter}}''
+    ''{{toanchor|NonEscapeCharacter}}''
+
+  ''<b id="SingleEscapeCharacter">SingleEscapeCharacter</b>'' :: '''one of'''
+    '''' " \ b f n r t v'''
+
+  ''<b id="NonEscapeCharacter">NonEscapeCharacter</b>'' ::
+    ''{{toanchor|SourceCharacter}} '''but not one of''' {{toanchor|EscapeCharacter}}'' '''or''' ''{{toanchor|LineTerminator}}''
+
+  ''<b id="EscapeCharacter">EscapeCharacter</b>'' ::
+    ''{{toanchor|SingleEscapeCharacter}}''
+    ''{{toanchor|DecimalDigit}}''
+    '''x'''
+    '''u'''
+
+  ''<b id="HexEscapeSequence">HexEscapeSequence</b>'' ::
+    '''x''' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}''
+
+  ''<b id="UnicodeEscapeSequence">UnicodeEscapeSequence</b>'' ::
+    '''u''' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}''
+
+  ''<b id="RegularExpressionLiteral">RegularExpressionLiteral</b>'' ::
+    '''/''' ''{{toanchor|RegularExpressionBody}}'' '''/''' ''{{toanchor|RegularExpressionFlags}}''
+
+  ''<b id="RegularExpressionBody">RegularExpressionBody</b>'' ::
+    ''{{toanchor|RegularExpressionFirstChar}}'' ''{{toanchor|RegularExpressionChars}}''
+
+  ''<b id="RegularExpressionChars">RegularExpressionChars</b>'' ::
+    &#91;[[ES5/notation#empty|empty]]]
+    ''{{toanchor|RegularExpressionChars}}'' ''{{toanchor|RegularExpressionChar}}''
+
+  ''<b id="RegularExpressionFirstChar">RegularExpressionFirstChar</b>'' ::
+    ''{{toanchor|RegularExpressionNonTerminator}}'' '''but not one of * or \ or / or ['''
+    ''{{toanchor|RegularExpressionBackslashSequence}}''
+    ''{{toanchor|RegularExpressionClass}}''
+
+  ''<b id="RegularExpressionChar">RegularExpressionChar</b>'' ::
+    ''{{toanchor|RegularExpressionNonTerminator}}'' '''but not \ or / or [''' 
+    ''{{toanchor|RegularExpressionBackslashSequence}}''
+    ''{{toanchor|RegularExpressionClass}}''
+
+  ''<b id="RegularExpressionBackslashSequence">RegularExpressionBackslashSequence</b>'' ::
+    '''\''' ''{{toanchor|RegularExpressionNonTerminator}}''
+
+  ''<b id="RegularExpressionNonTerminator">RegularExpressionNonTerminator</b>'' ::
+    ''{{toanchor|SourceCharacter}}'' '''but not''' ''{{toanchor|LineTerminator}}''
+
+  ''<b id="RegularExpressionClass">RegularExpressionClass</b>'' ::
+    '''[''' ''{{toanchor|RegularExpressionClassChars}}'' ''']'''
+
+  ''<b id="RegularExpressionClassChars">RegularExpressionClassChars</b>'' ::
+    &#91;[[ES5/notation#empty|empty]]]
+    ''{{toanchor|RegularExpressionClassChars}}'' ''{{toanchor|RegularExpressionClassChar}}''
+
+  ''<b id="RegularExpressionClassChar">RegularExpressionClassChar</b>'' ::
+    ''{{toanchor|RegularExpressionNonTerminator}}'' '''but not ] or \''' 
+    ''{{toanchor|RegularExpressionBackslashSequence}}''
+
+  ''<b id="RegularExpressionFlags">RegularExpressionFlags</b>'' ::
+    &#91;[[ES5/notation#empty|empty]]]
+    ''{{toanchor|RegularExpressionFlags}}'' ''{{toanchor|IdentifierPart}}''
+
+=== {{anchor|A.2}}A.2 数字转换 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-A.2}}
+
+
+
+  ''<b id="StringNumericLiteral">StringNumericLiteral</b>'' :::
+    ''{{toanchor|StrWhiteSpace}}''{{opt}}
+    ''{{toanchor|StrWhiteSpace}}''{{opt}} ''{{toanchor|StrNumericLiteral}}'' ''{{toanchor|StrWhiteSpace}}''{{opt}}
+
+  ''<b id="StrWhiteSpace">StrWhiteSpace</b>'' :::
+    ''{{toanchor|StrWhiteSpaceChar}}'' ''{{toanchor|StrWhiteSpace}}''{{opt}}
+
+  ''<b id="StrWhiteSpaceChar">StrWhiteSpaceChar</b>'' :::
+    ''{{toanchor|WhiteSpace}}''
+    ''{{toanchor|LineTerminator}}''
+
+  ''<b id="StrNumericLiteral">StrNumericLiteral</b>'' :::
+    ''{{toanchor|StrDecimalLiteral}}''
+    ''{{toanchor|HexIntegerLiteral}}''
+
+  ''<b id="StrDecimalLiteral">StrDecimalLiteral</b>'' :::
+    ''{{toanchor|StrUnsignedDecimalLiteral}}''
+    '''+''' ''{{toanchor|StrUnsignedDecimalLiteral}}''
+    '''-''' ''{{toanchor|StrUnsignedDecimalLiteral}}''
+
+  ''<b id="StrUnsignedDecimalLiteral">StrUnsignedDecimalLiteral</b>'' :::
+    '''Infinity''' 
+    ''{{toanchor|DecimalDigits}}'' . ''{{toanchor|DecimalDigits}}''{{opt}} ''{{toanchor|ExponentPart}}''{{opt}}
+    '''.''' ''{{toanchor|DecimalDigits}}'' ''{{toanchor|ExponentPart}}''{{opt}}
+    ''{{toanchor|DecimalDigits}}'' ''{{toanchor|ExponentPart}}''{{opt}}
+
+  ''<b id="DecimalDigits">DecimalDigits</b>'' :::
+    ''{{toanchor|DecimalDigit}}''
+    ''{{toanchor|DecimalDigits}}'' ''{{toanchor|DecimalDigit}}''
+
+  ''<b id="DecimalDigit">DecimalDigit</b>'' :::'''one of'''
+    '''0 1 2 3 4 5 6 7 8 9'''
+
+  ''<b id="ExponentPart">ExponentPart</b>'' :::
+    ''{{toanchor|ExponentIndicator}}'' ''{{toanchor|SignedInteger}}''
+
+  ''<b id="ExponentIndicator">ExponentIndicator</b>'' :::'''one of'''
+    '''e E'''
+
+  ''<b id="SignedInteger">SignedInteger</b>'' :::
+    ''{{toanchor|DecimalDigits}}''
+    '''+''' ''{{toanchor|DecimalDigits}}''
+    '''-''' ''{{toanchor|DecimalDigits}}''
+
+  ''<b id="HexIntegerLiteral">HexIntegerLiteral</b>'' :::
+    '''0x''' ''{{toanchor|HexDigit}}''
+    '''0X''' ''{{toanchor|HexDigit}}''
+    ''{{toanchor|HexIntegerLiteral}}'' ''{{toanchor|HexDigit}}''
+
+  ''<b id="HexDigit">HexDigit</b>'' :::'''one of'''
+    '''0 1 2 3 4 5 6 7 8 9 a b c d e f A B C D E F'''
+
+=== {{anchor|A.3}}A.3 表达式 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-A.3}}
+
+
+
+  ''<b id="PrimaryExpression">PrimaryExpression</b>'' :
+    '''this''' 
+    ''{{toanchor|Identifier}}''
+    ''{{toanchor|Literal}}''
+    ''{{toanchor|ArrayLiteral}}''
+    ''{{toanchor|ObjectLiteral}}''
+    '''(''' ''{{toanchor|Expression}}'' ''')'''
+
+  ''<b id="ArrayLiteral">ArrayLiteral</b>'' :
+    '''[''' ''{{toanchor|Elision}}''{{opt}} ''']'''
+    '''[''' ''{{toanchor|ElementList}}'' ''']'''
+    '''[''' ''{{toanchor|ElementList}}'' ''',''' ''{{toanchor|Elision}}''{{opt}} ''']'''
+
+  ''<b id="ElementList">ElementList</b>'' :
+    ''{{toanchor|Elision}}''{{opt}} ''{{toanchor|AssignmentExpression}}''
+    ''{{toanchor|ElementList}}'' ''',''' ''{{toanchor|Elision}}''{{opt}} ''{{toanchor|AssignmentExpression}}''
+
+  ''<b id="Elision">Elision</b>'' :
+    ''','''
+    ''{{toanchor|Elision}}'' ''','''
+
+  ''<b id="ObjectLiteral">ObjectLiteral</b>'' :
+    '''{ }''' 
+    '''{''' ''{{toanchor|PropertyNameAndValueList}}'' '''}'''
+    '''{''' ''{{toanchor|PropertyNameAndValueList}}'' ''',''' '''}'''
+
+  ''<b id="PropertyNameAndValueList">PropertyNameAndValueList</b>'' :
+    ''{{toanchor|PropertyAssignment}}''
+    ''{{toanchor|PropertyNameAndValueList}}'' ''',''' ''{{toanchor|PropertyAssignment}}''
+
+  ''<b id="PropertyAssignment">PropertyAssignment</b>'' :
+    ''{{toanchor|PropertyName}}'' : ''{{toanchor|AssignmentExpression}}''
+    '''get''' ''{{toanchor|PropertyName}}'''''()''' '''{''' ''{{toanchor|FunctionBody}}'' '''}'''
+    '''set''' ''{{toanchor|PropertyName}}'''''(''' ''{{toanchor|PropertySetParameterList}}'' ''') {''' ''{{toanchor|FunctionBody}}'' '''}'''
+
+  ''<b id="PropertyName">PropertyName</b>'' :
+    ''{{toanchor|IdentifierName}}''
+    ''{{toanchor|StringLiteral}}''
+    ''{{toanchor|NumericLiteral}}''
+
+  ''<b id="PropertySetParameterList">PropertySetParameterList</b>'' :
+    ''{{toanchor|Identifier}}''
+
+  ''<b id="MemberExpression">MemberExpression</b>'' :
+    ''{{toanchor|PrimaryExpression}}''
+    ''{{toanchor|FunctionExpression}}''
+    ''{{toanchor|MemberExpression}}'' '''[''' ''{{toanchor|Expression}}'' ''']'''
+    ''{{toanchor|MemberExpression}}'' '''.''' ''{{toanchor|IdentifierName}}''
+    '''new''' ''{{toanchor|MemberExpression}}'' ''{{toanchor|Arguments}}''
+
+  ''<b id="NewExpression">NewExpression</b>'' :
+    ''{{toanchor|MemberExpression}}''
+    '''new''' ''{{toanchor|NewExpression}}''
+
+  ''<b id="CallExpression">CallExpression</b>'' :
+    ''{{toanchor|MemberExpression}}'' ''{{toanchor|Arguments}}''
+    ''{{toanchor|CallExpression}}'' ''{{toanchor|Arguments}}''
+    ''{{toanchor|CallExpression}}'' '''[''' ''{{toanchor|Expression}}'' ''']'''
+    ''{{toanchor|CallExpression}}'' '''.''' ''{{toanchor|IdentifierName}}''
+
+  ''<b id="Arguments">Arguments</b>'' :
+    '''( )'''
+    '''(''' ''{{toanchor|ArgumentList}}'' ''')'''
+
+  ''<b id="ArgumentList">ArgumentList</b>'' :
+    ''{{toanchor|AssignmentExpression}}''
+    ''{{toanchor|ArgumentList}}'' ''',''' ''{{toanchor|AssignmentExpression}}''
+
+  ''<b id="LeftHandSideExpression">LeftHandSideExpression</b>'' :
+    ''{{toanchor|NewExpression}}''
+    ''{{toanchor|CallExpression}}''
+
+  ''<b id="PostfixExpression">PostfixExpression</b>'' :
+    ''{{toanchor|LeftHandSideExpression}}''
+    ''{{toanchor|LeftHandSideExpression}}'' &#91;[[ES5/notation#restricted-production|no ''LineTerminator'' here]]] '''++''' 
+    ''{{toanchor|LeftHandSideExpression}}'' &#91;[[ES5/notation#restricted-production|no ''LineTerminator'' here]]] '''--'''
+
+  ''<b id="UnaryExpression">UnaryExpression</b>'' :
+    ''{{toanchor|PostfixExpression}}''
+    '''delete''' ''{{toanchor|UnaryExpression}}''
+    '''void''' ''{{toanchor|UnaryExpression}}''
+    '''typeof''' ''{{toanchor|UnaryExpression}}''
+    '''++''' ''{{toanchor|UnaryExpression}}''
+    '''--''' ''{{toanchor|UnaryExpression}}''
+    '''+''' ''{{toanchor|UnaryExpression}}''
+    '''-''' ''{{toanchor|UnaryExpression}}''
+    '''~''' ''{{toanchor|UnaryExpression}}''
+    '''!''' ''{{toanchor|UnaryExpression}}''
+
+  ''<b id="MultiplicativeExpression">MultiplicativeExpression</b>'' :
+    ''{{toanchor|UnaryExpression}}''
+    ''{{toanchor|MultiplicativeExpression}}'' '''*''' ''{{toanchor|UnaryExpression}}''
+    ''{{toanchor|MultiplicativeExpression}}'' '''/''' ''{{toanchor|UnaryExpression}}''
+    ''{{toanchor|MultiplicativeExpression}}'' '''%''' ''{{toanchor|UnaryExpression}}''
+
+  ''<b id="AdditiveExpression">AdditiveExpression</b>'' :
+    ''{{toanchor|MultiplicativeExpression}}''
+    ''{{toanchor|AdditiveExpression}}'' '''+''' ''{{toanchor|MultiplicativeExpression}}''
+    ''{{toanchor|AdditiveExpression}}'' '''-''' ''{{toanchor|MultiplicativeExpression}}''
+
+  ''<b id="ShiftExpression">ShiftExpression</b>'' :
+    ''{{toanchor|AdditiveExpression}}''
+    ''{{toanchor|ShiftExpression}}'' '''<<''' ''{{toanchor|AdditiveExpression}}''
+    ''{{toanchor|ShiftExpression}}'' '''>>''' ''{{toanchor|AdditiveExpression}}''
+    ''{{toanchor|ShiftExpression}}'' '''>>>''' ''{{toanchor|AdditiveExpression}}''
+
+  ''<b id="RelationalExpression">RelationalExpression</b>'' :
+    ''{{toanchor|ShiftExpression}}''
+    ''{{toanchor|RelationalExpression}}'' '''<''' ''{{toanchor|ShiftExpression}}''
+    ''{{toanchor|RelationalExpression}}'' '''>''' ''{{toanchor|ShiftExpression}}''
+    ''{{toanchor|RelationalExpression}}'' '''<=''' ''{{toanchor|ShiftExpression}}''
+    ''{{toanchor|RelationalExpression}}'' '''>=''' ''{{toanchor|ShiftExpression}}''
+    ''{{toanchor|RelationalExpression}}'' '''instanceof''' ''{{toanchor|ShiftExpression}}''
+    ''{{toanchor|RelationalExpression}}'' '''in''' ''{{toanchor|ShiftExpression}}''
+
+  ''<b id="RelationalExpressionNoIn">RelationalExpressionNoIn</b>'' :
+    ''{{toanchor|ShiftExpression}}''
+    ''{{toanchor|RelationalExpressionNoIn}}'' '''<''' ''{{toanchor|ShiftExpression}}''
+    ''{{toanchor|RelationalExpressionNoIn}}'' '''>''' ''{{toanchor|ShiftExpression}}''
+    ''{{toanchor|RelationalExpressionNoIn}}'' '''<=''' ''{{toanchor|ShiftExpression}}''
+    ''{{toanchor|RelationalExpressionNoIn}}'' '''>=''' ''{{toanchor|ShiftExpression}}''
+    ''{{toanchor|RelationalExpressionNoIn}}'' '''instanceof''' ''{{toanchor|ShiftExpression}}''
+
+  ''<b id="EqualityExpression">EqualityExpression</b>'' :
+    ''{{toanchor|RelationalExpression}}''
+    ''{{toanchor|EqualityExpression}}'' '''==''' ''{{toanchor|RelationalExpression}}''
+    ''{{toanchor|EqualityExpression}}'' '''!=''' ''{{toanchor|RelationalExpression}}''
+    ''{{toanchor|EqualityExpression}}'' '''===''' ''{{toanchor|RelationalExpression}}''
+    ''{{toanchor|EqualityExpression}}'' '''!==''' ''{{toanchor|RelationalExpression}}''
+
+  ''<b id="EqualityExpressionNoIn">EqualityExpressionNoIn</b>'' :
+    ''{{toanchor|RelationalExpressionNoIn}}''
+    ''{{toanchor|EqualityExpressionNoIn}}'' '''==''' ''{{toanchor|RelationalExpressionNoIn}}''
+    ''{{toanchor|EqualityExpressionNoIn}}'' '''!=''' ''{{toanchor|RelationalExpressionNoIn}}''
+    ''{{toanchor|EqualityExpressionNoIn}}'' '''===''' ''{{toanchor|RelationalExpressionNoIn}}''
+    ''{{toanchor|EqualityExpressionNoIn}}'' '''!==''' ''{{toanchor|RelationalExpressionNoIn}}''
+
+  ''<b id="BitwiseANDExpression">BitwiseANDExpression</b>'' :
+    ''{{toanchor|EqualityExpression}}''
+    ''{{toanchor|BitwiseANDExpression}}'' '''&''' ''{{toanchor|EqualityExpression}}''
+
+  ''<b id="BitwiseANDExpressionNoIn">BitwiseANDExpressionNoIn</b>'' :
+    ''{{toanchor|EqualityExpressionNoIn}}''
+    ''{{toanchor|BitwiseANDExpressionNoIn}}'' '''&''' ''{{toanchor|EqualityExpressionNoIn}}''
+
+  ''<b id="BitwiseXORExpression">BitwiseXORExpression</b>'' :
+    ''{{toanchor|BitwiseANDExpression}}''
+    ''{{toanchor|BitwiseXORExpression}}'' '''^''' ''{{toanchor|BitwiseANDExpression}}''
+
+  ''<b id="BitwiseXORExpressionNoIn">BitwiseXORExpressionNoIn</b>'' :
+    ''{{toanchor|BitwiseANDExpressionNoIn}}''
+    ''{{toanchor|BitwiseXORExpressionNoIn}}'' '''^''' ''{{toanchor|BitwiseANDExpressionNoIn}}''
+
+  ''<b id="BitwiseORExpression">BitwiseORExpression</b>'' :
+    ''{{toanchor|BitwiseXORExpression}}''
+    ''{{toanchor|BitwiseORExpression}}'' '''|''' ''{{toanchor|BitwiseXORExpression}}''
+
+  ''<b id="BitwiseORExpressionNoIn">BitwiseORExpressionNoIn</b>'' :
+    ''{{toanchor|BitwiseXORExpressionNoIn}}''
+    ''{{toanchor|BitwiseORExpressionNoIn}}'' '''|''' ''{{toanchor|BitwiseXORExpressionNoIn}}''
+
+  ''<b id="LogicalANDExpression">LogicalANDExpression</b>'' :
+    ''{{toanchor|BitwiseORExpression}}''
+    ''{{toanchor|LogicalANDExpression}}'' '''&&''' ''{{toanchor|BitwiseORExpression}}''
+
+  ''<b id="LogicalANDExpressionNoIn">LogicalANDExpressionNoIn</b>'' :
+    ''{{toanchor|BitwiseORExpressionNoIn}}''
+    ''{{toanchor|LogicalANDExpressionNoIn}}'' '''&&''' ''{{toanchor|BitwiseORExpressionNoIn}}''
+
+  ''<b id="LogicalORExpression">LogicalORExpression</b>'' :
+    ''{{toanchor|LogicalANDExpression}}''
+    ''{{toanchor|LogicalORExpression}}'' '''||''' ''{{toanchor|LogicalANDExpression}}''
+
+  ''<b id="LogicalORExpressionNoIn">LogicalORExpressionNoIn</b>'' :
+    ''{{toanchor|LogicalANDExpressionNoIn}}''
+    ''{{toanchor|LogicalORExpressionNoIn}}'' '''||''' ''{{toanchor|LogicalANDExpressionNoIn}}''
+
+  ''<b id="ConditionalExpression">ConditionalExpression</b>'' :
+    ''{{toanchor|LogicalORExpression}}''
+    ''{{toanchor|LogicalORExpression}}'' '''?''' ''{{toanchor|AssignmentExpression}}'' ''':''' ''{{toanchor|AssignmentExpression}}''
+
+  ''<b id="ConditionalExpressionNoIn">ConditionalExpressionNoIn</b>'' :
+    ''{{toanchor|LogicalORExpressionNoIn}}''
+    ''{{toanchor|LogicalORExpressionNoIn}}'' '''?''' ''{{toanchor|AssignmentExpressionNoIn}}'' ''':''' ''{{toanchor|AssignmentExpressionNoIn}}''
+
+  ''<b id="AssignmentExpression">AssignmentExpression</b>'' :
+    ''{{toanchor|ConditionalExpression}}''
+    ''{{toanchor|LeftHandSideExpression}}'' ''{{toanchor|AssignmentOperator}}'' ''{{toanchor|AssignmentExpression}}''
+
+  ''<b id="AssignmentExpressionNoIn">AssignmentExpressionNoIn</b>'' :
+    ''{{toanchor|ConditionalExpressionNoIn}}''
+    ''{{toanchor|LeftHandSideExpression}}'' ''{{toanchor|AssignmentOperator}}'' ''{{toanchor|AssignmentExpressionNoIn}}''
+
+  ''<b id="AssignmentOperator">AssignmentOperator</b>'' :'''one of'''
+    '''= *= /= %= += -= <<= >>= >>>= &= ^= |=''' 
+    
+  ''<b id="Expression">Expression</b>'' :
+    ''{{toanchor|AssignmentExpression}}''
+    ''{{toanchor|Expression}}'' ''',''' ''{{toanchor|AssignmentExpression}}''
+
+  ''<b id="ExpressionNoIn">ExpressionNoIn</b>'' :
+    ''{{toanchor|AssignmentExpressionNoIn}}''
+    ''{{toanchor|ExpressionNoIn}}'' ''',''' ''{{toanchor|AssignmentExpressionNoIn}}''
+
+=== {{anchor|A.3}}A.4 语句  ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-A.4}}
+
+
+
+  ''<b id="Statement">Statement</b>'' :
+    ''{{toanchor|Block}}''
+    ''{{toanchor|VariableStatement}}''
+    ''{{toanchor|EmptyStatement}}''
+    ''{{toanchor|ExpressionStatement}}''
+    ''{{toanchor|IfStatement}}''
+    ''{{toanchor|IterationStatement}}''
+    ''{{toanchor|ContinueStatement}}''
+    ''{{toanchor|BreakStatement}}''
+    ''{{toanchor|ReturnStatement}}''
+    ''{{toanchor|WithStatement}}''
+    ''{{toanchor|LabelledStatement}}''
+    ''{{toanchor|SwitchStatement}}''
+    ''{{toanchor|ThrowStatement}}''
+    ''{{toanchor|TryStatement}}''
+    ''{{toanchor|DebuggerStatement}}''
+
+  ''<b id="Block">Block</b>'' :
+    '''{''' ''{{toanchor|StatementList}}''{{opt}} '''}'''
+
+  ''<b id="StatementList">StatementList</b>'' :
+    ''{{toanchor|Statement}}''
+    ''{{toanchor|StatementList}}'' ''{{toanchor|Statement}}''
+
+  ''<b id="VariableStatement">VariableStatement</b>'' :
+    '''var''' ''{{toanchor|VariableDeclarationList}}'' ''';'''
+
+  ''<b id="VariableDeclarationList">VariableDeclarationList</b>'' :
+    ''{{toanchor|VariableDeclaration}}''
+    ''{{toanchor|VariableDeclarationList}}'' ''',''' ''{{toanchor|VariableDeclaration}}''
+
+  ''<b id="VariableDeclarationListNoIn">VariableDeclarationListNoIn</b>'' :
+    ''{{toanchor|VariableDeclarationNoIn}}''
+    ''{{toanchor|VariableDeclarationListNoIn}}'' ''',''' ''{{toanchor|VariableDeclarationNoIn}}''
+
+  ''<b id="VariableDeclaration">VariableDeclaration</b>'' :
+    ''{{toanchor|Identifier}}'' ''{{toanchor|Initialiser}}''{{opt}}
+
+  ''<b id="VariableDeclarationNoIn">VariableDeclarationNoIn</b>'' :
+    ''{{toanchor|Identifier}}'' ''{{toanchor|InitialiserNoIn}}''{{opt}}
+
+  ''<b id="Initialiser">Initialiser</b>'' :
+    '''=''' ''{{toanchor|AssignmentExpression}}''
+
+  ''<b id="InitialiserNoIn">InitialiserNoIn</b>'' :
+    '''=''' ''{{toanchor|AssignmentExpressionNoIn}}''
+
+  ''<b id="EmptyStatement">EmptyStatement</b>'' :
+    ''';'''
+
+  ''<b id="ExpressionStatement">ExpressionStatement</b>'' :
+    &#91;[[ES5/notation#lookahead-not-in|lookahead ?]] {'''{''', '''function'''}] ''{{toanchor|Expression}}'' ;
+
+  ''<b id="IfStatement">IfStatement</b>'' :
+    '''if (''' ''{{toanchor|Expression}}'' ''')''' ''{{toanchor|Statement}}'' '''else''' ''{{toanchor|Statement}}''
+    '''if (''' ''{{toanchor|Expression}}'' ''')''' ''{{toanchor|Statement}}''
+
+  ''<b id="IterationStatement">IterationStatement</b>'' :
+    '''do''' ''{{toanchor|Statement}}'' '''while (''' ''{{toanchor|Expression}}'' ''');''' 
+    '''while (''' ''{{toanchor|Expression}}'' ''')''' ''{{toanchor|Statement}}''
+    '''for (''' ''{{toanchor|ExpressionNoIn}}''{{opt}} ''';''' ''{{toanchor|Expression}}''{{opt}} ''';''' ''{{toanchor|Expression}}''{{opt}} ''')''' ''{{toanchor|Statement}}''
+    '''for ( var''' ''{{toanchor|VariableDeclarationListNoIn}}'' ''';''' ''{{toanchor|Expression}}''{{opt}} ''';''' ''{{toanchor|Expression}}''{{opt}} ''')''' ''{{toanchor|Statement}}''
+    '''for (''' ''{{toanchor|LeftHandSideExpression}}'' '''in''' ''{{toanchor|Expression}}'' ''')''' ''{{toanchor|Statement}}''
+    '''for ( var''' ''{{toanchor|VariableDeclarationNoIn}}'' '''in''' ''{{toanchor|Expression}}'' ''')''' ''{{toanchor|Statement}}''
+
+  ''<b id="ContinueStatement">ContinueStatement</b>'' :
+    '''continue''' &#91;[[ES5/notation#restricted-production|no ''LineTerminator'' here]]] ''{{toanchor|Identifier}}''{{opt}} ''';'''
+
+  ''<b id="BreakStatement">BreakStatement</b>'' :
+    '''break''' &#91;[[ES5/notation#restricted-production|no ''LineTerminator'' here]]] ''{{toanchor|Identifier}}''{{opt}} ''';'''
+
+  ''<b id="ReturnStatement">ReturnStatement</b>'' :
+    '''return''' &#91;[[ES5/notation#restricted-production|no ''LineTerminator'' here]]] ''{{toanchor|Expression}}''{{opt}} ''';'''
+
+  ''<b id="WithStatement">WithStatement</b>'' :
+    '''with''' '''(''' ''{{toanchor|Expression}}'' ''')''' ''{{toanchor|Statement}}''
+
+  ''<b id="SwitchStatement">SwitchStatement</b>'' :
+    '''switch''' '''(''' ''{{toanchor|Expression}}'' ''')''' ''{{toanchor|CaseBlock}}''
+
+  ''<b id="CaseBlock">CaseBlock</b>'' :
+    { ''{{toanchor|CaseClauses}}''{{opt}} } 
+    { ''{{toanchor|CaseClauses}}''{{opt}}''{{toanchor|DefaultClause}}'' ''{{toanchor|CaseClauses}}''{{opt}} }
+
+  ''<b id="CaseClauses">CaseClauses</b>'' :
+    ''{{toanchor|CaseClause}}''
+    ''{{toanchor|CaseClauses}}'' ''{{toanchor|CaseClause}}''
+
+  ''<b id="CaseClause">CaseClause</b>'' :
+    '''case''' ''{{toanchor|Expression}}'' ''':''' ''{{toanchor|StatementList}}''{{opt}}
+
+  ''<b id="DefaultClause">DefaultClause</b>'' :
+    '''default :''' ''{{toanchor|StatementList}}''{{opt}}
+
+  ''<b id="LabelledStatement">LabelledStatement</b>'' :
+    ''{{toanchor|Identifier}}'' : ''{{toanchor|Statement}}''
+
+  ''<b id="ThrowStatement">ThrowStatement</b>'' :
+    '''throw''' &#91;[[ES5/notation#restricted-production|no ''LineTerminator'' here]]] ''{{toanchor|Expression}}'' ;
+
+  ''<b id="TryStatement">TryStatement</b>'' :
+    '''try''' ''{{toanchor|Block}}'' ''{{toanchor|Catch}}''
+    '''try''' ''{{toanchor|Block}}'' ''{{toanchor|Finally}}''
+    '''try''' ''{{toanchor|Block}}'' ''{{toanchor|Catch}}'' ''{{toanchor|Finally}}''
+
+  ''<b id="Catch">Catch</b>'' :
+    '''catch (''' ''{{toanchor|Identifier}}'' ''')''' ''{{toanchor|Block}}''
+
+  ''<b id="Finally">Finally</b>'' :
+    '''finally''' ''{{toanchor|Block}}''
+
+  ''<b id="DebuggerStatement">DebuggerStatement</b>'' :
+    '''debugger ;'''
+
+=== {{anchor|A.5}}A.5 函数和程序 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-A.5}}
+
+
+
+  ''<b id="FunctionDeclaration">FunctionDeclaration</b>'' :
+    '''function''' ''{{toanchor|Identifier}}'' '''(''' ''{{toanchor|FormalParameterList}}''{{opt}} ''') {''' ''{{toanchor|FunctionBody}}'' '''}'''
+
+  ''<b id="FunctionExpression">FunctionExpression</b>'' :
+    '''function''' ''{{toanchor|Identifier}}''{{opt}} '''(''' ''{{toanchor|FormalParameterList}}''{{opt}} ''') {''' ''{{toanchor|FunctionBody}}'' '''}'''
+
+  ''<b id="FormalParameterList">FormalParameterList</b>'' :
+    ''{{toanchor|Identifier}}''
+    ''{{toanchor|FormalParameterList}}'' ''',''' ''{{toanchor|Identifier}}''
+
+  ''<b id="FunctionBody">FunctionBody</b>'' :
+    ''{{toanchor|SourceElements}}''{{opt}}
+
+  ''<b id="Program">Program</b>'' :
+    ''{{toanchor|SourceElements}}''{{opt}}
+
+  ''<b id="SourceElements">SourceElements</b>'' :
+    ''{{toanchor|SourceElement}}''
+    ''{{toanchor|SourceElements}}'' ''{{toanchor|SourceElement}}''
+
+  ''<b id="SourceElement">SourceElement</b>'' :
+    ''{{toanchor|Statement}}''
+    ''{{toanchor|FunctionDeclaration}}''
+
+=== {{anchor|A.6}}A.6 统一资源定位符字符分类 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-A.6}}
+
+
+
+  ''<b id="uri">uri</b>'' :::
+    ''{{toanchor|uriCharacters}}''{{opt}}
+
+  ''<b id="uriCharacters">uriCharacters</b>'' :::
+    ''{{toanchor|uriCharacter}}'' ''{{toanchor|uriCharacters}}''{{opt}}
+
+  ''<b id="uriCharacter">uriCharacter</b>'' :::
+    ''{{toanchor|uriReserved}}''
+    ''{{toanchor|uriUnescaped}}''
+    ''{{toanchor|uriEscaped}}''
+
+  ''<b id="uriReserved">uriReserved</b>'' ::: '''one of'''
+    '''; / ? : @ & = + $ ,'''
+
+  ''<b id="uriUnescaped">uriUnescaped</b>'' :::
+    ''{{toanchor|uriAlpha}}''
+    ''{{toanchor|DecimalDigit}}''
+    ''{{toanchor|uriMark}}''
+
+  ''<b id="uriEscaped">uriEscaped</b>'' :::
+    '''%''' ''{{toanchor|HexDigit}}'' ''{{toanchor|HexDigit}}''
+
+  ''<b id="uriAlpha">uriAlpha</b>'' ::: '''one of'''
+    '''a b c d e f g h i j k l m n o p q r s t u v w x y z'''
+    '''A B C D E F G H I J K L M N O P Q R S T U V W X Y Z'''
+
+  ''<b id="uriMark">uriMark</b>'' ::: '''one of'''
+    '''- _ . ! ~ * ‘ ( )'''
+
+=== {{anchor|A.7}}A.7 正则表达式 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-A.7}}
+
+
+
+  ''<b id="Pattern">Pattern</b>'' ::
+    ''{{toanchor|Disjunction}}''
+
+  ''<b id="Disjunction">Disjunction</b>'' ::
+    ''{{toanchor|Alternative}}''
+    ''{{toanchor|Alternative}}'' '''|''' ''{{toanchor|Disjunction}}''
+
+  ''<b id="Alternative">Alternative</b>'' ::
+    &#91;[[ES5/notation#empty|empty]]]
+    ''{{toanchor|Alternative}}'' ''{{toanchor|Term}}''
+
+  ''<b id="Term">Term</b>'' ::
+    ''{{toanchor|Assertion}}''
+    ''{{toanchor|Atom}}''
+    ''{{toanchor|Atom}}'' ''{{toanchor|Quantifier}}''
+
+  ''<b id="Assertion">Assertion</b>'' ::
+    '''^''' 
+    '''$''' 
+    '''\ b''' 
+    '''\ B''' 
+    '''( ? =''' ''{{toanchor|Disjunction}}'' ''')''' 
+    '''( ? !''' ''{{toanchor|Disjunction}}'' ''')'''
+
+  ''<b id="Quantifier">Quantifier</b>'' ::
+    ''{{toanchor|QuantifierPrefix}}''
+    ''{{toanchor|QuantifierPrefix}}'' '''?'''
+
+  ''<b id="QuantifierPrefix">QuantifierPrefix</b>'' ::
+    '''*'''
+    '''+''' 
+    '''?''' 
+    '''{''' ''{{toanchor|DecimalDigits}}'' '''}''' 
+    '''{''' ''{{toanchor|DecimalDigits}}'' ''', }''' 
+    '''{''' ''{{toanchor|DecimalDigits}}'' ''',''' ''{{toanchor|DecimalDigits}}'' '''}'''
+
+  ''<b id="Atom">Atom</b>'' ::
+    ''{{toanchor|PatternCharacter}}''
+    '''.'''
+    '''\''' ''{{toanchor|AtomEscape}}''
+    ''{{toanchor|CharacterClass}}''
+    '''(''' ''{{toanchor|Disjunction}}'' ''')''' 
+    '''( ? :''' ''{{toanchor|Disjunction}}'' ''')'''
+
+  ''<b id="PatternCharacter">PatternCharacter</b>'' :: 
+    ''{{toanchor|SourceCharacter}}'' '''but not one of''' :
+    '''^ $ \ . * + ? ( ) [ ] { } |'''
+
+  ''<b id="AtomEscape">AtomEscape</b>'' ::
+    ''{{toanchor|DecimalEscape}}''
+    ''{{toanchor|CharacterEscape}}''
+    ''{{toanchor|CharacterClassEscape}}''
+
+  ''<b id="CharacterEscape">CharacterEscape</b>'' ::
+    ''{{toanchor|ControlEscape}}''
+    '''c''' ''{{toanchor|ControlLetter}}''
+    ''{{toanchor|HexEscapeSequence}}''
+    ''{{toanchor|UnicodeEscapeSequence}}''
+    ''{{toanchor|IdentityEscape}}''
+
+  ''<b id="ControlEscape">ControlEscape</b>'' :: '''one of'''
+    '''f n r t v'''
+
+  ''<b id="ControlLetter">ControlLetter</b>'' :: '''one of'''
+    '''a b c d e f g h i j k l m n o p q r s t u v w x y z'''
+    '''A B C D E F G H I J K L M N O P Q R S T U V W X Y Z'''
+
+  ''<b id="IdentityEscape">IdentityEscape</b>'' ::
+    ''{{toanchor|SourceCharacter}}'' but not ''{{toanchor|IdentifierPart}}''
+    <ZWJ>
+    <ZWNJ>
+
+  ''<b id="DecimalEscape">DecimalEscape</b>'' ::
+    ''{{toanchor|DecimalIntegerLiteral}}'' &#91;[[ES5/notation#lookahead-not-in|lookahead ?]] ''{{toanchor|DecimalDigit}}'']
+
+  ''<b id="CharacterClassEscape">CharacterClassEscape</b>'' ::'''one of'''
+    '''d D s S w W'''
+
+  ''<b id="CharacterClass">CharacterClass</b>'' ::
+    '''[''' &#91;[[ES5/notation#lookahead-not-in|lookahead ?]] {'''^'''}] ''{{toanchor|ClassRanges}}'' ''']''' 
+    '''[ ^''' ''{{toanchor|ClassRanges}}'' ''']'''
+
+  ''<b id="ClassRanges">ClassRanges</b>'' ::
+    &#91;[[ES5/notation#empty|empty]]]
+    ''{{toanchor|NonemptyClassRanges}}''
+
+  ''<b id="NonemptyClassRanges">NonemptyClassRanges</b>'' ::
+    ''{{toanchor|ClassAtom}}''
+    ''{{toanchor|ClassAtom}}'' ''{{toanchor|NonemptyClassRangesNoDash}}''
+    ''{{toanchor|ClassAtom}}'' '''–''' ''{{toanchor|ClassAtom}}'' ''{{toanchor|ClassRanges}}''
+
+  ''<b id="NonemptyClassRangesNoDash">NonemptyClassRangesNoDash</b>'' ::
+    ''{{toanchor|ClassAtom}}''
+    ''{{toanchor|ClassAtomNoDash}}'' ''{{toanchor|NonemptyClassRangesNoDash}}''
+    ''{{toanchor|ClassAtomNoDash}}'' '''–''' ''{{toanchor|ClassAtom}}'' ''{{toanchor|ClassRanges}}''
+
+  ''<b id="ClassAtom">ClassAtom</b>'' ::
+    '''-''' 
+    ''{{toanchor|ClassAtomNoDash}}''
+
+  ''<b id="ClassAtomNoDash">ClassAtomNoDash</b>'' ::
+    ''{{toanchor|SourceCharacter}}'' '''but not one of \ or ] or -''' 
+    '''\''' ''{{toanchor|ClassEscape}}''
+
+  ''<b id="ClassEscape">ClassEscape</b>'' ::
+    ''{{toanchor|DecimalEscape}}''
+    '''b''' 
+    ''{{toanchor|CharacterEscape}}''
+    ''{{toanchor|CharacterClassEscape}}''
+
+=== {{anchor|A.8}}A.8 JSON ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-A.8}}
+
+==== {{anchor|A.8.1}}A.8.1 JSON 词法 ====
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-A.8.1}}
+
+
+
+  ''<b id="JSONWhiteSpace">JSONWhiteSpace</b>'' ::
+    <TAB>
+    <CR>
+    <LF>
+    <SP>
+
+  ''<b id="JSONString">JSONString</b>'' ::
+    '''"''' ''{{toanchor|JSONStringCharacters}}''{{opt}} '''"'''
+
+  ''<b id="JSONStringCharacters">JSONStringCharacters</b>'' ::
+    ''{{toanchor|JSONStringCharacter}}'' ''{{toanchor|JSONStringCharacters}}''{{opt}}
+
+  ''<b id="JSONStringCharacter">JSONStringCharacter</b>'' ::
+    ''{{toanchor|SourceCharacter}}'' '''but not one of " or \ or U+0000 or U+001F'''
+    '''\''' ''{{toanchor|JSONEscapeSequence}}''
+
+  ''<b id="JSONEscapeSequence">JSONEscapeSequence</b>'' ::
+    ''{{toanchor|JSONEscapeCharacter}}''
+    ''{{toanchor|UnicodeEscapeSequence}}''
+
+  ''<b id="JSONEscapeCharacter">JSONEscapeCharacter</b>'' :: '''one of'''
+    '''" / \ b f n r t'''
+
+  ''<b id="JSONNumber">JSONNumber</b>'' ::
+    '''-'''{{opt}} ''{{toanchor|DecimalIntegerLiteral}}'' ''{{toanchor|JSONFraction}}''{{opt}} ''{{toanchor|ExponentPart}}''{{opt}}
+
+  ''<b id="JSONFraction">JSONFraction</b>'' ::
+    '''.''' ''{{toanchor|DecimalDigits}}''
+
+  ''<b id="JSONNullLiteral">JSONNullLiteral</b>'' ::
+    ''{{toanchor|NullLiteral}}''
+
+  ''<b id="JSONBooleanLiteral">JSONBooleanLiteral</b>'' ::
+    ''{{toanchor|BooleanLiteral}}''
+
+
+==== {{anchor|A.8.2}}A.8.2 JSON 句法 ====
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-A.8.1}}
+
+
+
+  ''<b id="JSONText">JSONText</b>'' :
+    ''{{toanchor|JSONValue}}''
+
+  ''<b id="JSONValue">JSONValue</b>'' :
+    ''{{toanchor|JSONNullLiteral}}''
+    ''{{toanchor|JSONBooleanLiteral}}''
+    ''{{toanchor|JSONObject}}''
+    ''{{toanchor|JSONArray}}''
+    ''{{toanchor|JSONString}}''
+    ''{{toanchor|JSONNumber}}''
+
+  ''<b id="JSONObject">JSONObject</b>'' :
+    '''{ }''' 
+    '''{''' ''{{toanchor|JSONMemberList}}'' '''}'''
+
+  ''<b id="JSONMember">JSONMember</b>'' :
+    ''{{toanchor|JSONString}}'' ''':''' ''{{toanchor|JSONValue}}''
+
+  ''<b id="JSONMemberList">JSONMemberList</b>'' :
+    ''{{toanchor|JSONMember}}'' 
+    ''{{toanchor|JSONMemberList}}'' ''',''' ''{{toanchor|JSONMember}}''
+
+  ''<b id="JSONArray">JSONArray</b>'' :
+    '''[ ]''' 
+    '''[''' ''{{toanchor|JSONElementList}}'' ''']'''
+
+  ''<b id="JSONElementList">JSONElementList</b>'' :
+    ''{{toanchor|JSONValue}}''
+    ''{{toanchor|JSONElementList}}'' ''',''' ''{{toanchor|JSONValue}}''
+
+== {{anchor|B}}附录 B 兼容性 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-B}}
+
+=== {{anchor|B.1}}附加语法 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-B.1}}
+ECMAScript 的过去版本中还包含了说明八进制直接量和八进制转义序列的额外语法、语义。在此版本中已将这些附加语法、语义移除。这个非规范性的附录给出与八进制直接量和八进制转义序列一致的语法、语义，以兼容某些较老的 ECMAScript 程序。
+
+
+==== {{anchor|B.1.1}}{{anchor|numeric-literals}}数字直接量 ====
+{{eng ver|http://es5.github.com/#B.1.1}}
+
+[[ES5/lexical#numeric-literals|7.8.3]] 中的语法、语义可以做如下扩展，但在[[ES5/execution#strict-mode-code|严格模式代码]]里不允许做这样的扩展。{{extra note||所有浏览器在非严格模式都支持这种扩展（ES3 因素），而且也都在严格模式下不支持（语法错误）。测试案例：<nowiki>try { eval(" 'use strict'; var x = 010;") } catch(e) { alert(e) } </nowiki>}}
+
+语法
+
+  ''<b id="NumericLiteral">NumericLiteral</b>'' ::
+    ''[[ES5/lexical#DecimalLiteral|DecimalLiteral]]''
+    ''[[ES5/lexical#HexIntegerLiteral|HexIntegerLiteral]]''
+    ''{{toanchor|OctalIntegerLiteral}}''
+
+  ''<b id="OctalIntegerLiteral">OctalIntegerLiteral</b>'' ::
+    '''0''' ''{{toanchor|OctalDigit}}''
+    ''{{toanchor|OctalIntegerLiteral}}'' ''{{toanchor|OctalDigit}}''
+
+  ''<b id="OctalDigit">OctalDigit</b>'' :: '''one of'''
+    '''0 1 2 3 4 5 6 7'''
+
+语义
+
+* ''{{toanchor|NumericLiteral}}'' :: ''{{toanchor|OctalIntegerLiteral}}'' 的数学值是 ''{{toanchor|OctalIntegerLiteral}}'' 的数学值。
+* ''{{toanchor|OctalDigit}}'' :: '''0''' 的数学值是 '''0'''。
+* ''{{toanchor|OctalDigit}}'' :: '''1''' 的数学值是 '''1'''。
+* ''{{toanchor|OctalDigit}}'' :: '''2''' 的数学值是 '''2'''。
+* ''{{toanchor|OctalDigit}}'' :: '''3''' 的数学值是 '''3'''。
+* ''{{toanchor|OctalDigit}}'' :: '''4''' 的数学值是 '''4'''。
+* ''{{toanchor|OctalDigit}}'' :: '''5''' 的数学值是 '''5'''。
+* ''{{toanchor|OctalDigit}}'' :: '''6''' 的数学值是 '''6'''。
+* ''{{toanchor|OctalDigit}}'' :: '''7''' 的数学值是 '''7'''。
+* ''{{toanchor|OctalIntegerLiteral}}'' :: '''0''' ''{{toanchor|OctalDigit}}'' 的数学值是 ''{{toanchor|OctalDigit}}'' 的数学值。
+* ''{{toanchor|OctalIntegerLiteral}}'' :: ''{{toanchor|OctalIntegerLiteral}}'' ''{{toanchor|OctalDigit}}'' 的数学值是 ''{{toanchor|OctalIntegerLiteral}}'' 的数学值乘以 '''8''' 再加上 ''{{toanchor|OctalDigit}}'' 的数学值。
+
+
+==== {{anchor|B.1.2}}{{anchor|string-literals}}字符串直接量 ====
+{{eng ver|http://es5.github.com/#B.1.2}}
+
+[[ES5/lexical#string-literals|7.8.4]] 中的语法、语义可以做如下扩展，但在[[ES5/execution#strict-mode-code|严格模式代码]]里不允许做这样的扩展。
+
+语法
+
+  ''<b id="EscapeSequence">EscapeSequence</b>'' ::
+    ''[[ES5/lexical#CharacterEscapeSequence|CharacterEscapeSequence]]''
+    ''{{toanchor|OctalEscapeSequence}}''
+    ''[[ES5/lexical#HexEscapeSequence|HexEscapeSequence]]''
+    ''[[ES5/lexical#UnicodeEscapeSequence|UnicodeEscapeSequence]]''
+
+  ''<b id="OctalEscapeSequence">OctalEscapeSequence</b>'' ::
+    ''[[#OctalDigit|OctalDigit]]'' &#91;[[ES5/notation#lookahead-not-in|lookahead ?]] ''[[ES5/lexical#DecimalDigit|DecimalDigit]]'']
+    ''{{toanchor|ZeroToThree}}'' ''[[#OctalDigit|OctalDigit]]'' &#91;[[ES5/notation#lookahead-not-in|lookahead ?]] ''[[ES5/lexical#DecimalDigit|DecimalDigit]]'']
+    ''{{toanchor|FourToSeven}}'' ''[[#OctalDigit|OctalDigit]]''
+    ''{{toanchor|ZeroToThree}}'' ''[[#OctalDigit|OctalDigit]]'' ''[[#OctalDigit|OctalDigit]]''
+
+  ''<b id="ZeroToThree">ZeroToThree</b>'' :: '''one of'''
+    '''0 1 2 3'''
+
+  ''<b id="FourToSeven">FourToSeven</b>'' :: '''one of'''
+    '''4 5 6 7'''
+
+
+语义
+
+* ''{{toanchor|EscapeSequence}}'' :: ''{{toanchor|OctalEscapeSequence}}'' 的字符值是 ''{{toanchor|OctalEscapeSequence}}'' 的字符值。
+* ''{{toanchor|OctalEscapeSequence}}'' :: ''{{toanchor|OctalDigit}}'' &#91;[[ES5/notation#lookahead-not-in|lookahead ?]] ''[[ES5/lexical#DecimalDigit|DecimalDigit]]''] 的字符值是个字符，它的 unicode 代码单元值是 ''{{toanchor|OctalDigit}}'' 的数学值。
+* ''{{toanchor|OctalEscapeSequence}}'' :: ''{{toanchor|ZeroToThree}}'' ''{{toanchor|OctalDigit}}'' &#91;[[ES5/notation#lookahead-not-in|lookahead ?]] ''[[ES5/lexical#DecimalDigit|DecimalDigit]]''] 的字符值是个字符，它的 unicode 代码单元值是 ''{{toanchor|ZeroToThree}}'' 的数学值乘以 '''8''' 再加上 ''{{toanchor|OctalDigit}}'' 的数学值。
+* ''{{toanchor|OctalEscapeSequence}}'' :: ''{{toanchor|FourToSeven}}'' ''{{toanchor|OctalDigit}}'' 的字符值是个字符，它的 unicode 代码单元值是  ''{{toanchor|FourToSeven}}'' 的数学值乘以 '''8''' 再加上 ''{{toanchor|OctalDigit}}'' 的数学值。
+* ''{{toanchor|OctalEscapeSequence}}'' :: ''{{toanchor|ZeroToThree}}'' ''{{toanchor|OctalDigit}}'' ''{{toanchor|OctalDigit}}'' 的字符值是个字符，它的 unicode 代码单元值是（''{{toanchor|ZeroToThree}}'' 的数学值乘以 '''8<sup>2</sup>'''）加上（第一个 ''{{toanchor|OctalDigit}}'' 的数学值乘以 '''8'''）加上 ''{{toanchor|OctalDigit}}'' 的数学值。
+* ''{{toanchor|ZeroToThree}}'' :: '''0''' 的数学值是 '''0'''。
+* ''{{toanchor|ZeroToThree}}'' :: '''1''' 的数学值是 '''1'''。
+* ''{{toanchor|ZeroToThree}}'' :: '''2''' 的数学值是 '''2'''。
+* ''{{toanchor|ZeroToThree}}'' :: '''3''' 的数学值是 '''3'''。
+* ''{{toanchor|FourToSeven}}'' :: '''4''' 的数学值是 '''4'''。
+* ''{{toanchor|FourToSeven}}'' :: '''5''' 的数学值是 '''5'''。
+* ''{{toanchor|FourToSeven}}'' :: '''6''' 的数学值是 '''6'''。
+* ''{{toanchor|FourToSeven}}'' :: '''7''' 的数学值是 '''7'''。
+
+
+=== 附加属性 ===
+ECMAScript的某些实现给某些标准内置对象加入了额外属性。这个非规范性的附录为这些没有在本标准中提到的属性或它们的语义给出了一致的语义。
+
+
+==== escape (string) ====
+'''escape''' 函数是全局对象的一个属性。它通过将一些字符替换成十六进制转义序列，计算出一个新字符串值。
+
+对于代码单元小于等于 '''0xFF''' 的被替换字符，使用 '''%xx''' 格式的两位数转义序列。对于代码单元大于 '''0xFF''' 的被替换字符，使用 '''%uxxxx''' 格式的四位数转义序列。
+
+用一个参数 <var>string</var> 调用 '''escape''' 函数，采用以下步骤：
+
+# 调用 [[ES5/conversion#ToString|ToString]](<var>string</var>)。
+# 计算 <var>Result(1)</var> 的字符数。
+# 令 <var>R</var> 为空字符串。
+# 令 <var>k</var> 为 '''0'''。
+# 如果 <var>k</var> 等于 <var>Result(2)</var>, 返回 <var>R</var>。
+# 获得 <var>Result(1)</var> 中 <var>k</var> 位置的字符（表示为16位无符号整数）。
+# 如果 <var>Result(6)</var> 是69个非空字符 '''"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@*_+-./"''' 之一，则转到 '''步骤13'''。
+# 如果 <var>Result(6)</var> 小于 '''256'''，则转到 '''步骤11'''。
+# 令 <var>S</var> 为包含六个字符 '''"%u wxyz"''' 的字符串，其中 <var>wxyz</var> 是用四个十六进制数字编码的 <var>Result(6)</var> 值。
+# 转到 '''步骤14'''。
+# 令 <var>S</var> 为包含三个字符 '''"% xy"''' 的字符串，其中 <var>xy</var> 是用两个十六进制数字编码的 <var>Result(6)</var> 值。
+# 转到 '''步骤14'''。
+# 令 <var>S</var> 为包含单个字符 <var>Result(6)</var> 的字符串。
+# 令 <var>R</var> 为将之前的 <var>R</var> 和 <var>S</var> 值连起来组成的新字符串。
+# <var>k</var> 递增 '''1'''。
+# 转到 '''步骤5'''。
+
+{{note| 这里的编码方式有部分是基于 RFC 1738 描述的编码方式, 但本标准规定的完整编码方式只有上面描述的这些，不考虑 RFC 1738 中的内容。 此编码方式并没有反映出从 RFC 1738 到 RFC 3986 的变化。}}
+
+
+==== unescape (string) ====
+
+'''unescape''' 函数是全局对象的一个属性。它通过将每个可能是 '''escape''' 函数导入的转义序列，分别替换成代表这些转义序列的字符， 计算出一个新字符串值。
+
+用一个参数 <var>string</var> 调用 '''unescape''' 函数，采用以下步骤：
+
+# 调用 [[ES5/conversion#ToString|ToString]](<var>string</var>)。
+# 计算 <var>Result(1)</var> 的字符数。
+# 令 <var>R</var> 为空字符串。
+# 令 <var>k</var> 为 '''0'''。
+# 如果 <var>k</var> 等于 <var>Result(2)</var>，返回 <var>R</var>。
+# 令 <var>c</var> 为 <var>Result(1)</var> 中 <var>k</var> 位置的字符。
+# 如果 <var>c</var> 不是 '''%''' ，转到 '''步骤18'''。
+# 如果 <var>k</var> 大于 <var>Result(2)</var> - '''6'''，转到 '''步骤14'''。
+# 如果 <var>Result(1)</var> 中 <var>k</var> + '''1''' 位置的字符不是 <b>u</b>，转到 '''步骤14'''。
+# 如果 <var>Result(1)</var> 中分别在 <var>k</var> + '''2'''、<var>k</var> + '''3'''、<var>k</var> + '''4'''、<var>k</var> + '''5''' 位置的四个字符不全是十六进制数字，转到 '''步骤14'''。
+# 令 <var>c</var> 为一个字符，它的代码单元值是 <var>Result(1)</var> 中 <var>k</var> + '''2'''、<var>k</var> + '''3'''、<var>k</var> + '''4'''、<var>k</var> + '''5''' 位置的四个十六进制数字代表的整数。
+# <var>k</var> 递增 '''5'''。
+# 转到 '''步骤18'''。
+# 如果 <var>k</var> 大于 <var>Result(2)</var> - '''3'''，转到 '''步骤18'''。
+# 如果 <var>Result(1)</var> 中分别在 <var>k</var> + '''1'''、<var>k</var> + '''2''' 位置的两个字符不都是十六进制数字，转到 '''步骤18'''。
+# 令 <var>c</var> 为一个字符，它的代码单元值是两个零加上 <var>Result(1)</var> 中 <var>k</var> + '''1'''、<var>k</var> + '''2''' 位置的两个十六进制数字代表的整数。
+# <var>k</var> 递增 '''2'''。
+# 令 <var>R</var> 为将之前的 <var>R</var> 和 <var>c</var> 值连起来组成的新字符串。
+# <var>k</var> 递增 '''1'''。
+# 转到 '''步骤5'''。
+
+
+==== String.prototype.substr (start, length) ====
+
+'''substr''' 方法有两个参数 <var>start</var> 和 <var>length</var>，将 '''this''' 对象转换为一个字符串，并返回这个字符串中从 <var>start</var> 位置一直到 <var>length</var> 位置（或如果 <var>length</var> 是 '''undefined'''，就一直到字符串结束位置）的字符组成的子串。如果 <var>start</var> 是负数，那么它就被当作是 (<var>sourceLength</var> + <var>start</var>)，这里的 <var>sourceLength</var> 是字符串的长度。返回结果是一个字符串值，不是 '''String''' 对象。采用以下步骤：
+
+# 将 '''this''' 值作为参数调用 [[ES5/conversion#ToString|ToString]]。
+# 调用 [[ES5/conversion#ToInteger|ToInteger]](<var>start</var>)。
+# 如果 <var>length</var> 是 '''undefined'''，就用 '''+∞'''；否则调用 [[ES5/conversion#ToInteger|ToInteger]](<var>length</var>)。
+# 计算 <var>Result(1)</var> 的字符数。
+# 如果 <var>Result(2)</var> 是正数或零，就用 <var>Result(2)</var>；否则使用 [[ES5/builtins#x15.8.2.11|max]](<var>Result(4)</var> + <var>Result(2)</var>, '''0''')。
+# 计算 [[ES5/builtins#x15.8.2.12|min]]([[ES5/builtins#x15.8.2.11|max]](<var>Result(3)</var>, '''0'''), <var>Result(4)</var> - <var>Result(5)</var>)。
+# 如果 <var>Result(6)</var> ≤ '''0''', 返回空字符串 "" 。
+# 返回一个由 <var>Result(1)</var> 中的 <var>Result(5)</var> 位置的字符开始的连续的 <var>Result(6)</var> 个字符组成的字符串。
+
+<var>substr</var> 方法的 '''length''' 属性是 '''2'''。
+
+{{note| '''substr''' 函数被刻意设计成通用的；它并不要求其 '''this''' 值为字符串对象。因此它可以作为方法转移到其他种类的对象中。}}
+
+
+===={{anchor|Date.prototype.getYear}}Date.prototype.getYear ( ) ====
+{{note| 对于近乎所有用途，getFullYear 方法都是首选的，因为它避免了“2000年问题”。}}
+
+无参数方式调用 '''getYear''' 方法，采用以下步骤：
+
+# 令 <var>t</var> 为 '''this时间值'''。
+# 如果 <var>t</var> 是 '''NaN'''，返回 '''NaN'''。
+# 返回 [[ES5/builtins#YearFromTime|YearFromTime]]([[ES5/builtins#LocalTime|LocalTime]](<var>t</var>)) - '''1900'''。
+
+
+===={{anchor|Date.prototype.setYear}}Date.prototype.setYear (year) ====
+{{note| 对于近乎所有用途， '''setFullYear''' 方法都是首选的，因为它避免了“2000年问题”。}}
+
+用一个参数 <var>year</var> 调用 '''setYear''' 方法，采用以下步骤：
+
+# 令 <var>t</var> 为 [[ES5/builtins#LocalTime|LocalTime]]('''this时间值''') 的结果；但如果 '''this时间值''' 是 '''NaN'''，那么令 <var>t</var> 为 '''+0'''。
+# 调用 [[ES5/conversion#ToNumber|ToNumber]](<var>year</var>)。
+# 如果 <var>Result(2)</var> 是 '''NaN'''，将 '''this''' 值的 <nowiki>[[PrimitiveValue]]</nowiki> 内部属性设为 '''NaN'''，并返回 '''NaN'''。
+# 如果 <var>Result(2)</var> 不是 '''NaN''' 并且 '''0''' ≤ [[ES5/conversion#ToInteger|ToInteger]](<var>Result(2)</var>) ≤ '''99'''，则 <var>Result(4)</var> 是 [[ES5/conversion#ToInteger|ToInteger]](<var>Result(2)</var>) + '''1900'''。否则，<var>Result(4)</var> 是 <var>Result(2)</var>。
+# 计算 [[ES5/builtins#MakeDay|MakeDay]](<var>Result(4)</var>, [[ES5/builtins#MonthFromTime|MonthFromTime]](<var>t</var>), [[ES5/builtins#DateFromTime|DateFromTime]](<var>t</var>))。
+# 计算 [[ES5/builtins#UTC|UTC]]([[ES5/builtins#MakeDate|MakeDate]](<var>Result(5)</var>, [[ES5/builtins#TimeWithinDay|TimeWithinDay]](<var>t</var>)))。
+# 将 '''this''' 值的 [[ES5/types#PrimitiveValue|<nowiki>[[PrimitiveValue]]</nowiki>]] 内部属性设为 [[ES5/builtins#TimeClip|TimeClip]](<var>Result(6)</var>)。
+# 返回 '''this''' 值的 [[ES5/types#PrimitiveValue|<nowiki>[[PrimitiveValue]]</nowiki>]] 内部属性值。
+
+
+===={{anchor|Date.prototype.toGMTString}}Date.prototype.toGMTString ( ) ====
+{{note| '''toUTCString''' 属性是首选的，'''toGMTString''' 属性是为了兼容较老的代码才提供的。建议在新的 ECMAScript 代码中使用 '''toUTCString''' 属性。}}
+
+'''Date.prototype.toGMTString''' 的初始值是与 '''Date.prototype.toUTCString''' 的初始值相同的函数对象。
+
+== {{anchor|C}}附录 C ECMAScript 的严格模式 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-C}}
+
+
+
+'''严格模式下的限制和异常'''
+
+* 在[[ES5/execution#x10.1.1|严格模式]]下,"'''implements'''"、"'''interface'''"、"'''let'''"、"'''package'''"、"'''private'''"、"'''protected'''"、"'''public'''"、"'''static'''"、和 "'''yield'''" 这些标识符都属于 ''[[ES5/lexical#FutureReservedWord|FutureReservedWord]]''。
+
+* 符合规范的实现中，当处理[[ES5/execution#x10.1.1|严格模式下的代码]]时，不应该像 {{toanchor|B.1.1}} 中描述地那样将 ''{{toanchor|OctalIntegerLiteral}}'' 扩展到 ''[[ES5/lexical#NumericLiteral|NumericLiteral]]'' 的语法中。
+
+* 符合规范的实现中，当处理[[ES5/execution#x10.1.1|严格模式下的代码]]时，不应该像 {{toanchor|B.1.2}} 中描述地那样将 ''{{toanchor|OctalEscapeSequence}}'' 扩展到 ''[[ES5/lexical#EscapeSequence|EscapeSequence]]'' 的语法中。
+
+* 对一个未定义的标识符或其他[[ES5/types#IsUnresolvableReference|无法解析的引用]]赋值时不会在全局对象上创建属性。在[[ES5/execution#x10.1.1|严格模式]]下，出现一个简单的赋值时，其 ''[[ES5/expressions#LeftHandSideExpression|LeftHandSideExpression]]'' 不能解析为一个[[ES5/types#IsUnresolvableReference|无法解析的引用]]。如果是那样，将抛出一个 '''ReferenceError''' 异常。同时，''[[ES5/expressions#LeftHandSideExpression|LeftHandSideExpression]]'' 不该引用到一个特性为 { &#91;[Writable]]: '''false''' } 的数据属性上，也不该引用到一个特性为 { &#91;[Set]]: '''undefined''' } 的访问器属性上，还不该引用到一个 [[ES5/types#Extensible|<nowiki>[[Extensible]]</nowiki>]] 内部属性值为 '''false''' 的不可扩对象上。这些情况同样会抛出一个 '''TypeError'''。
+
+* '''eval''' 或 '''arguments''' 不能出现在[[ES5/expressions#x11.13|赋值运算符]]或[[ES5/expressions#x11.3|后缀表达式]]的  ''[[ES5/expressions#LeftHandSideExpression|LeftHandSideExpression]]'' 中，也不能作为[[ES5/expressions#x11.4.4|前自增运算符]]或[[ES5/expressions#x11.4.5|前自减运算符]]的 ''[[ES5/expressions#UnaryExpression|UnaryExpression]]''。
+
+* [[ES5/execution#x10.1.1|严格模式]]下，[[ES5/execution#x10.6|Arguments]] 对象定义了不可配置的存取属性，包括“'''caller'''”和“'''callee'''”，如果访问这两个对象则会抛出一个 '''TypeError'''。
+
+* [[ES5/execution#x10.1.1|严格模式]]下，[[ES5/execution#x10.6|Arguments]] 对象不于其对应的函数形参列表动态共享参数数组索引的值（[[ES5/execution#x10.6|10.6]]）。
+
+* [[ES5/execution#x10.1.1|严格模式]]下，在 [[ES5/execution#x10.6|Arguments]] 被创建后，局部标识符 '''arguments''' 将指向这个对象。它是不可改变的，之后也不能对其做赋值操作。（[[ES5/execution#x10.5|10.5]]）
+
+* 在[[ES5/execution#x10.1.1|严格模式]]下，如果 ''[[ES5/expressions#ObjectLiteral|ObjectLiteral]]'' 中的任何同名数据属性定义超过一次，那么这就是一个语法错误（[[ES5/expressions#x11.1.5|11.1.5]]）。
+
+* 在[[ES5/execution#x10.1.1|严格模式]]下，如果 '''eval''' 或者 '''arguments''' 出现在属性参数列表中，那么这就是一个语法错误（[[ES5/expressions#x11.1.5|11.1.5]]）。
+
+* 如果在[[ES5/execution#x10.1.1|严格模式]]下执行 [[ES5/expressions#x11.1.1|this]] 相关的代码，而且 [[ES5/expressions#x11.1.1|this]] 的值没有强制指向一个对象。如果 [[ES5/expressions#x11.1.1|this]] 的值是 '''null''' 或者 '''undefined'''，那么 [[ES5/expressions#x11.1.1|this]] 就不会被转换成全局对象并且静态值不会被转换成包装对象。在[[ES5/execution#x10.4.3|函数调用]]的操作中（包括 [[ES5/builtins#x15.3.4.3|Function.prototype.apply]] 和 [[ES5/builtins#x15.3.4.4|Function.prototype.call]]）传入的 [[ES5/expressions#x11.1.1|this]] 值不会被强制将传入的 [[ES5/expressions#x11.1.1|this]] 值指向一个对象。
+
+* 在[[ES5/execution#x10.1.1|严格模式]]下，使用 [[ES5/expressions#x11.4.1|delete]] 运算符时，如果 [[ES5/expressions#x11.4.1|delete]] 后面的值是一个变量的直接引用、函数的参数或函数名，那么就会抛出一个 '''SyntexError'''。
+
+* 在[[ES5/execution#x10.1.1|严格模式]]下，使用 [[ES5/expressions#x11.4.1|delete]] 运算符删除特性为“{ &#91;[Configurable]]:'''false''' }”的属性时，会抛出一个 '''TypeError'''。
+
+* 在[[ES5/execution#x10.1.1|严格模式]]下，''[[ES5/statements#VariableDeclaration|VariableDeclaration]]'' 或 ''[[ES5/statements#VariableDeclarationNoIn|VariableDeclarationNoIn]]'' 中的 ''[[ES5/lexical#Identifier|Identifier]]'' 出现 '''eval''' 或 '''arguments''' 时，抛出一个 '''SyntaxError'''。
+
+* [[ES5/execution#x10.1.1|严格模式]]下的代码不应该含有 ''[[ES5/statements#WithStatement|WithStatement]]''，如果存在则抛出一个 '''SyntexError'''。
+
+* 在[[ES5/execution#x10.1.1|严格模式]]下，使用 ''[[ES5/statements#TryStatement|TryStatement]]'' 语句时，如果 ''[[ES5/statements#Catch|Catch]]'' 产生式中的 ''[[ES5/lexical#Identifier|Identifier]]'' 是 '''eval''' 或 '''arguments'''，则抛出一个 '''SyntexError'''。
+
+* 在[[ES5/execution#x10.1.1|严格模式]]下，''[[ES5/functions#FunctionDeclaration|FunctionDeclaration]]'' 或 ''[[ES5/functions#FunctionExpression|FunctionExpression]]'' 中的 ''[[ES5/functions#FormalParameterList|FormalParameterList]]'' 里面包含 '''eval''' 或 '''arguments''' 标识符，则抛出一个 '''SyntexError'''。{{extra note||在Function构造器的参数列表中使用是允许的。}}
+
+* 在[[ES5/execution#x10.1.1|严格模式]]下，函数的形参列表中不能含有两个或两个以上的同名参数。当试图使用 ''[[ES5/functions#FunctionDeclaration|FunctionDeclaration]]''、''[[ES5/functions#FunctionExpression|FunctionExpression]]'' 或 [[ES5/builtins#x15.3.2|Function构造器]] 来创建一个这样的函数时将抛出一个 '''SyntexError'''。
+
+* 浏览器具体实现不会在当前规范下进行扩展，这也意味着包括[[ES5/execution#x10.1.1|严格模式]]下函数的 '''caller''' 或其实例的 '''arguments''' 属性。[[ES5/execution#x10.1.1|严格模式]]下，ECMAScript代码不能创建或者修改函数上的这些属性。（[[ES5/execution#x10.6|10.6]]、[[ES5/functions#x13.2|13.2]]、[[ES5/builtins#x15.3.4.5.3|15.3.4.5.3]]）
+
+* 在[[ES5/execution#x10.1.1|严格模式]]下，使用 '''eval''' 或 '''arguments''' 标识符作为 ''[[ES5/functions#FunctionDeclaration|FunctionDeclaration]]'' 或 ''[[ES5/functions#FunctionExpression|FunctionExpression]]'' 或 ''[[ES5/functions#FormalParameterList|FormalParameterList]]'' 的名字，都会导致 '''SyntexError'''。试图使用 [[ES5/builtins#x15.3.2|Function构造器]] 动态定义一个这样的严格模式函数也会抛出一个 '''SyntexError'''。
+
+== {{anchor|D}}附录 D  第5版 中可能会对 第3版 产生兼容性影响的更正及澄清 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-D}}
+
+全体：在 '''第3版''' 规范中像“就像用表达式 '''new Array()''' 一样”这样的短语的意思受到了误解。 '''第5版''' 规范中，对标准内置对象、属性的所有内部引用和内部调用相关文本描述，都做了澄清：应使用实际的内置对象，而不是对应命名属性的当前动态值。
+
+[[ES5/expressions#x11.8.2|11.8.2]]、[[ES5/expressions#x11.8.3|11.8.3]]、[[ES5/expressions#x11.8.5|11.8.5]]：ECMAScript 总体上是以从左到右的顺序解释执行，但是 '''第3版''' 规范中 '''>''' 和 '''<=''' 运算符的描述语言导致了局部从右到左的顺序。本规范已经更正了这些运算符，现在完全是从左到右的顺序解释执行。然而，这个对顺序的修改，如果在解释执行过程期间产生副作用，就有可能被观察到。
+
+[[ES5/expressions#x11.1.4|11.1.4]]：'''第5版''' 澄清了[[ES5/expressions#x11.1.4|数组初始化]]结束位置的尾端逗号不计入数组长度。这不是对 '''第3版''' 语义的修改，但有些实现在之前可能对此有误解。
+
+[[ES5/expressions#x11.2.3|11.2.3]]：'''第5版''' 调换了算法 '''第2步''' 和 '''第3步''' 的顺序。'''第1版''' 一直到 '''第3版''' 规定的顺序是错误的，原来的顺序在解释执行 [[ES5/execution#x10.6|Arguments]] 时有副作用，可能影响到 ''[[ES5/expressions#MemberExpression|MemberExpression]]'' 的解释执行结果。
+
+[[ES5/statements#x12.14|12.14]]：在 '''第3版''' 中，对于传给 [[ES5/statements#x12.14|try语句]] 的 '''catch''' 子句的异常参数的名称解析，用与 '''new Object()''' 一样的方式创建一个对象来作为解析这个名称的作用域。如果实际的异常对象是个函数并且在 '''catch''' 子句中调用了它，那么作用域对象将会作为 '''this''' 值传给这个调用。在函数体里可以给它的 '''this''' 值定义新属性，并且这些属性名将在函数返回之后在 '''catch''' 子句的作用域内变成可见的标识符绑定。在 '''第5版''' 中，如果把异常参数作为函数来调用，传入的 '''this''' 值是 '''undefined'''。
+
+[[ES5/functions|13]]：在 '''第3版''' 中，有 ''[[ES5/lexical#Identifier|Identifier]]'' 的 ''[[ES5/functions#FunctionExpression|FunctionExpression]]'' 产生式的算法，用与 '''new Object()''' 一样的方式创建一个对象并加入到作用域链中，用来提供函数名查找的作用域。标识符解析规则（'''第3版''' 里的 [[ES5/expressions#x10.1.4|10.1.4]]）会作用在这样的对象上，如果需要，还会用对象的原型链来尝试解析标识符。这种方式使得 '''Object.prototype''' 的所有属性以标识符的形式在这个作用域里可见。实践中，大多数 '''第3版''' 的实现都没有实行这个语义。'''第5版''' 更改了这里的语义，用一个声明式环境记录项来绑定了函数名。
+
+[[ES5/program|14]]：在 '''第3版''' 中，产生式 ''[[ES5/program#SourceElements|SourceElements]]'' : ''[[ES5/program#SourceElements|SourceElements]]'' ''[[ES5/program#SourceElement|SourceElement]]'' 的算法不像相同形式的 ''[[ES5/statements#Block|Block]]'' 对语句的结果值做正确的传递。这可导致 '''eval''' 函数解释执行一个 ''[[ES5/program#Program|Program]]'' 文本时产生错误的结果。实践中，大多数 '''第3版''' 的实现都做了正确的传递，而不关心 '''第5版''' 规定了什么。
+
+[[ES5/builtins#15.10.6|15.10.6]]：'''RegExp.prototype''' 现在是一个 '''RegExp''' 对象，而不是 '''Object''' 的一个实例。用 '''Object.prototype.toString''' 可看到它的 [[ES5/types#Class|<nowiki>[[Class]]</nowiki>]] 内部属性值现在是 "'''RegExp'''"，不是 "'''Object'''"。
+
+== {{anchor|E}}附录 E 第5版 内容的增加与变化，介绍 第3版 不兼容问题 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-E}}
+
+[[ES5/lexical#x7.1|7.1]]：Unicode 格式控制字符在受到处理之前不再从 ECMAScript 源文本中剥离。在 '''第5版''' 中，如果这样一个字符在字符串字面量或者正则表达式字面量中出现，这个字符会被合并到字面量中，而在 '''第3版''' 里，这个字符不会被合并。
+
+[[ES5/lexical#x7.2|7.2]]：Unicode 字符 '''<BOM>''' 现在是作为空格使用，如果它出现在本该是一个标识符的位置的中间，则会产生一个语法错误，而在 '''第3版''' 里不会。
+
+[[ES5/lexical#x7.3|7.3]]：换行符以前是作为转义字符处理，而现在允许换行符被包含在字符串字面量标记中。这在 '''第3版''' 中会产生一个语法错误。
+
+[[ES5/lexical#x7.8.5|7.8.5]]：现在的正则表达式字面量在字面量解析执行的时候都会返回一个唯一的对象。这个改变可以被任意测试字面量值的对象标识符或者一些敏感的副作用的程序检测到。
+
+[[ES5/lexical#x7.8.5|7.8.5]]：'''第5版''' 要求从 ''[[ES5/lexical#RegularExpressionLiteral|RegularExpressionLiteral]]'' 转换到 '''RegExp''' 对象时可能的错误作为[[ES5/errors#early-error|早期错误]]抛出。在 '''第5版''' 之前的实现允许延迟抛出 '''TypeError'''，直到真正执行到这个对象。
+
+[[ES5/lexical#x7.8.5|7.8.5]]：在 '''第5版''' 中，未转义的 "'''/'''" 字符可以作为 ''[[ES5/lexical#x7.8.5|CharacterClass]]'' 存在于正则表达式字面量中。在 '''第3版''' 里，这样的字符是作为字面量的最后一个字符存在。
+
+[[ES5/execution#x10.4.2|10.4.2]]：在 '''第5版''' 中，间接调用 '''eval''' 函数会将全局对象作为 [[ES5/execution#eval-code|eval代码]] 的变量环境和 [[ES5/execution#x10.2|词法环境]]。在 '''第3版''' 中，'''eval''' 函数的间接调用者的变量和[[ES5/execution#x10.2|词法环境]]是作为 [[ES5/execution#eval-code|eval代码]] 的环境使用。
+
+[[ES5/builtins#x15.4.4|15.4.4]]：在 '''第5版''' 中，所有 [[ES5/builtins#x15.4.3.1|Array.prototype]] 下的方法都是通用的。在 '''第3版''' 中，'''toString''' 和 '''toLocaleString''' 方法不是通用的，如果被非 '''Array''' 实例调用时会抛出一个 '''TypeError''' 的异常。
+
+[[ES5/execution#x10.6|10.6]]：在 '''第5版''' 中，'''arguments''' 对象与实际的参数符合，它的数组索引属性是可枚举的。在 '''第3版''' 中，这些属性是不可枚举的。
+
+[[ES5/execution#x10.6|10.6]]：在 '''第5版''' 中，'''arguments''' 对象的 [[ES5/types#Class|<nowiki>[[Class]]</nowiki>]] 内置属性值是“'''Arguments'''”。在 '''第3版''' 中，它是“'''Object'''”。当对 '''arguments''' 对象调用 '''toString''' 的时候 
+
+[[ES5/statements#x12.6.4|12.6.4]]：当 '''in''' 表达式执行一个 '''null''' 或者 '''undefined''' 时，[[ES5/statements#12.6.4|for-in 语句]]不再抛出 '''TypeError'''。取而代之的是将其作为不包含可枚举属性的对象执行。
+
+[[ES5/builtins|15]]：在 '''第5版''' 中，下面的新属性都是在第三种中已存在的内建对象中定义，'''Object.getPrototypeOf, Object.getOwnPropertyDescriptor, Object.getOwnPropertyNames, Object.create, Object.defineProperty, Object.defineProperties, Object.seal, Object.freeze, Object.preventExtensions, Object.isSealed, Object.isFrozen, Object.isExtensible, Object.keys, Function.prototype.bind, Array.prototype.indexOf, Array.prototype.lastIndexOf, Array.prototype.every, Array.prototype.some, Array.prototype.forEach, Array.prototype.map, Array.prototype.filter, Array.prototype.reduce, Array.prototype.reduceRight, String.prototype.trim, Date.now, Date.prototype.toISOString, Date.prototype.toJSON'''。
+
+[[ES5/builtins|15]]：实现现在要求忽略内建方法中的额外参数，除非明确指定。在 '''第3版''' 中，并没有规定额外参数的处理方式，实现中明确允许抛出一个 '''TypeError''' 错误。
+
+[[ES5/builtins#x15.1.1|15.1.1]]：全局对象的值属性 '''NaN'''、'''Infinity''' 和 '''Undefined''' 改为只读属性。
+
+[[ES5/builtins#x15.1.2.1|15.1.2.1]]：实现不再允许约束非直接调用 '''eval''' 的方式。另外间接调用 '''eval''' 会使用全局对象作为变量环境，而不是使用调用者的变量环境作为变量环境。
+
+[[ES5/builtins#x15.1.2.2|15.1.2.2]]：'''parseInt''' 的规范不再允许实现将 '''0''' 开头的字符串作为8进制值。
+
+[[ES5/builtins#x15.3.4.3|15.3.4.3]]：在 '''第3版''' 中，如果传入 [[ES5/builtins#x15.3.4.3|Function.prototype.apply]] 的第二个参数不是一个数组对象或者一个 '''arguments''' 对象，就会抛出一个 '''TypeError'''。在 '''第5版''' 中，参数也可以是任意类型的含有 '''length''' 属性的类数组对象。
+
+[[ES5/builtins#x15.3.4.3|15.3.4.3]]，[[ES5/builtins#x15.3.4.4|15.3.4.4]]：在 '''第3版''' 中，在 [[ES5/builtins#x15.3.4.3|Function.prototype.apply]] 或者 [[ES5/builtins#x15.3.4.4|Function.prototype.call]] 中传入 '''undefined''' 或者 '''null''' 作为第一个参数会导致[[ES5/builtins#x15.1|全局对象]]被作为一个个参数传入，间接导致目标函数的 '''this''' 会指向全局变量环境。如果第一个参数是一个原始值，在原始值上调用 [[ES5/conversion#ToObject|ToObject]] 的结果会作为 '''this''' 的值。在 '''第5版''' 中，这些转换不会出现，目标函数的 '''this''' 会指向真实传入的参数。这个不同点一般情况下对已存在的遵循 ECMAScript '''第3版''' 的代码来说不太明显，因为相应转换会在目标函数生效之前执行。然而，基于不同的实现，如果使用 '''apply''' 或者 '''call''' 调用函数时，这个不同点就会很明显。另外，用这个方法调用一个标准的内建函数，并使用 '''null''' 或者 '''undefined''' 作为参数时，很可能会导致 '''第5版''' 标准下的实现与 '''第3版''' 标准下的实现不同。特别是 '''第5版''' 中代表性地规定了需要将实际调用的传入的 '''this''' 值作为对象的内建函数，在传入 '''null''' 或者 '''undefined''' 作为 '''this''' 值时，会抛出一个 '''TypeError''' 异常。
+
+[[ES5/builtins#x15.3.5.2|15.3.5.2]]：在 '''第5版''' 中，函数实例的 '''prototype''' 属性是不可枚举的。在 '''第3版''' 中，是可以枚举的。
+
+[[ES5/builtins#x15.5.5.2|15.5.5.2]]：在 '''第5版''' 中，一个字符串对象的 [[ES5/types#PrimitiveValue|<nowiki>[[PrimitiveValue]]</nowiki>]] 的单个字符可以作为字符串对象的数组索引属性访问。这些属性是不可泄也不可配置的，并会影响任意名字相同的继承属性。在 '''第3版''' 中，这些属性不会存在，ECMAScript 代码可以通过这些名字动态添加和移除可写的属性并访问以这些名字继承的属性。
+
+[[ES5/builtins#x15.9.4.2|15.9.4.2]]：[[ES5/builtins#x15.9.4.2|Date.parse]] 方法现在不要求第一个参数首先作为 ISO 格式字符串解析。使用这个格式但是基于特定行为实现（包括未来的一些行为）或许会表现的不太一样。
+
+[[ES5/builtins#x15.10.2.12|15.10.2.12]]：在 '''第5版''' 中，'''\s''' 现在可以匹配 '''<BOM>''' 了。 
+
+[[ES5/builtins#x15.10.4.1|15.10.4.1]]：在 '''第3版''' 中，由 '''RegExp''' 构造器创建的对象的 '''source''' 字符串的精确形式由实现定义。在 '''第5版''' 中，字符串必须符合确定的指定条件，因此会和 '''第3版''' 标准的实现的结果不一样。
+
+[[ES5/builtins#x15.10.6.4|15.10.6.4]]：在 '''第3版''' 中，[[ES5/builtins#x15.10.6.4|RegExp.prototype.toString]] 的规则不需要由 '''RegExp''' 对象的 '''source''' 属性决定。在 '''第5版''' 中，结果必须由 '''source''' 属性经由一个指定的规则，因此会和 '''第3版''' 实现的结果不一样。
+
+[[ES5/builtins#x15.11.2.1|15.11.2.1]]，[[ES5/builtins#x15.11.4.3|15.11.4.3]]：在 '''第5版''' 中，如果一个错误对象的 '''message''' 属性原始值没有通过 '''Error''' 构造器指定，那么这个原始值就是一个空的字符串。在 '''第3版''' 中，这个原始值由实现决定。
+
+[[ES5/builtins#x15.11.4.4|15.11.4.4]]：在 '''第3版''' 中，[[ES5/builtins#x15.11.4.4|Error.prototype.toString]] 的结果是由实现定义的。在 '''第5版''' 中，有完整的规范指定，因此可能会和 '''第3版''' 的实现不同。
+
+[[ES5/builtins#x15.12|15.12]]： 在 '''第5版''' 中，'''JSON''' 是在全局环境中定义的。 '''第3版''' 中，测试这个名词的存在会发现它是 '''undefined'''，除非这个程序或者实现定义了这个名词。
+
+== {{anchor|F}}附录 F  5.1 版中技术上的重大更正和阐明 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-F}}
+
+[[ES5/lexical#x7.8.4|7.8.4]]：字符值定义追加了 ''[[ES5/lexical#DoubleStringCharacter|DoubleStringCharacter]]'' :: ''[[ES5/lexical#LineContinuation|LineContinuation]]'' 与 ''[[ES5/lexical#SingleStringCharacter|SingleStringCharacter]]'' :: ''[[ES5/lexical#LineContinuation|LineContinuation]]''。
+
+[[ES5/execution#x10.2.1.1.3|10.2.1.1.3]]：参数 <var>S</var> 是不能被忽略的。它控制着试图设置一个不可改变的绑定时是否抛出异常。
+
+[[ES5/execution#x10.2.1.2.2|10.2.1.2.2]]：在算法的 '''第5步'''，真被传递后最后一个参数为 [[ES5/types#DefineOwnProperty|<nowiki>[[DefineOwnProperty]]</nowiki>]]。
+
+[[ES5/execution#x10.5|10.5]]：当重定义全局函数使，原算法 '''第5.5步''' 调整为现在的 '''第5.6步'''，并加入一个新的 '''第5.5步''' 用来还原与第三版的兼容性。
+
+[[ES5/expressions#x11.5.3|11.5.3]]：在最后符号项，指定使用 IEEE754 舍入到最接近模式。
+
+[[ES5/statements#x12.6.3|12.6.3]]：在 '''第3.1.2步''' 的两种算法中修复缺失的 [[ES5/conversion#ToBoolean|ToBoolean]]。
+
+[[ES5/statements#x12.6.4|12.6.4]]：在最后两段的额外最后一句中，阐明某些属性枚举的规定。
+
+[[ES5/statements#x12.7|12.7]]、[[ES5/statements#x12.8|12.8]]、[[ES5/statements#x12.9|12.9]]：BNF 的修改为阐明 [[ES5/statements#x12.7|continue]] 或 [[ES5/statements#x12.8|break]] 语句没有一个 [[ES5/lexical#Identifier|Identifier]] 或一个 [[ES5/statements#x12.9|return]] 语句没有一个表达式时，在分号之前可以有一个 ''[[ES5/lexical#LineTerminator|LineTerminator]]''。
+
+[[ES5/statements#x12.14|12.14]]：'''算法1''' 的 '''第3步'''，'''算法3''' 的 '''第2.1步''' 中，纠正这样的值 <var>B</var> 是作为参数传递而不是 <var>B</var> 本身。
+
+[[ES5/builtins#x15.1.2.2|15.1.2.2]]：在算法的 '''第2步''' 中阐明 <var>S</var> 可能是空字符串。
+
+[[ES5/builtins#x15.1.2.3|15.1.2.3]]：在算法的 '''第2步''' 中阐明 <var>trimmedString</var> 可以是空字符串。
+
+[[ES5/builtins#x15.1.3|15.1.3]]：添加注释阐明 ECMAScript 中的 URI 语法基于 RFC 2396 和较新的 RFC 3986。
+
+[[ES5/builtins#x15.2.3.7|15.2.3.7]]：在算法 '''第5步''' 和 '''第6步''' 中更正使用变量 <var>P</var>。
+
+[[ES5/builtins#x15.2.4.2|15.2.4.2]]：'''第5版''' 处理 '''undefined''' 和 '''null''' 值导致现有代码失败。规范修改为保持这样的代码的兼容性。在算法中加入新的 '''第1步''' 和 '''第2步'''。
+
+[[ES5/builtins#x15.3.4.3|15.3.4.3]]：'''第5版''' 中的 '''第5步''' 和 '''第7步''' 已被删除，因为它们规定要求 <var>argArray</var> 参数与泛数组状对象的其它用法不一致。
+
+[[ES5/builtins#x15.4.4.12|15.4.4.12]]：在 '''第9.1步'''，用 <var>actualStart</var> 替换不正确 <var>relativeStart</var> 引用。
+
+[[ES5/builtins#x15.4.4.15|15.4.4.15]]：阐明 <var>fromIndex</var> 的默认值是数组的长度减去 '''1'''。
+
+[[ES5/builtins#x15.4.4.18|15.4.4.18]]：在算法的 '''第9步'''，'''undefined''' 是现在指定的返回值。
+
+[[ES5/builtins#x15.4.4.22|15.4.4.22]]：在 '''第9.3.2步'''，第一个参数的 [[ES5/types#Call|<nowiki>[[Call]]</nowiki>]] 内部方法已经改变为 '''undefined'''，保持与 '''Array.prototype.reduce''' 定义的一致性。
+
+[[ES5/builtins#x15.4.5.1|15.4.5.1]]：在算法 '''第3.12.2步''' 和 '''第3.12.3步''' 中，变量的名字是相反的，导致一个不正确的相反测试。
+
+[[ES5/builtins#x15.5.4.9|15.5.4.9]]：规范要求每有关规范等效字符串删除，算法从每一个段落都承接，因为它在 '''注2''' 中被列为建议的。
+
+[[ES5/builtins#x15.5.4.14|15.5.4.14]]：在 '''split''' 算法 '''第11.1步''' 和 '''第13.1步'''，[[ES5/builtins#SplitMatch|SplitMatch]] 参数的位置顺序已修正为匹配 [[ES5/builtins#SplitMatch|SplitMatch]] 的实际参数特征。在 '''第13.1.3.7.4步'''，<var>lengthA</var> 取代 <var>A</var>.<var>length</var>。
+
+[[ES5/builtins#x15.5.5.2|15.5.5.2]]：在首段中，删除的单个字符属性访问“'''array index'''”语义的含义。改进算法 '''第3步''' 和 '''第5步'''，这样它们不执行“'''array index'''”的要求。
+
+[[ES5/builtins#x15.9.1.15|15.9.1.15]]：为缺失字段指定了合法值范围。淘汰“'''time-only'''”格式。所有可选字段指定默认值。
+
+[[ES5/builtins#x15.10.2.2|15.10.2.2]]：算法步骤编号为 '''第2步''' 所产生的内部闭包被错误的编号，它们是额外的算法步骤。
+
+[[ES5/builtins#x15.10.2.6|15.10.2.6]]：在 '''第3步''' 中的列表中抽象运算符 [[ES5/builtins#IsWordChar|IsWordChar]] 的第一个字符是“'''a'''”而不是“'''A'''”。
+
+[[ES5/builtins#x15.10.2.8|15.10.2.8]]：在闭包算法返回抽象运算符 [[ES5/builtins#CharacterSetMatcher|CharacterSetMatcher]] 中，为了避免与一个闭包的形参名称冲突，'''第3步''' 中定义的变量作为参数传递在 '''第4步''' 更名为 <var>ch</var>。
+
+[[ES5/builtins#x15.10.6.2|15.10.6.2]]：'''第步9.5步''' 被删除，因为它执行了 <var>I</var> 的额外增量。
+
+[[ES5/builtins#x15.11.1.1|15.11.1.1]]：当 <var>message</var> 参数是 '''undefined''' 时，撤销 <var>message</var> 自身属性设置为空字符串的要求。
+
+[[ES5/builtins#x15.11.1.2|15.11.1.2]]：当 <var>message</var> 参数是 '''undefined''' 时，撤销 <var>message</var> 自身属性设置为空字符串的要求。
+
+[[ES5/builtins#x15.11.4.4|15.11.4.4]]：'''第6步''' 到 '''第10步''' 修改 '''/''' 添加正确处理缺少或空的 <var>message</var> 属性值。
+
+[[ES5/builtins#x15.12.3|15.12.3]]：在 [[ES5/builtins#JSON-JA|JA]] 的内部操作的 '''第10.2.3步'''，串联的最后一个元素是 “<nowiki>]</nowiki>”。
+
+[[ES5/annex#B.2.1|B.2.1]]：追加注释，说明编码是基于 RFC 1738 而不是新的 RFC 3986。
+
+附录 [[ES5/annex#C|C]]：增加了 '''FutureReservedWords''' 在标准模式下的相应内容到 [[ES5/lexical#x7.6.12|7.6.1.2]] 节。
