@@ -1,0 +1,58 @@
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-14}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch14}}
+
+
+
+
+{{syntax}}
+
+    ''<b id="Program">Program</b>'' :
+        ''{{toanchor|SourceElements}}''<sub>opt</sub>
+
+    ''<b id="SourceElements">SourceElements</b>'' :
+        ''{{toanchor|SourceElement}}'' 
+        ''{{toanchor|SourceElements}}''  ''{{toanchor|SourceElement}}''
+
+    ''<b id="SourceElement">SourceElement</b>'' :
+        ''[[ES5/statements#Statement|Statement]]'' 
+        ''[[ES5/functions#FunctionDeclaration|FunctionDeclaration]]''
+
+{{semantics}}
+
+产生式 ''{{toanchor|Program}}'' ''':''' ''{{toanchor|SourceElements}}<sub>opt</sub>''  依照下面的步骤来解释执行：{{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L853|}}
+
+# 若 ''{{toanchor|SourceElements}}'' 的指令序言（参考 [[#directive-prologue|14.1]] 章）中，包含严格模式指令， 或者满足 [[ES5/execution#strict-mode-code|10.1.1]] 章节所描述的任何一个条件，则 ''{{toanchor|Program}}'' 的代码就是一段[[ES5/execution#strict-mode-code|严格模式代码]]，并对应性的，以[[ES5/execution#strict-mode-code|严格模式]]或[[ES5/execution#strict-mode-code|非严格模式]]，依照下面列出的步骤来解释执行代码。
+# 若没有 ''{{toanchor|SourceElements}}'' 部分 , 则返回 ('''normal''', '''empty''', '''empty''')。
+# 令 <var>progCxt</var> 为一个新的，如 [[ES5/execution#entering-global-code|10.4.1]] 章节所描述的，应用于[[ES5/execution#global-code|全局代码]]的执行环境。
+# 令 <var>result</var> 为解释执行 ''{{toanchor|SourceElements}}'' 的结果。
+# 退出 <var>progCxt</var> 这个执行环境。
+# 返回 <var>result</var>。
+          
+{{note|本规范不会规定，具体如何解释执行一个 '''''Program''''' 以及如何处理其结果，其具体行为由 ECMAScript 实现自行定义。}}
+
+
+产生式 ''{{toanchor|SourceElements}}'' ''':''' ''{{toanchor|SourceElements}}'' ''{{toanchor|SourceElement}}'' 依照下面的步骤来解释执行 :
+     
+# 令 <var>headResult</var> 为解释执行 ''{{toanchor|SourceElements}}'' 的结果。
+# 若 <var>headResult</var> 是[[ES5/types#abrupt-completion|非常规性完结]]的，返回 <var>headResult</var>。
+# 令 <var>tailResult</var> 为解释执行 ''{{toanchor|SourceElement}}'' 的结果。
+# 若 <var>tailResult</var>'''.value''' 为 '''empty'''，令 <var>V</var> = <var>headResult</var>'''.value'''，其他情况，令 <var>V</var> = <var>tailResult</var>'''.value'''。
+# 返回 (<var>tailResult</var>'''.type''', <var>V</var>, <var>tailResult</var>'''.target''')。
+
+产生式 : ''{{toanchor|SourceElement}}'' ''':''' ''[[ES5/statements#Statement|Statement]]'' 依照下面的步骤来解释执行：
+# 返回解释执行 [[ES5/statements#Statement|Statement]] 的结果。
+
+产生式 : ''{{toanchor|SourceElement}}'' ''':''' ''[[ES5/functions#FunctionDeclaration|FunctionDeclaration]]'' 依照下面的步骤来解释执行：
+# 返回 ('''normal''', '''empty''', '''empty''')。
+
+== {{anchor|x14.1}}{{anchor|directive-prologue}}指令序言和严格模式指令 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-14.1}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch14/14.1}}
+
+一个'''指令序言'''，是那些从 ''{{toanchor|Program}}'' 或 ''[[ES5/functions#FunctionBody|FunctionBody]]'' 的首个 ''{{toanchor|SourceElement}}'' 开始，到那些完全由一个字符串字面量后面跟一个分号，所构成的最长的 ''[[ES5/statements#x12.4|ExpressionStatement]]'' 序列。''[[ES5/statements#x12.4|ExpressionStatement]]'' 序列中的每一个都是 ''[[ES5/lexical#x7.8.4|StringLiteral]]'' 后面接分号，可以显式的插入，或者借助[[ES5/lexical#automatic-semicolon-insertion|分号自动插入机制]]来插入。一个指令序言也可以是一个空的序列。 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L887|}}
+
+'''严格模式指令'''是一个 '''"use strict"''' 或 '''<nowiki>'use strict'</nowiki>''' 的 ''[[ES5/lexical#x7.8.4|StringLiteral]]''。一个严格模式指令不应该包含 ''[[ES5/lexical#EscapeSequence|EscapeSequence]]'' 或 ''[[ES5/lexical#LineContinuation|LineContinuation]]''。
+
+一个指令序言，可以不仅仅包含一个严格模式指令。然而，当这种情况出现的时候，ECMAScript 实现可以发出一个相关警告。
+
+{{note|指令序言包含的 '''''ExpressionStatement''''' 产生式们，会在解释执行包含他们的 '''''SourceElements''''' 产生式期间，被正常的解析执行。ECMAScript 实现可以在一个'''指令序言'''中定义其他非严格模式指令。当一个指令序言中的某个 '''''ExpressionStatement''''' 并不是一个严格模式指令，也不是一个被 ECMAScript 实现所定义的指令，且存在某种通知机制的话，就要借助该机制，发出一个警告。}}
