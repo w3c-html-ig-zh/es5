@@ -1,0 +1,141 @@
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-13}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch13}}
+
+
+
+
+语法 
+
+  ''<b id="FunctionDeclaration">FunctionDeclaration</b>'' :
+    '''function''' ''[[ES5/lexical#Identifier|Identifier]]'' '''(''' ''{{toanchor|FormalParameterList}}<sub>opt</sub>'' ''')''' '''{''' ''{{toanchor|FunctionBody}}'' '''}'''
+
+  ''<b id="FunctionExpression">FunctionExpression</b>'' :
+    '''function''' ''[[ES5/lexical#Identifier|Identifier]]<sub>opt</sub>'' '''(''' ''{{toanchor|FormalParameterList}}<sub>opt</sub>'' ''')''' '''{''' ''{{toanchor|FunctionBody}}'' '''}'''
+
+  ''<b id="FormalParameterList">FormalParameterList</b>'' :
+    ''[[ES5/lexical#Identifier|Identifier]]''
+    ''{{toanchor|FormalParameterList}}'' ''',''' ''[[ES5/lexical#Identifier|Identifier]]''
+
+  ''<b id="FunctionBody">FunctionBody</b>'' :
+    ''[[ES5/program#SourceElements|SourceElements]]<sub>opt</sub>''
+
+语义 
+
+产生式 
+{{toanchor|FunctionDeclaration}} : '''function''' [[ES5/lexical#Identifier|Identifier]] '''(''' {{toanchor|FormalParameterList}}<sub>opt</sub> ''')''' '''{''' {{toanchor|FunctionBody}} '''}'''
+依照定义绑定初始化 ([[ES5/execution#declartioin-binding-Instantiation|10.5]]) 如下初始化：
+
+# 依照 [[#creating-function-objects|13.2]]，指定 {{toanchor|FormalParameterList}}<sub>opt</sub> 为<var>参数列表</var>，指定 {{toanchor|FunctionBody}} 为 <var>函数体</var>，创建一个新函数对象，返回结果。运行中的执行环境的 [[ES5/execution#VariableEnvironment|VariableEnvironment]] 传递为 <var>Scope</var>。如果 {{toanchor|FunctionDeclaration}} 包含在[[ES5/execution#strict-mode-code|严格模式代码]]里或 {{toanchor|FunctionBody}} 是[[ES5/execution#strict-mode-code|严格模式代码]]，那么传递 '''true''' 为 <var>Strict</var> 标志。
+
+产生式 
+{{toanchor|FunctionExpression}} : '''function''' '''(''' {{toanchor|FormalParameterList}}<sub>opt</sub> ''')''' '''{''' {{toanchor|FunctionBody}} '''}'''
+的解释执行如下：
+
+# 依照 [[#creating-function-objects|13.2]]，指定 {{toanchor|FormalParameterList}}<sub>opt</sub> 为<var>参数列表</var>，指定 {{toanchor|FunctionBody}} 为 <var>函数体</var>，创建一个新函数对象，返回结果。运行中的执行环境的 [[ES5/execution#LexicalEnvironment|LexicalEnvironment]] 传递为 <var>Scope</var>。如果 {{toanchor|FunctionExpression}} 包含在[[ES5/execution#strict-mode-code|严格模式代码]]里或 {{toanchor|FunctionBody}} 是[[ES5/execution#strict-mode-code|严格模式代码]]，那么传递 '''true''' 为 <var>Strict</var> 标志。
+
+产生式 
+{{toanchor|FunctionExpression}} : '''function''' [[ES5/lexical#Identifier|Identifier]] '''(''' {{toanchor|FormalParameterList}}<sub>opt</sub> ''')''' '''{''' {{toanchor|FunctionBody}} '''}'''
+的解释执行如下：
+
+# 令 <var>funcEnv</var> 为以运行中执行环境的 [[ES5/execution#LexicalEnvironment|LexicalEnvironment]] 为参数调用 [[ES5/execution#NewDeclarativeEnvironment|NewDeclarativeEnvironment]] 的结果。
+# 令 <var>envRec</var> 为 <var>funcEnv</var> 的环境记录项。
+# 以 [[ES5/lexical#Identifier|Identifier]] 的字符串值为参数调用 <var>envRec</var> 的具体方法 [[ES5/execution#CreateImmutableBinding|CreateImmutableBinding]](N)。
+# 令 <var>closure</var> 为依照 [[#creating-function-objects|13.2]]，指定 {{toanchor|FormalParameterList}}<sub>opt</sub> 为参数，指定 {{toanchor|FunctionBody}} 为 <var>函数体</var>，创建一个新函数对象的结果。传递 <var>funcEnv</var> 为 <var>Scope</var>。如果 {{toanchor|FunctionExpression}} 包含在[[ES5/execution#strict-mode-code|严格模式代码]]里或 {{toanchor|FunctionBody}} 是[[ES5/execution#strict-mode-code|严格模式代码]]，那么传递 '''true''' 为 <var>Strict</var> 标志。
+# 以 [[ES5/lexical#Identifier|Identifier]] 的字符串值和 <var>closure</var> 为参数调用 <var>envRec</var> 的具体方法 [[ES5/execution#InitializeImmutableBinding|InitializeImmutableBinding]](N,V)。
+# 返回 <var>closure</var>。
+
+{{note| 可以从 '''''FunctionExpression''''' 的 '''''FunctionBody''''' 里面引用 '''''FunctionExpression''''' 的 '''''Identifier'''''，以允许函数递归调用自身。然而不像 '''''FunctionDeclaration'''''，'''''FunctionExpression''''' 的 '''''Identifier''''' 不能被范围封闭的 '''''FunctionExpression''''' 引用，也不会影响它。}}
+
+产生式 {{toanchor|FunctionBody}} ''':''' ''[[ES5/program#SourceElements|SourceElements]]<sub>opt</sub>'' 的解释执行如下：
+
+# 如果这个 {{toanchor|FunctionBody}} 所在 {{toanchor|FunctionDeclaration}} 或 {{toanchor|FunctionExpression}} 包含在[[ES5/execution#strict-mode-code|严格模式代码]]内，或其 ''[[ES5/program#SourceElements|SourceElements]]'' 的指令序言（[[ES5/program#directive-prologue|14.1]]）包含一个 use strict 指令，或满足 [[ES5/execution#strict-mode-code|10.1.1]] 的任何条件，那么其代码[[ES5/execution#strict-mode-code|严格模式代码]]。如果 {{toanchor|FunctionBody}} 的代码是[[ES5/execution#strict-mode-code|严格模式代码]]，''[[ES5/program#SourceElements|SourceElements]]'' 的解释执行为以下的[[ES5/execution#strict-mode-code|严格模式代码]]步骤。否则，''[[ES5/program#SourceElements|SourceElements]]'' 的解释执行为以下的非[[ES5/execution#strict-mode-code|严格模式代码]]。
+# 如果 ''[[ES5/program#SourceElements|SourceElements]]'' 存在，则返回 ''[[ES5/program#SourceElements|SourceElements]]'' 的解释执行结果。
+# 否则返回 ('''normal''', '''undefined''', '''empty''')。
+
+
+== {{anchor|x13.1}}严格的模式的限制 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-13.1}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch13/13.1}}
+
+如果[[ES5/execution#strict-mode-code|严格模式]] {{toanchor|FunctionDeclaration}} 或 {{toanchor|FunctionExpression}} 的 {{toanchor|FormalParameterList}} 里出现多个相同 [[ES5/lexical#Identifier|Identifier]] 值，那么这是个 '''SyntaxError'''。{{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L4472|}}
+
+如果[[ES5/execution#strict-mode-code|严格模式]] {{toanchor|FunctionDeclaration}} 或 {{toanchor|FunctionExpression}} 的 {{toanchor|FormalParameterList}} 里出现标识符 '''"eval"''' 或标识符 '''"arguments"'''，那么这是个 '''SyntaxError'''。{{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L4466|}}
+
+如果[[ES5/execution#strict-mode-code|严格模式]] {{toanchor|FunctionDeclaration}} 或 {{toanchor|FunctionExpression}} 的 [[ES5/lexical#Identifier|Identifier]] 是标识符 '''"eval"''' 或标识符 '''"arguments"'''，那么这是个 '''SyntaxError'''。{{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L4456|}}
+
+== {{anchor|x13.2}}{{anchor|creating-function-objects}}创建函数对象 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-13.2}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch13/13.2}}
+
+指定 {{toanchor|FormalParameterList}} 为可选的 <var>参数列表</var>，指定 {{toanchor|FunctionBody}} 为 <var>函数体</var>，指定 <var>Scope</var> 为[[ES5/execution#lexical-environments|词法环境]]，<var>Strict</var> 为布尔标记，按照如下步骤构建函数对象：
+
+# 创建一个新的 ECMAScript 原生对象，令 <var>F</var> 为此对象。
+# 依照 [[ES5/types#object-internal-methods|8.12]] 描述设定 <var>F</var> 的除 [[ES5/types#Get|<nowiki>[[Get]]</nowiki>]] 以外的所有内部方法。
+# 设定 <var>F</var> 的 [[ES5/types#Class|<nowiki>[[Class]]</nowiki>]] 内部属性为 '''"Function"'''。
+# 设定 <var>F</var> 的 [[ES5/types#Prototype|<nowiki>[[Prototype]]</nowiki>]] 内部属性为 [[ES5/builtins#x15.3.3.1|15.3.3.1]] 指定的标准内置 '''Function''' 对象的 '''prototype''' 属性。
+# 依照 [[ES5/builtins#x15.3.5.4|15.3.5.4]] 描述，设定 <var>F</var> 的 [[ES5/types#Get|<nowiki>[[Get]]</nowiki>]] 内部属性。
+# 依照 [[#Call-impl|13.2.1]] 描述，设定 <var>F</var> 的 [[ES5/types#Call|<nowiki>[[Call]]</nowiki>]] 内部属性。
+# 依照 [[#Construct-impl|13.2.2]] 描述，设定 <var>F</var> 的 [[ES5/types#Construct|<nowiki>[[Construct]]</nowiki>]] 内部属性。
+# 依照 [[ES5/builtins#x15.3.5.3|15.3.5.3]] 描述，设定 <var>F</var> 的 [[ES5/types#HasInstance|<nowiki>[[HasInstance]]</nowiki>]] 内部属性。
+# 设定 <var>F</var> 的 [[ES5/types#Scope|<nowiki>[[Scope]]</nowiki>]] 内部属性为 <var>Scope</var> 的值。
+# 令 <var>names</var> 为一个[[ES5/types#List|列表]]容器，其中元素是以从左到右的文本顺序对应 {{toanchor|FormalParameterList}} 的标识符的字符串。
+# 设定 <var>F</var> 的 [[ES5/types#FormalParameters|<nowiki>[[FormalParameters]]</nowiki>]] 内部属性为 <var>names</var>。
+# 设定 <var>F</var> 的 [[ES5/types#Code|<nowiki>[[Code]]</nowiki>]] 内部属性为 {{toanchor|FunctionBody}}。
+# 设定 <var>F</var> 的 [[ES5/types#Extensible|<nowiki>[[Extensible]]</nowiki>]] 内部属性为 '''true'''。
+# 令 <var>len</var> 为 {{toanchor|FormalParameterList}} 指定的形式参数的个数。如果没有指定参数，则令 <var>len</var> 为 '''0'''。
+# 以参数 '''"length"'''、属性描述符 {<nowiki>[[Value]]</nowiki>: <var>len</var>, <nowiki>[[Writable]]</nowiki>: '''false''', <nowiki>[[Enumerable]]</nowiki>: '''false''', <nowiki>[[Configurable]]</nowiki>: '''false'''}、'''false''' 调用 <var>F</var> 的 [[ES5/types#DefineOwnProperty|<nowiki>[[DefineOwnProperty]]</nowiki>]] 内部方法。
+# 令 <var>proto</var> 为仿佛使用 '''new Object()''' 表达式创建新对象的结果，其中 Object 是[[ES5/builtins#object-objects|标准内置构造器]]名。
+# 以参数 '''"constructor"'''、属性描述符 {<nowiki>[[Value]]</nowiki>: <var>F</var>, { <nowiki>[[Writable]]</nowiki>: '''true''', <nowiki>[[Enumerable]]</nowiki>: '''false''', <nowiki>[[Configurable]]</nowiki>: '''true'''}、'''false''' 调用 <var>proto</var> 的 [[ES5/types#DefineOwnProperty|<nowiki>[[DefineOwnProperty]]</nowiki>]] 内部方法。
+# 以参数 '''"prototype"'''、属性描述符 {<nowiki>[[Value]]</nowiki>: <var>proto</var>, <nowiki>[[Writable]]</nowiki>: '''true''', <nowiki>[[Enumerable]]</nowiki>: '''false''', <nowiki>[[Configurable]]</nowiki>: '''false'''}、'''false''' 调用 <var>F</var> 的 [[ES5/types#DefineOwnProperty|<nowiki>[[DefineOwnProperty]]</nowiki>]] 内部方法。
+# 如果 <var>Strict</var> 是 '''true'''，则 
+## 令 <var>thrower</var> 为 [[#ThrowTypeError|<nowiki>[[ThrowTypeError]]</nowiki>]] 函数对象（[[#ThrowTypeError|13.2.3]]）。
+## 以参数 '''"caller"'''、属性描述符 {<nowiki>[[Get]]</nowiki>: <var>thrower</var>, <nowiki>[[Set]]</nowiki>: <var>thrower</var>, <nowiki>[[Enumerable]]</nowiki>: '''false''', <nowiki>[[Configurable]]</nowiki>: '''false'''}、'''false''' 调用 <var>F</var> 的 [[ES5/types#DefineOwnProperty|<nowiki>[[DefineOwnProperty]]</nowiki>]] 内部方法。
+## 以参数 '''"arguments"'''、属性描述符 {<nowiki>[[Get]]</nowiki>: <var>thrower</var>, <nowiki>[[Set]]</nowiki>: <var>thrower</var>, <nowiki>[[Enumerable]]</nowiki>: '''false''', <nowiki>[[Configurable]]</nowiki>: '''false'''}、'''false''' 调用 <var>F</var> 的 [[ES5/types#DefineOwnProperty|<nowiki>[[DefineOwnProperty]]</nowiki>]] 内部方法。
+# 返回 <var>F</var>。
+
+{{note|每个函数都会自动创建一个 '''prototype''' 属性，以满足函数会被当作构造器的可能性。}}
+
+=== {{anchor|x13.2.1}}{{anchor|Call-impl}}<nowiki>[[Call]]</nowiki> ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-13.2.1}}
+
+当用一个 '''this''' 值、一个参数列表调用函数对象 <var>F</var> 的 <b><nowiki>[[Call]]</nowiki></b> 内部方法，采用以下步骤：
+
+# 用 <var>F</var> 的 [[ES5/types#FormalParameters|<nowiki>[[FormalParameters]]</nowiki>]] 内部属性值、参数[[ES5/types#List|列表]] <var>args</var>、[[ES5/execution#entering-function-code|10.4.3]] 描述的 '''this''' 值来建立[[ES5/execution#function-code|函数代码]]的一个新执行环境，令 <var>funcCtx</var> 为其结果。
+# 令 <var>result</var> 为 {{toanchor|FunctionBody}}（也就是 <var>F</var> 的 [[ES5/types#Code|<nowiki>[[Code]]</nowiki>]] 内部属性）解释执行的结果。如果 F 没有 [[ES5/types#Code|<nowiki>[[Code]]</nowiki>]] 内部属性或其值是空的 {{toanchor|FunctionBody}}，则 <var>result</var> 是 ('''normal''', '''undefined''', '''empty''')。
+# 退出 <var>funcCtx</var> 运行环境，恢复到之前的执行运行环境。
+# 如果 <var>result</var>'''.type''' 是 '''throw''' 则抛出 <var>result</var>'''.value'''。
+# 如果 <var>result</var>'''.type''' 是 '''return''' 则返回 <var>result</var>'''.value'''。
+# 否则 <var>result</var>'''.type''' 必定是 '''normal'''。返回 '''undefined'''。
+
+=== {{anchor|x13.2.2}}{{anchor|Construct-impl}}<nowiki>[[Construct]]</nowiki> ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-13.2.2}}
+
+当以一个可能的空的参数列表调用函数对象 <var>F</var> 的 <b><nowiki>[[Construct]]</nowiki></b> 内部方法，采用以下步骤：
+
+# 令 <var>obj</var> 为新创建的 ECMAScript 原生对象。
+# 依照 [[ES5/types#object-internal-methods|8.12]] 设定 <var>obj</var> 的所有内部方法。
+# 设定 <var>obj</var> 的 [[ES5/types#Class|<nowiki>[[Class]]</nowiki>]] 内部属性为 '''"Object"'''。
+# 设定 <var>obj</var> 的 [[ES5/types#Extensible|<nowiki>[[Extensible]]</nowiki>]] 内部属性为 '''true'''。
+# 令 <var>proto</var> 为以参数 '''"prototype"''' 调用 <var>F</var> 的 [[ES5/types#Get|<nowiki>[[Get]]</nowiki>]] 内部属性的值。
+# 如果 [[ES5/types#Type|Type]](<var>proto</var>) 是 '''Object'''，设定 <var>obj</var> 的 [[ES5/types#Prototype|<nowiki>[[Prototype]]</nowiki>]] 内部属性为 <var>proto</var>。
+# 如果 [[ES5/types#Type|Type]](<var>proto</var>) 不是 '''Object'''，设定 <var>obj</var> 的 [[ES5/types#Prototype|<nowiki>[[Prototype]]</nowiki>]] 内部属性为 [[ES5/builtins#x15.2.4|15.2.4]] 描述的标准内置的 '''Object''' 原型对象。
+# 以 <var>obj</var> 为 '''this''' 值，调用 [[ES5/types#Construct|<nowiki>[[Construct]]</nowiki>]] 的参数列表为 <var>args</var>，调用 <var>F</var> 的 [[ES5/types#Call|<nowiki>[[Call]]</nowiki>]] 内部属性，令 <var>result</var> 为调用结果。
+# 如果 [[ES5/types#Type|Type]](<var>result</var>) 是 '''Object'''，则返回 <var>result</var>。
+# 返回 <var>obj</var>。
+
+==={{anchor|x13.2.3}}{{anchor|ThrowTypeError}}<nowiki>[[ThrowTypeError]]</nowiki> 函数对象 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-13.2.3}}
+
+'''<nowiki>[[ThrowTypeError]]</nowiki>''' 对象是个唯一的函数对象，如下只定义一次：{{v8|https://github.com/v8/v8/blob/3.22/src/bootstrapper.cc#L575|}}
+
+# 创建一个新 ECMAScript 原生对象，令 <var>F</var> 为此对象。
+# 依照 [[ES5/types#object-internal-methods|8.12]] 设定 <var>F</var> 的所有内部属性。
+# 设定 <var>F</var> 的 [[ES5/types#Class|<nowiki>[[Class]]</nowiki>]] 内部属性为 '''"Function"'''。
+# 设定 <var>F</var> 的 [[ES5/types#Prototype|<nowiki>[[Prototype]]</nowiki>]] 内部属性为 [[ES5/builtins#x15.3.3.1|15.3.3.1]] 指定的标准内置 [[ES5/builtins#x15.3.3.1|Function]] 的原型对象。
+# 依照 [[#Call-impl|13.2.1]] 描述设定 <var>F</var> 的 [[ES5/types#Call|<nowiki>[[Call]]</nowiki>]] 内部属性。
+# 设定 <var>F</var> 的 [[ES5/types#Scope|<nowiki>[[Scope]]</nowiki>]] 内部属性为[[ES5/execution#the-global-environment|全局环境]]。
+# 设定 <var>F</var> 的 [[ES5/types#FormalParameters|<nowiki>[[FormalParameters]]</nowiki>]] 内部属性为一个空[[ES5/types#List|列表]]。
+# 设定 <var>F</var> 的 [[ES5/types#Code|<nowiki>[[Code]]</nowiki>]] 内部属性为一个 {{toanchor|FunctionBody}}，它无条件抛出一个 '''TypeError''' 异常，不做其他事情。
+# 以参数 '''"length"'''、属性描述符 {<nowiki>[[Value]]</nowiki>: '''0''', <nowiki>[[Writable]]</nowiki>: '''false''', <nowiki>[[Enumerable]]</nowiki>: '''false''', <nowiki>[[Configurable]]</nowiki>: '''false'''}、'''false''' 调用 <var>F</var> 的 [[ES5/types#DefineOwnProperty|<nowiki>[[DefineOwnProperty]]</nowiki>]] 内部方法。
+# 设定 <var>F</var> 的 [[ES5/types|<nowiki>[[Extensible]]</nowiki>]] 内部属性为 '''false'''。
+# 令 '''<nowiki>[[ThrowTypeError]]</nowiki>''' 为 <var>F</var>。
