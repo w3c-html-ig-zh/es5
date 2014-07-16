@@ -1,0 +1,1256 @@
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11}}
+
+== {{anchor|x11.1}}主值表达式 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.1}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.1}}
+
+
+
+
+{{Syntax}}
+
+    ''<b id="PrimaryExpression">PrimaryExpression</b>'' :
+        '''this''' 
+        ''[[ES5/lexical#Identifier|Identifier]]''
+        ''[[ES5/lexical#Literal|Literal]]''
+        ''{{toanchor|ArrayLiteral}}''
+        ''{{toanchor|ObjectLiteral}}''
+        '''(''' ''{{toanchor|Expression}}'' ''')'''
+
+=== {{anchor|x11.1.1}}this关键字{{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3542-L3546|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.1.1}}
+
+'''this''' 关键字执行为当前执行环境的 [[ES5/execution#ThisBinding|this 绑定]]。
+
+=== {{anchor|x11.1.2}}{{anchor|identifier-reference}}标识符引用 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L4668-L4680|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.1.2}}
+
+''[[ES5/lexical#Identifier|Identifier]]'' 的执行遵循 [[ES5/execution#identifier-resolution|10.3.1]] 所规定的标识符查找。标识符执行的结果总是一个 [[ES5/types#Reference|Reference]] 类型的值。
+
+=== {{anchor|x11.1.3}}字面量引用 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3548-L3561|}} {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3578-L3603|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.1.3}}
+
+''[[ES5/lexical#Literal|Literal]]'' 按照 [[ES5/lexical#literals|7.8]] 所描述的方式执行。
+
+=== {{anchor|x11.1.4}}{{anchor|array-initialiser}}数组初始化 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3642|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.1.4}}
+
+数组初始化是一个以字面量的形式书写的描述数组对象的初始化的表达式。它是一个零个或者多个表达式的序列，其中每一个表示一个[[ES5/builtins#array-element|数组元素]]，并且用方括号括起来。元素并不一定要是字面量，每次数组初始化执行时它们都会被执行一次。
+
+[[ES5/builtins#array-element|数组元素]]可能在元素列表的开始、结束，或者中间位置以逗号取代。当元素列表中的一个逗号的前面没有 ''{{toanchor|AssignmentExpression}}''（如，一个逗号在另一个逗号之前。）的情况下，缺失的[[ES5/builtins#array-element|数组元素]]仍然会对数组长度有贡献，并且增加后续元素的索引值。以逗号省略的数组元素是 '''undefined'''。假如元素在数组末尾被省略，那么元素不会贡献数组长度。
+
+{{syntax}}
+
+    ''<b id="ArrayLiteral">ArrayLiteral</b>'' :
+        '''[''' ''{{toanchor|Elision}}''{{opt}} ''']'''
+        '''[''' ''{{toanchor|ElementList}}'' ''']'''
+        '''[''' ''{{toanchor|ElementList}}'' ''',''' ''{{toanchor|Elision}}''{{opt}} ''']'''
+
+    ''<b id="ElementList">ElementList</b>'' :
+        ''{{toanchor|Elision}}{{opt}}'' ''{{toanchor|AssignmentExpression}}''
+        ''{{toanchor|ElementList}}'' ''',''' ''{{toanchor|Elision}}''{{opt}} ''{{toanchor|AssignmentExpression}}''
+
+    ''<b id="Elision">Elision</b>'' :
+        ''','''
+        ''{{toanchor|Elision}}'' ''','''
+
+{{semantics}}
+
+产生式 ''{{toanchor|ArrayLiteral}}'' ''':''' '''[''' ''{{toanchor|Elision}}''<sub>opt</sub> ''']''' 按照下面的过程执行 :
+
+# 令 <var>array</var> 为以表达式 '''new Array()''' 完全一致的方式创建一个新对象的结果，其中 [[ES5/builtins#x15.4|Array]] 是一个标准的内置构造器。
+# 令 <var>pad</var> 为解释执行 ''{{toanchor|Elision}}'' 的结果；如果不存在的话，使用数值 '''0'''。
+# 以参数 '''"length"'''、<var>pad</var> 和 '''false''' 调用 <var>array</var> 的 [[ES5/types#Put|<nowiki>[[Put]]</nowiki>]] 内置方法 
+# 返回 <var>array</var>。
+
+产生式 ''{{toanchor|ArrayLiteral}}'' ''':''' '''[''' ''{{toanchor|ElementList}}'' ''']''' 按照下面的过程执行 :
+
+# 返回解释执行 ''{{toanchor|ElementList}}'' 的结果。
+
+产生式 ''{{toanchor|ArrayLiteral}}'' ''':''' '''[''' ''{{toanchor|ElementList}}'' ''',''' ''{{toanchor|Elision}}''<sub>opt</sub> ''']''' 按照下面的过程执行：
+
+# 令 <var>array</var> 为解释执行 ''{{toanchor|ElementList}}'' 的结果。
+# 令 <var>pad</var> 为解释执行 ''{{toanchor|Elision}}'' 的结果；如果不存在的话，使用数值 '''0'''。
+# 令 <var>len</var> 为以参数 '''"length"''' 调用 <var>array</var> 的 [[ES5/types#Get|<nowiki>[[Get]]</nowiki>]] 内置方法的结果。
+# 以参数 '''"length"'''、[[ES5/conversion#to-uint32|ToUint32]](<var>pad</var>+<var>len</var>) 和 '''false''' 调用 <var>array</var> 的 [[ES5/types#Put|<nowiki>[[Put]]</nowiki>]] 内置方法。
+# 返回 <var>array</var>。
+
+产生式 ''{{toanchor|ElementList}}'' ''':''' ''{{toanchor|Elision}}''<sub>opt</sub> ''{{toanchor|AssignmentExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>array</var> 为以表达式 '''new Array()''' 完全一致的方式创建一个新对象的结果，其中 [[ES5/builtins#x15.4|Array]] 是一个标准的内置构造器。
+# 令 <var>firstIndex</var> 为解释执行 ''{{toanchor|Elision}}'' 的结果；如果不存在的话，使用数值 '''0'''。
+# 令 <var>initResult</var> 为解释执行 ''{{toanchor|AssignmentExpression}}'' 的结果。
+# 令 <var>initValue</var> 为 [[ES5/types#GetValue|GetValue]](<var>initResult</var>)。
+# 以参数 [[ES5/conversion#to-string|ToString]](<var>firstIndex</var>)、属性描述对象 { <nowiki>[[Value]]</nowiki>: <var>initValue</var>, <nowiki>[[Writable]]</nowiki>: '''true''', <nowiki>[[Enumerable]]</nowiki>: '''true''', <nowiki>[[Configurable]]</nowiki>: '''true'''} 和 '''false''' 调用 <var>array</var> 的 [[ES5/types#DefineOwnProperty|<nowiki>[[DefineOwnProperty]]</nowiki>]] 内置方法。
+# 返回 <var>array</var>。
+
+产生式 ''{{toanchor|ElementList}}'' ''':''' ''{{toanchor|ElementList}}'' ''',''' ''{{toanchor|Elision}}''<sub>opt</sub> ''{{toanchor|AssignmentExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>array</var> 为解释执行 ''{{toanchor|ElementList}}'' 的结果。
+# 令 <var>pad</var> 为解释执行 ''{{toanchor|Elision}}'' 的结果；如果不存在的话，使用数值 '''0'''。
+# 令 <var>initResult</var> 为解释执行 ''{{toanchor|AssignmentExpression}}'' 的结果。
+# 令 <var>initValue</var> 为 [[ES5/types#GetValue|GetValue]](<var>initResult</var>)。
+# 令 <var>len</var> 为以参数 '''"length"''' 调用 <var>array</var> 的 [[ES5/types#Get|<nowiki>[[Get]]</nowiki>]] 内置方法的结果。
+# 以参数 [[ES5/conversion#to-string|ToString]]([[ES5/conversion#to-uint32|ToUint32]](<var>pad</var>+<var>len</var>)) {{extra note||原文此处小括号不成对。}} 和属性描述对象 { <nowiki>[[Value]]</nowiki>: <var>initValue</var>, <nowiki>[[Writable]]</nowiki>: '''true''', <nowiki>[[Enumerable]]</nowiki>: '''true''', <nowiki>[[Configurable]]</nowiki>: '''true'''} 和 '''false''' 调用 <var>array</var> 的 [[ES5/types#DefineOwnProperty|<nowiki>[[DefineOwnProperty]]</nowiki>]] 内置方法。
+# 返回 <var>array</var>。
+
+产生式 ''{{toanchor|Elision}}'' ''':''' ''',''' 按照下面的过程执行 :
+
+# 返回数值 '''1'''。
+
+产生式 ''{{toanchor|Elision}}'' ''':''' ''{{toanchor|Elision}}'' ''',''' 按照下面的过程执行 :
+
+# 令 <var>preceding</var> 为解释执行 ''{{toanchor|Elision}}'' 的结果。
+# 返回 <var>preceding</var>+'''1'''。
+
+{{note|'''<nowiki>[[DefineOwnProperty]]</nowiki>''' 用于确保即使默认的数组原型对象被更改的情况下自身属性也会被定义，可以杜绝用 '''<nowiki>[[Put]]</nowiki>''' 创建一个新的自身属性。}}
+
+=== {{anchor|object-initialiser}}{{anchor|x11.1.5}}对象初始化 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3850|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.1.5}}
+
+对象初始化是一个以直接量的方式描述对象的初始化过程的表达式。它是用花括号括起来的由零或者多对属性名 / 关联值组成的列表，值不需要是直接量，每次对象初始化被执行到时他们会执行一次。
+
+{{syntax}}
+    ''<b id="ObjectLiteral">ObjectLiteral</b>'' :
+        '''{ }''' 
+        '''{''' ''{{toanchor|PropertyNameAndValueList}}'' '''}'''
+        '''{''' ''{{toanchor|PropertyNameAndValueList}}'' ''', }'''
+
+    ''<b id="PropertyNameAndValueList'">PropertyNameAndValueList</b>'' :
+        ''{{toanchor|PropertyAssignment}}''
+        ''{{toanchor|PropertyNameAndValueList}}'' ''',''' ''{{toanchor|PropertyAssignment}}''
+
+    ''<b id="PropertyAssignment">PropertyAssignment</b>'' :
+        ''{{toanchor|PropertyName}}'' ''':''' ''{{toanchor|AssignmentExpression}}''
+        '''get''' ''{{toanchor|PropertyName}}'' '''( ) {''' ''[[ES5/functions#FunctionBody|FunctionBody]]'' '''}'''
+        '''set''' ''{{toanchor|PropertyName}}'' '''(''' ''{{toanchor|PropertySetParameterList}}'' ''') {''' ''[[ES5/functions#FunctionBody|FunctionBody]]'' '''}'''
+
+    ''<b id="PropertyName">PropertyName</b>'' :
+        ''[[ES5/lexical#IdentifierName|IdentifierName]]''
+        ''[[ES5/lexical#StringLiteral|StringLiteral]]''
+        ''[[ES5/lexical#NumericLiteral|NumericLiteral]]''
+
+    ''<b id="PropertySetParameterList">PropertySetParameterList</b>'' :
+        ''[[ES5/lexical#Identifier|Identifier]]''
+
+{{semantics}}
+
+产生式 ''{{toanchor|ObjectLiteral}}'' ''':''' '''{''' '''}''' 按照下面的过程执行 :
+
+# 如同以表达式 '''new Object()''' 创建新对象，其中 [[ES5/builtins#x15.2|Object]] 是标准的内置构造器。
+
+产生式 s ''{{toanchor|ObjectLiteral}}'' ''':''' '''{''' ''{{toanchor|PropertyNameAndValueList}}'' '''}''' 以及 
+''{{toanchor|ObjectLiteral}}'' ''':''' '''{''' ''{{toanchor|PropertyNameAndValueList}}'' ,'''}''' 按照下面的过程执行 :
+
+# 返回解释执行 ''{{toanchor|PropertyNameAndValueList}}'' 的结果。
+
+产生式 ''{{toanchor|PropertyNameAndValueList}}'' ''':''' ''{{toanchor|PropertyAssignment}}'' 按照下面的过程执行 :
+
+# 令 <var>obj</var> 为以表达式 '''new Object()''' 完全一致的方式创建一个新对象的结果，其中 [[ES5/builtins#x15.2|Object]] 是一个标准的内置构造器。
+# 令 <var>propId</var> 为解释执行 ''{{toanchor|PropertyAssignment}}'' 的结果。
+# 以参数 <var>propId</var>.'''name'''、<var>propId</var>.'''descriptor''' 和 '''false''' 调用 <var>obj</var> 的 [[ES5/types#DefineOwnProperty|<nowiki>[[DefineOwnProperty]]</nowiki>]] 内置方法。
+# 返回 <var>obj</var>。
+
+产生式 
+''{{toanchor|PropertyNameAndValueList}}'' ''':''' ''{{toanchor|PropertyNameAndValueList}}'' ''',''' ''{{toanchor|PropertyAssignment}}''
+按照下面的过程执行 :
+
+# 令 <var>obj</var> 为解释执行 ''{{toanchor|PropertyNameAndValueList}}'' 的结果。
+# 令 <var>propId</var> 为解释执行 ''{{toanchor|PropertyAssignment}}'' 的结果。
+# 令 <var>previous</var> 为以参数 <var>propId</var>.'''name''' 调用 <var>obj</var> 的 [[ES5/types#GetOwnProperty|<nowiki>[[GetOwnProperty]]</nowiki>]] 内置方法的结果。
+# 如果 <var>previous</var> 不是 '''undefined'''，且当以下任意一个条件为 '''true''' 时，则抛出一个 '''SyntaxError''' 异常：
+#* 产生式包含在[[ES5/execution#strict-mode-code|严格模式]]下并且 [[ES5/types#IsDataDescriptor|IsDataDescriptor]](<var>previous</var>) 为 '''true''' 并且 [[ES5/types#IsDataDescriptor|IsDataDescriptor]](<var>propId</var>.'''descriptor''') 为 '''true'''。
+#* [[ES5/types#IsDataDescriptor|IsDataDescriptor]](<var>previous</var>) 为 '''true''' 并且 [[ES5/types#IsAccessorDescriptor|IsAccessorDescriptor]](<var>propId</var>.'''descriptor''') 为 '''true'''。
+#* [[ES5/types#IsAccessorDescriptor|IsAccessorDescriptor]](<var>previous</var>) 为 '''true''' 并且 [[ES5/types#IsDataDescriptor|IsDataDescriptor]](<var>propId</var>.'''descriptor''') 为 '''true'''。
+#* [[ES5/types#IsAccessorDescriptor|IsAccessorDescriptor]](<var>previous</var>) 为 '''true''' 并且 [[ES5/types#IsAccessorDescriptor|IsAccessorDescriptor]](<var>propId</var>.'''descriptor''') 为 '''true''' 并且 <var>previous</var> 和 <var>propId</var>.'''descriptor''' 都有 [[ES5/types#descriptor-Get|<nowiki>[[Get]]</nowiki>]] 字段或者 <var>previous</var> 和 <var>propId</var>.'''descriptor''' 都有 [[ES5/types#descriptor-Set|<nowiki>[[Set]]</nowiki>]] 字段。
+
+如果以上步骤抛出一个 '''SyntaxError'''，那么实现应该把这个错误视为[[ES5/errors#early-error|早期错误]]。
+
+产生式 ''{{toanchor|PropertyAssignment}}'' ''':''' ''{{toanchor|PropertyName}}'' ''':''' ''{{toanchor|AssignmentExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>propName</var> 为解释执行 ''{{toanchor|PropertyName}}'' 的结果。
+# 令 <var>exprValue</var> 为解释执行 ''{{toanchor|AssignmentExpression}}'' 的结果。
+# 令 <var>propValue</var> 为 [[ES5/types#GetValue|GetValue]](<var>exprValue</var>)。
+# 令 <var>desc</var> 为[[ES5/types#property-descriptor|属性描述对象]] {<nowiki>[[Value]]</nowiki>: <var>propValue</var>, <nowiki>[[Writable]]</nowiki>: '''true''', <nowiki>[[Enumerable]]</nowiki>: '''true''', <nowiki>[[Configurable]]</nowiki>: '''true'''}。
+# 返回 [[ES5/types#property-identifier|属性标识符]] (<var>propName</var>, <var>desc</var>)。
+
+产生式 ''{{toanchor|PropertyAssignment}}'' ''':''' '''get''' ''{{toanchor|PropertyName}}'' '''( ) {''' ''[[ES5/functions#FunctionBody|FunctionBody]]'' '''}''' 按照下面的过程执行：
+
+# 令 <var>propName</var> 为解释执行 ''{{toanchor|PropertyName}}'' 的结果。
+# 令 <var>closure</var> 为根据 [[ES5/functions#creating-function-objects|13.2]] 的定义，以空参数列表和 ''[[ES5/functions#FunctionBody|FunctionBody]]'' 函数体创建的一个新的函数对象。传入当前执行中的执行环境的 [[ES5/execution#LexicalEnvironment|LexicalEnvironment]] 作为 '''Scope'''。假如 ''{{toanchor|PropertyAssignment}}'' 包含在[[ES5/execution#strict-mode-code|严格模式代码]]中或者 ''[[ES5/functions#FunctionBody|FunctionBody]]'' 是[[ES5/execution#strict-mode-code|严格模式代码]]，传入 '''true''' 为严格模式标志。
+# 令 <var>desc</var> 为[[ES5/types#property-descriptor|属性描述对象]] {<nowiki>[[Get]]</nowiki>: <var>closure</var>, <nowiki>[[Enumerable]]</nowiki>: '''true''', <nowiki>[[Configurable]]</nowiki>: '''true'''}。
+# 返回 [[ES5/types#property-identifier|属性标识符]] (<var>propName</var>, <var>desc</var>)。
+
+产生式 ''{{toanchor|PropertyAssignment}}'' ''':''' '''set''' ''{{toanchor|PropertyName}}'' '''( ''' ''{{toanchor|PropertySetParameterList}}''''' )''' '''{''' ''[[ES5/functions#FunctionBody|FunctionBody]]'' '''}''' 按照下面的过程执行：
+
+# 令 <var>propName</var> 为解释执行 ''{{toanchor|PropertyName}}'' 的结果。
+# 令 <var>closure</var> 为按照 [[ES5/functions#creating-function-objects|13.2]] 规定，以 ''{{toanchor|PropertySetParameterList}}'' 作为参数列表和 ''[[ES5/functions#FunctionBody|FunctionBody]]'' 函数体创建的一个新的函数对象。传入当前执行中的执行环境的 [[ES5/execution#LexicalEnvironment|LexicalEnvironment]] 作为 '''Scope'''。假如 ''{{toanchor|PropertyAssignment}}'' 包含在[[ES5/execution#strict-mode-code|严格模式代码]]中或者 ''[[ES5/functions#FunctionBody|FunctionBody]]'' 是[[ES5/execution#strict-mode-code|严格模式代码]]，传入 '''true''' 为严格模式标志。
+# 令 <var>desc</var> 为[[ES5/types#property-descriptor|属性描述对象]] {<nowiki>[[Set]]</nowiki>: <var>closure</var>, <nowiki>[[Enumerable]]</nowiki>: '''true''', <nowiki>[[Configurable]]</nowiki>: '''true'''}。
+# 返回[[ES5/types#property-identifier|属性标识符]] (<var>propName</var>, <var>desc</var>)。
+
+假如 ''[[ES5/functions#FunctionBody|FunctionBody]]'' 是[[ES5/execution#strict-mode-code|严格模式]]或者被包含在[[ES5/execution#strict-mode-code|严格模式代码]]内，''{{toanchor|PropertyAssignment}}'' 中的 ''{{toanchor|PropertySetParameterList}}''，'''"eval"''' 或者 '''"arguments"''' 作为标识符将会是一个语法错误。
+
+产生式 ''{{toanchor|PropertyName}}'' ''': ''' ''[[ES5/lexical#IdentifierName|IdentifierName]]'' 按照下面的过程执行：
+
+# 返回一个包含跟 ''[[ES5/lexical#IdentifierName|IdentifierName]]'' 完全相同的字符序列的字符串值。
+
+产生式 ''{{toanchor|PropertyName}}'' ''': ''' ''[[ES5/lexical#StringLiteral|StringLiteral]]'' 按照下面的过程执行：
+
+# 返回 ''[[ES5/lexical#StringLiteral|StringLiteral]]''  的字符串值。
+
+产生式 ''{{toanchor|PropertyName}}'' ''':''' ''[[ES5/lexical#NumericLiteral|NumericLiteral]]'' 按照下面的过程执行：
+
+# 令 <var>nbr</var> 为求 ''[[ES5/lexical#NumericLiteral|NumericLiteral]]'' 值的结果。
+# 返回 [[ES5/conversion#to-string|ToString]](<var>nbr</var>)。
+
+{{note|'''<nowiki>[[DefineOwnProperty]]</nowiki>''' 用于确保即使在内置的 '''Array.prototype''' 被修改的情况下数组的自身属性也会被定义，这可以避免用 '''<nowiki>[[Put]]</nowiki>''' 来创建新的自身属性。}}
+
+=== {{anchor|x11.1.6}}群组运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3613-L3620|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.1.6}}
+
+产生式 ''{{toanchor|PrimaryExpression}}'' ''':''' '''(''' ''{{toanchor|Expression}}'' ''')''' 按照下面的过程执行：
+
+# 返回执行 ''{{toanchor|Expression}}'' 的结果。这可能是一个 [[ES5/types#Reference|Reference]]。
+
+{{note|本算法不在执行 '''''Expression''''' 后使用 '''GetValue'''。这主要的目的是让 '''delete''' 与 '''typeof''' 运算符可以作用在被括号括起来的表达式。}}
+
+== {{anchor|x11.2}}左值表达式 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.2}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.2}}
+
+
+
+
+{{syntax}}
+
+    ''<b id="MemberExpression">MemberExpression</b>'' :
+        ''{{toanchor|PrimaryExpression}}''
+        ''[[ES5/functions#FunctionExpression|FunctionExpression]]''
+        ''{{toanchor|MemberExpression}}'' '''[''' ''{{toanchor|Expression}}'' ''']'''
+        ''{{toanchor|MemberExpression}}'' '''.''' ''[[ES5/lexical#IdentifierName|IdentifierName]]''
+        '''new''' ''{{toanchor|MemberExpression}}'' ''{{toanchor|Arguments}}''
+
+    ''<b id="NewExpression">NewExpression</b>'' :
+        ''{{toanchor|MemberExpression}}''
+        '''new''' ''{{toanchor|NewExpression}}''
+
+    ''<b id="CallExpression">CallExpression</b>'' :
+        ''{{toanchor|MemberExpression}}'' ''{{toanchor|Arguments}}''
+        ''{{toanchor|CallExpression}}'' ''{{toanchor|Arguments}}''
+        ''{{toanchor|CallExpression}}'' '''[''' ''{{toanchor|Expression}}'' ''']'''
+        ''{{toanchor|CallExpression}}'' '''.''' ''[[ES5/lexical#IdentifierName|IdentifierName]]''
+
+    ''<b id="Arguments">Arguments</b>'' :
+        '''( )'''
+        '''(''' ''{{toanchor|ArgumentList}}'' ''')'''
+
+    ''<b id="ArgumentList">ArgumentList</b>'' :
+        ''{{toanchor|AssignmentExpression}}''
+        ''{{toanchor|ArgumentList}}'' ''',''' ''{{toanchor|AssignmentExpression}}''
+
+    ''<b id="LeftHandSideExpression">LeftHandSideExpression</b>'' :
+        ''{{toanchor|NewExpression}}''
+        ''{{toanchor|CallExpression}}''
+
+=== {{anchor|x11.2.1}}属性访问 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3427-L3451|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.2.1}}
+
+属性是通过 name 来访问的，可以使用点表示法访问 
+    ''{{toanchor|MemberExpression}}'' '''.''' ''[[ES5/lexical#IdentifierName|IdentifierName]]''
+    ''{{toanchor|CallExpression}}'' '''.''' ''[[ES5/lexical#IdentifierName|IdentifierName]]''
+或者括号表示法访问 
+    ''{{toanchor|MemberExpression}}'' '''[''' ''{{toanchor|Expression}}'' ''']''' 
+    ''{{toanchor|CallExpression}}'' '''[''' ''{{toanchor|Expression}}'' ''']'''
+点表示法是根据以下的语法转换解释 
+    ''{{toanchor|MemberExpression}}'' '''.''' ''[[ES5/lexical#IdentifierName|IdentifierName]]''
+这会等同于下面这个行为 
+    ''{{toanchor|MemberExpression}}'' '''[''' ''<identifier-name-string>'' ''']'''
+类似地，
+    ''{{toanchor|CallExpression}}'' '''.''' ''[[ES5/lexical#IdentifierName|IdentifierName]]''
+是等同于下面的行为 
+    ''{{toanchor|CallExpression}}'' '''[''' ''<identifier-name-string>'' ''']'''
+
+''<identifier-name-string>'' 是一个字符串字面量，它与 Unicode 编码后的 ''[[ES5/lexical#IdentifierName|IdentifierName]]'' 包含相同的字符序列。
+
+产生式 ''{{toanchor|MemberExpression}}'' ''':''' ''{{toanchor|MemberExpression}}'' '''[''' ''{{toanchor|Expression}}'' ''']''' 按照下面的过程执行：
+
+# 令 <var>baseReference</var> 为解释执行 ''{{toanchor|MemberExpression}}'' 的结果。
+# 令 <var>baseValue</var> 为 [[ES5/types#GetValue|GetValue]](<var>baseReference</var>)。
+# 令 <var>propertyNameReference</var> 为解释执行 ''{{toanchor|Expression}}'' 的结果。
+# 令 <var>propertyNameValue</var> 为 [[ES5/types#GetValue|GetValue]](<var>propertyNameReference</var>)。
+# 调用 [[ES5/conversion#CheckObjectCoercible|CheckObjectCoercible]](<var>baseValue</var>)。
+# 令 <var>propertyNameString</var> 为 [[ES5/conversion#to-string|ToString]](<var>propertyNameValue</var>)。
+# 如果正在执行中的语法产生式包含在[[ES5/execution#strict-mode-code|严格模式代码]]当中，令 <var>strict</var> 为 '''true'''，否则令 <var>strict</var> 为 '''false'''。
+# 返回一个值类型的[[ES5/types#Reference|引用]]，其基值为 <var>baseValue</var> 且其引用名为 <var>propertyNameString</var>，严格模式标记为 <var>strict</var>。
+产生''{{toanchor|CallExpression}}'' ''':''' ''{{toanchor|CallExpression}}'' '''[''' ''{{toanchor|Expression}}'' ''']'''的执行方式与以上执行过程完全一样，除非''{{toanchor|CallExpression}}''在步骤1已经执行过。
+
+=== {{anchor|x11.2.2}}new 运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3352-L3380|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.2.2}}
+
+产生式 ''{{toanchor|NewExpression}}'' ''':''' '''new''' ''{{toanchor|NewExpression}}'' 按照下面的过程执行：
+
+# 令 <var>ref</var> 为解释执行 ''{{toanchor|NewExpression}}'' 的结果。
+# 令 <var>constructor</var> 为 [[ES5/types#GetValue|GetValue]](<var>ref</var>)。
+# 如果 [[ES5/types#Type|Type]](<var>constructor</var>) 不是 '''Object'''，抛出一个 '''TypeError''' 异常。
+# 如果 <var>constructor</var> 没有实现 [[ES5/types#Construct|<nowiki>[[Construct]]</nowiki>]] 内置方法，抛出一个 '''TypeError''' 异常。
+# 返回调用 <var>constructor</var> 的 [[ES5/types#Construct|<nowiki>[[Construct]]</nowiki>]] 内置方法的结果，传入按无参数传入参数列表（就是一个空的参数列表）。
+
+产生式 ''{{toanchor|MemberExpression}}'' ''':''' '''new''' ''{{toanchor|MemberExpression}}'' ''{{toanchor|Arguments}}'' 按照下面的过程执行 :
+
+# 令 <var>ref</var> 为解释执行 ''{{toanchor|MemberExpression}}'' 的结果。
+# 令 <var>constructor</var> 为 [[ES5/types#GetValue|GetValue]](<var>ref</var>)。
+# 令 <var>argList</var> 为解释执行 ''{{toanchor|Arguments}}'' 的结果，是一个参数值的内部列表（[[#argument-lists|11.2.4]]）。
+# 如果 [[ES5/types#Type|Type]](<var>constructor</var>) 不是 '''Object'''，抛出一个 '''TypeError''' 异常。
+# 如果 <var>constructor</var> 没有实现 [[ES5/types#Construct|<nowiki>[[Construct]]</nowiki>]] 内置方法，抛出一个 '''TypeError''' 异常。
+# 返回以 <var>argList</var> 为参数调用 <var>constructor</var> 的 [[ES5/types#Construct|<nowiki>[[Construct]]</nowiki>]] 内置方法的结果。
+
+=== {{anchor|x11.2.3}}函数调用 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3452-L3459|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.2.3}}
+
+
+产生式 ''{{toanchor|CallExpression}}'' ''':''' ''{{toanchor|MemberExpression}}'' ''{{toanchor|Arguments}}'' 按照下面的过程执行 :
+
+# 令 <var>ref</var> 为解释执行 ''{{toanchor|MemberExpression}}'' 的结果。
+# 令 <var>func</var> 为 [[ES5/types#GetValue|GetValue]](<var>ref</var>)。
+# 令 <var>argList</var> 为解释执行 ''{{toanchor|Arguments}}'' 的结果，产生参数值们的内部列表（参见 [[#argument-lists|11.2.4]]）。
+# 如果 [[ES5/types#Type|Type]](<var>func</var>) 不是 '''Object'''，抛出一个 '''TypeError''' 异常。
+# 如果 [[ES5/conversion#is-callable|IsCallable]](<var>func</var>) 为 '''false'''，抛出一个 '''TypeError''' 异常。
+# 如果 [[ES5/types#Type|Type]](<var>ref</var>) 为 [[ES5/types#Reference|Reference]]，那么
+## 如果 [[ES5/types#IsPropertyReference|IsPropertyReference]](<var>ref</var>) 为 '''true'''，那么 
+### 令 <var>thisValue</var> 为 [[ES5/types#GetBase|GetBase]](<var>ref</var>)。
+## 否则，<var>ref</var> 的基值是一个[[ES5/execution#environment-record|环境记录项]]。
+### 令 <var>thisValue</var> 为调用 [[ES5/types#GetBase|GetBase]](<var>ref</var>) 的 [[ES5/execution#ImplicitThisValue|ImplicitThisValue]] 具体方法的结果。
+# 否则，[[ES5/types#Type|Type]](<var>ref</var>) 不是 [[ES5/types#Reference|Reference]]。
+## 令 <var>thisValue</var> 为 '''undefined'''。
+# 返回调用 <var>func</var> 的 [[ES5/types#Call|<nowiki>[[Call]]</nowiki>]] 内置方法的结果，传入 <var>thisValue</var> 作为 '''this''' 值和列表 <var>argList</var> 作为参数列表。
+
+=== {{anchor|x11.2.4}}{{anchor|argument-lists}}参数列表 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L4051-L4072|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.2.4}}
+
+产生式 ''{{toanchor|Arguments}}'' ''':''' '''( )''' 按照下面的过程执行：
+
+# 返回一个空[[ES5/types#List|列表]]。
+
+产生式 ''{{toanchor|Arguments}}'' ''':''' '''( ''' ''{{toanchor|ArgumentList}}'' ''')''' 按照下面的过程执行：
+
+# 返回解释执行 ''{{toanchor|ArgumentList}}'' 的结果。
+
+产生式 ''{{toanchor|ArgumentList}}'' ''':''' ''{{toanchor|AssignmentExpression}}'' 按照下面的过程执行：
+
+# 令 <var>ref</var> 为解释执行 ''{{toanchor|AssignmentExpression}}'' 的结果。
+# 令 <var>arg</var> 为 [[ES5/types#GetValue|GetValue]](<var>ref</var>)。
+# 返回唯一的项目是 <var>arg</var> 的[[ES5/types#List|列表]]。
+
+产生式 ''{{toanchor|ArgumentList}}'' ''':''' ''{{toanchor|ArgumentList}}'' ''',''' ''{{toanchor|AssignmentExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>precedingArgs</var> 为解释执行 ''{{toanchor|ArgumentList}}'' 的结果。
+# 令 <var>ref</var> 为解释执行 ''{{toanchor|AssignmentExpression}}'' 的结果。
+# 令 <var>arg</var> 为 [[ES5/types#GetValue|GetValue]](<var>ref</var>)。
+# 返回一个[[ES5/types#List|列表]]，长度比 <var>precedingArgs</var> 大 1 且它的项目为 <var>precedingArgs</var> 的项目按顺序在后面接 <var>arg</var>，<var>arg</var> 就是这个新的列表的最后一个项目。
+
+=== {{anchor|x11.2.5}}函数表达式 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L4168|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.2.5}}
+
+产生式 ''{{toanchor|MemberExpression}}'' ''':''' ''[[ES5/functions#FunctionExpression|FunctionExpression]]'' 按照下面的过程执行 :
+
+# 返回解释执行 ''[[ES5/functions#FunctionExpression|FunctionExpression]]'' 的结果。
+
+== {{anchor|x11.3}}后缀表达式 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3240|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.3}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.3}}
+
+
+
+
+{{syntax}}
+    ''<b id="PostfixExpression">PostfixExpression</b>'' :
+        ''{{toanchor|LeftHandSideExpression}}''
+        ''{{toanchor|LeftHandSideExpression}}'' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] '''++''' 
+        ''{{toanchor|LeftHandSideExpression}}'' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] '''--'''
+
+=== {{anchor|x11.3.1}}后缀自增运算符 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.3.1}}
+ 
+产生式 <var>PostfixExpression</var> ''':''' ''{{toanchor|LeftHandSideExpression}}'' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] '''++''' 按照下面的过程执行：
+
+# 令 <var>lhs</var> 为解释执行 ''{{toanchor|LeftHandSideExpression}}'' 的结果。
+# 假如以下所有条件都为真，抛出一个 '''SyntaxError''' 异常：
+#* [[ES5/types#Type|Type]](<var>lhs</var>) 为 [[ES5/types#Reference|Reference]]
+#* [[ES5/types#IsStrictReference|IsStrictReference]](<var>lhs</var>) 为 '''true'''
+#* [[ES5/types#Type|Type]]([[ES5/types#GetBase|GetBase]](<var>lhs</var>)) 为[[ES5/execution#environment-record|环境记录项]]
+#* [[ES5/types#GetReferencedName|GetReferencedName]](<var>lhs</var>) 为 '''"eval"''' 或 '''"arguments"'''
+# 令 <var>oldValue</var> 为 [[ES5/conversion#to-number|ToNumer]]([[ES5/types#GetValue|GetValue]](<var>lhs</var>))。
+# 令 <var>newValue</var> 为 '''1''' 加上 <var>oldValue</var> 的结果，使用与 '''+''' 运算符 相同的规则（参见 [[#additive-operators|11.6.3]]）。
+# 调用 [[ES5/types#PutValue|PutValue]](<var>lhs</var>, <var>newValue</var>)。
+# 返回 <var>oldValue</var>。
+
+=== {{anchor|x11.3.2}}后缀自减运算符 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.3.2}}
+ 
+产生式 <var>PostfixExpression</var> ''':''' ''{{toanchor|LeftHandSideExpression}}'' [[ES5/notation#restricted-production|[no ''LineTerminator'' here]]] '''-- ''' 按照下面的过程执行：
+
+# 令 <var>lhs</var> 为解释执行 ''{{toanchor|LeftHandSideExpression}}'' 的结果。
+# 假如以下所有条件都为真，抛出一个 '''SyntaxError''' 异常：
+#* [[ES5/types#Type|Type]](<var>lhs</var>) 为 [[ES5/types#Reference|Reference]]
+#* [[ES5/types#IsStrictReference|IsStrictReference]](<var>lhs</var>) 为 '''true'''
+#* [[ES5/types#Type|Type]]([[ES5/types#GetBase|GetBase]](<var>lhs</var>)) 为[[ES5/execution#environment-record|环境记录项]]
+#* [[ES5/types#GetReferencedName|GetReferencedName]](<var>lhs</var>) 为 '''"eval"''' 或 '''"arguments"'''
+# 令 <var>oldValue</var> 为 [[ES5/conversion#to-number|ToNumer]]([[ES5/types#GetValue|GetValue]](<var>lhs</var>))。
+# 令 <var>newValue</var> 为从 <var>oldValue</var> 减掉 '''1''' 的结果，使用与 '''-''' 运算符 相同的规则（参见 [[#additive-operators|11.6.3]]）。
+# 调用 [[ES5/types#PutValue|PutValue]](<var>lhs</var>, <var>newValue</var>)。
+# 返回 <var>oldValue</var>。
+
+== {{anchor|x11.4}}一元运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3132|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.4}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.4}}
+
+
+
+
+{{syntax}}
+    ''<b id="UnaryExpression">UnaryExpression</b>'' :
+        ''{{toanchor|PostfixExpression}}''
+        '''delete''' ''{{toanchor|UnaryExpression}}''
+        '''void''' ''{{toanchor|UnaryExpression}}''
+        '''typeof''' ''{{toanchor|UnaryExpression}}''
+        '''++''' ''{{toanchor|UnaryExpression}}''
+        '''--''' ''{{toanchor|UnaryExpression}}''
+        '''+''' ''{{toanchor|UnaryExpression}}''
+        '''-''' ''{{toanchor|UnaryExpression}}''
+        '''~''' ''{{toanchor|UnaryExpression}}''
+        '''!''' ''{{toanchor|UnaryExpression}}''
+
+=== {{anchor|x11.4.1}}delete 运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/runtime.js#L342-L344|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.4.1}}
+
+产生式 ''{{toanchor|UnaryExpression}}'' ''':''' '''delete''' ''{{toanchor|UnaryExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>ref</var> 为解释执行 ''{{toanchor|UnaryExpression}}'' 的结果。
+# 如果 [[ES5/types#Type|Type]](<var>ref</var>) 不是 [[ES5/types#Reference|Reference]]，返回 '''true'''。
+# 若 [[ES5/types#IsUnresolvableReference|IsUnresolvableReference]](<var>ref</var>) 则
+## 如果 [[ES5/types#IsStrictReference|IsStrictReference]](<var>ref</var>) 为 '''true'''，抛出一个 '''SyntaxError''' 异常。
+## 否则，返回 '''true'''。
+# 如果 [[ES5/types#IsPropertyReference|IsPropertyReference]](<var>ref</var>) 为 '''true''' 则：
+## 返回以 [[ES5/types#GetReferencedName|GetReferencedName]](<var>ref</var>) 和 [[ES5/types#IsStrictReference|IsStrictReference]](<var>ref</var>) 做为参数调用 [[ES5/conversion#to-object|ToObject]]([[ES5/types#GetBase|GetBase]](<var>ref</var>)) 的 [[ES5/types#Delete|<nowiki>[[Delete]]</nowiki>]] 内置方法的结果。
+# 否则，<var>ref</var> 是到[[ES5/execution#environment-record|环境记录项]]绑定的 [[ES5/types#Reference|Reference]]，所以：
+## 如果 [[ES5/types#IsStrictReference|IsStrictReference]](<var>ref</var>) 为 '''true'''，抛出一个 '''SyntaxError''' 异常。
+## 令 <var>bindings</var> 为 [[ES5/types#GetBase|GetBase]](<var>ref</var>)。
+## 返回以 [[ES5/types#GetReferencedName|GetReferencedName]](<var>ref</var>) 为参数调用 <var>bindings</var> 的 [[ES5/execution#DeleteBinding|DeleteBinding]] 具体方法的结果。
+
+{{note|当 '''delete''' 操作符在严格模式下出现时，并且 '''''UnaryExpression''''' 是一个变量、函数参数或者函数名的直接引用，则抛出 '''SyntaxError''' 异常。此外，严格模式下删除属性且其内置属性 '''<nowiki>[[Configurable]]</nowiki>''' 为 '''false''' 时，则抛出 '''TypeError''' 异常。 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3175|}}}}
+
+=== {{anchor|x11.4.2}}void 运算符 ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.4.2}}
+
+产生式 ''{{toanchor|UnaryExpression}}'' ''':''' '''void''' ''{{toanchor|UnaryExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>expr</var> 为解释执行 ''{{toanchor|UnaryExpression}}'' 的结果。
+# 调用 [[ES5/types#GetValue|GetValue]](<var>expr</var>)。
+# 返回 '''undefined'''。
+
+{{note|就算值不会用到，用户代理仍必须调用 '''GetValue'''，因为可能有可观测的副作用。}}
+
+=== {{anchor|x11.4.3}}typeof 运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/ia32/full-codegen-ia32.cc#L4330-L4338|这里拿ia32举例，在不同的系统上使用不同的代码，但是原理基本相同。}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.4.3}}
+
+产生式 ''{{toanchor|UnaryExpression}}'' ''':''' '''typeof''' ''{{toanchor|UnaryExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>val</var> 为解释执行 ''{{toanchor|UnaryExpression}}'' 的结果。
+# 如果 [[ES5/types#Type|Type]](<var>val</var>) 为 [[ES5/types#Reference|Reference]]，则：
+## 如果 [[ES5/types#IsUnresolvableReference|IsUnresolvableReference]](<var>val</var>) 为 '''true'''，返回 '''"undefined"'''。
+## 令 <var>val</var> 为 [[ES5/types#GetValue|GetValue]](<var>val</var>)。
+# 返回根据 '''表20''' 由 [[ES5/types#Type|Type]](<var>val</var>) 决定的字符串。{{v8|https://github.com/v8/v8/blob/3.22/src/runtime.cc#L6014|}}
+
+{| cellpadding="5" border="1" align="center" style="border-collapse:collapse;"
+|+ '''表20 typeof 运算符结果'''
+|- style="background:#EEE"
+| val 类型
+| 结果
+|-
+| Undefined
+| '''"undefined"'''
+|-
+| Null
+| '''"object"'''
+|-
+| Boolean
+| '''"boolean"'''
+|-
+| Number
+| '''"number"'''
+|-
+| String
+| '''"string"'''
+|-
+| Object（原生，且没有实现 [[ES5/types#Call|<nowiki>[[Call]]</nowiki>]]）
+| '''"object"'''
+|-
+| Object（原生或者宿主且实现了 [[ES5/types#Call|<nowiki>[[Call]]</nowiki>]]）
+| '''"function"'''
+|-
+| Object（宿主且没实现 [[ES5/types#Call|<nowiki>[[Call]]</nowiki>]]）
+| 由实现定义，但不能是 '''"undefined"'''、'''"boolean"'''、'''"number"''' 或 '''"string"'''。
+|}
+
+=== {{anchor|x11.4.4}}前自增运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3210-L3233|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.4.4}}
+
+产生式 ''{{toanchor|UnaryExpression}}'' ''':''' '''++''' ''{{toanchor|UnaryExpression}}'' 按照下面的过程执行：
+
+# 令 <var>expr</var> 为解释执行 ''{{toanchor|UnaryExpression}}'' 的结果。
+# 假如以下所有条件都为真，抛出一个 '''SyntaxError''' 异常：
+#* [[ES5/types#Type|Type]](<var>expr</var>) 为 [[ES5/types#Reference|Reference]]
+#* [[ES5/types#IsStrictReference|IsStrictReference]](<var>expr</var>) 为 '''true'''
+#* [[ES5/types#Type|Type]]([[ES5/types#GetBase|GetBase]](<var>expr</var>)) 为[[ES5/execution#environment-record|环境记录项]]
+#* [[ES5/types#GetReferencedName|GetReferencedName]](<var>expr</var>) 为 '''"eval"''' 或 '''"arguments"'''
+# 令 <var>oldValue</var> 为 [[ES5/conversion#to-number|ToNumer]]([[ES5/types#GetValue|GetValue]](<var>expr</var>))。
+# 令 <var>newValue</var> 为 '''1''' 加上 <var>oldValue</var> 的结果，使用与 '''+''' 运算符 相同的规则（参见 [[#additive-operators|11.6.3]]）。
+# 调用 [[ES5/types#PutValue|PutValue]](<var>expr</var>, <var>newValue</var>)。
+# 返回 <var>newValue</var>。
+
+=== {{anchor|x11.4.5}}前自减运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3210-L3233|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.4.5}}
+
+产生式 ''{{toanchor|UnaryExpression}}'' ''':''' '''-- ''' ''{{toanchor|UnaryExpression}}'' 按照下面的过程执行：
+
+# 令 <var>expr</var> 为解释执行 ''{{toanchor|UnaryExpression}}'' 的结果。
+# 假如以下所有条件都为真，抛出一个 '''SyntaxError''' 异常：
+#* [[ES5/types#Type|Type]](<var>expr</var>) 为 [[ES5/types#Reference|Reference]]
+#* [[ES5/types#IsStrictReference|IsStrictReference]](<var>expr</var>) 为 '''true'''
+#* [[ES5/types#Type|Type]]([[ES5/types#GetBase|GetBase]](<var>expr</var>)) 为[[ES5/execution#environment-record|环境记录项]]
+#* [[ES5/types#GetReferencedName|GetReferencedName]](<var>expr</var>) 为 '''"eval"''' 或 '''"arguments"'''
+# 令 <var>oldValue</var> 为 [[ES5/conversion#to-number|ToNumer]]([[ES5/types#GetValue|GetValue]](<var>expr</var>))。
+# 令 <var>newValue</var> 为从 <var>oldValue</var> 减掉 '''1''' 的结果，使用与 '''-''' 运算符 相同的规则（参见 [[#additive-operators|11.6.3]]）。
+# 调用 [[ES5/types#PutValue|PutValue]](<var>expr</var>, <var>newValue</var>)。
+# 返回 <var>newValue</var>。
+
+=== {{anchor|x11.4.6}}一元 + 运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3187|这是一个糖语法，+foo 被映射 foo*1 上。}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.4.6}}
+
+产生式 ''{{toanchor|UnaryExpression}}'' ''':''' '''+''' ''{{toanchor|UnaryExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>expr</var> 为解释执行 ''{{toanchor|UnaryExpression}}'' 的结果。
+# 返回 [[ES5/conversion#to-number|ToNumber]]([[ES5/types#GetValue|GetValue]](<var>expr</var>))。
+
+=== {{anchor|x11.4.7}}一元 - 运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3194|这是一个糖语法，-foo 被映射 foo*(-1) 上。}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.4.7}}
+
+产生式 ''{{toanchor|UnaryExpression}}'' ''':''' '''-''' ''{{toanchor|UnaryExpression}}'' 按照下面的过程执行：
+# 令 <var>expr</var> 为解释执行 ''{{toanchor|UnaryExpression}}'' 的结果。
+# 令 <var>oldValue</var> 为 [[ES5/conversion#to-number|ToNumber]]([[ES5/types#GetValue|GetValue]](<var>expr</var>))。
+# 如果 <var>oldValue</var> 为 '''NaN'''，返回 '''NaN'''。
+# 返回 <var>oldValue</var> 取负（即，算出一个数字相同但是符号相反的值）的结果。
+
+=== {{anchor|x11.4.8}}按位非运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3194|这是一个糖语法，~foo 被映射 foo^(~0) 上。}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.4.8}}
+
+产生式 ''{{toanchor|UnaryExpression}}'' ''':''' '''~''' ''{{toanchor|UnaryExpression}}'' 按照下面的过程执行：
+
+# 令 <var>expr</var> 为解释执行 ''{{toanchor|UnaryExpression}}'' 的结果。
+# 令 <var>oldValue</var> 为 [[ES5/conversion#to-int32|ToInt32]]([[ES5/types#GetValue|GetValue]](<var>expr</var>))。
+# 返回 <var>oldValue</var> 按位取反的结果。结果为 32位 有符号整数。
+
+=== {{anchor|x11.4.9}}逻辑非运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3153|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.4.9}}
+
+产生式 ''{{toanchor|UnaryExpression}}'' ''':''' '''!''' ''{{toanchor|UnaryExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>expr</var> 为解释执行 ''{{toanchor|UnaryExpression}}'' 的结果。
+# 令 <var>oldValue</var> 为 [[ES5/conversion#to-boolean|ToBoolean]]([[ES5/types#GetValue|GetValue]](<var>expr</var>))。
+# 如果 <var>oldValue</var> 为 '''true'''，返回 '''false'''。
+# 返回 '''true'''。
+
+== {{anchor|x11.5}}乘法运算符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.5}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.5}}
+
+
+
+
+{{syntax}}
+    ''<b id="MultiplicativeExpression">MultiplicativeExpression</b>'' :
+        ''{{toanchor|UnaryExpression}}''
+        ''{{toanchor|MultiplicativeExpression}}'' '''*''' ''{{toanchor|UnaryExpression}}''
+        ''{{toanchor|MultiplicativeExpression}}'' '''/''' ''{{toanchor|UnaryExpression}}''
+        ''{{toanchor|MultiplicativeExpression}}'' '''%''' ''{{toanchor|UnaryExpression}}''
+
+{{semantics}}
+
+产生式 ''{{toanchor|MultiplicativeExpression}}'' ''':''' ''{{toanchor|MultiplicativeExpression}}'' ''@'' ''{{toanchor|UnaryExpression}}''，其中 @ 表示上面定义的运算符其一，按照下面的过程执行：
+
+# 令 <var>left</var> 为解释执行 ''{{toanchor|MultiplicativeExpression}}'' 的结果。
+# 令 <var>leftValue</var> 为 [[ES5/types#GetValue|GetValue]](<var>left</var>)。
+# 令 <var>right</var> 为解释执行 ''{{toanchor|UnaryExpression}}'' 的结果。
+# 令 <var>rightValue</var> 为 [[ES5/types#GetValue|GetValue]](<var>right</var>)。
+# 令 <var>leftNum</var> 为 [[ES5/conversion#to-number|ToNumber]](<var>leftValue</var>)。
+# 令 <var>rightNum</var> 为 [[ES5/conversion#to-number|ToNumber]](<var>rightValue</var>)。
+# 返回将特定运算符 ('''*''', '''/''' 或 '''%''') 作用于 <var>leftNum</var> 和 <var>rightNum</var> 的结果。参见 [[#times-operator|11.5.1]]、[[#divide-operator|11.5.2]]、[[#mod-operator|11.5.3]] 后的注解。
+
+=== {{anchor|x11.5.1}}{{anchor|times-operator}}使用 * 运算符 {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L6920-L6927|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.5.1}}
+
+'''*''' 运算符表示乘法，产生操作数的乘积。乘法运算满足交换律。因为精度问题，乘法不总是满足结合律。
+
+浮点数的乘法遵循 IEEE 754 二进制双精度幅度浮点算法规则：
+
+* 若两个操作数之一为 '''NaN'''，结果为 '''NaN'''。
+* 假如两个操作数的正负号相同，结果就是正的，如果不同就是负的。
+* 无穷大被零乘结果是 '''NaN'''。
+* 无穷大被无穷大乘结果就是无穷大。符号按照前面说过的规则决定。
+* 无穷大被有穷的非零值乘结果是带正负号的无穷大。符号仍然按照前面说过的规则决定。
+* 其它情况下，既没有无穷大也没有 '''NaN''' 参与运算，结果计算出来后会按照 [http://en.wikipedia.org/wiki/IEEE_floating_point#Roundings_to_nearest IEEE 754 round-to-nearest] 取到最接近的能表示的数。如果值过大不能表示，则结果为相应的正负无穷大。如果值过小不能表示，则结果为相应的正负零。ECMAScript 要求支持 IEEE 754 规定的渐进下溢。
+
+=== {{anchor|x11.5.2}}{{anchor|divide-operator}}使用 / 运算符 {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L6947-L6954|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.5.2}}
+
+'''/''' 运算符表示除法，产生操作数的商。左操作数是被除数，右操作数是除数。ECMAScript 不支持整数除法。所有除法运算的操作数和结果都是双精度浮点数。浮点数的除法遵循 IEEE 754 二进制双精度幅度浮点算法规则：
+
+* 若两个操作数之一为 '''NaN'''，结果为 '''NaN'''。
+* 假如两个操作数的正负号相同，结果就是正的，如果不同就是负的。
+* 无穷大被无穷大除结果是 '''NaN'''。
+* 无穷大被零除结果是无穷大。符号按照前面说过的规则决定。
+* 无穷大被非零有穷的值除结果是有正负号的无穷大。符号按照前面说过的规则决定。
+* 有穷的非零值被无穷大除结果是零。符号按照前面说过的规则决定。
+* 零被零除结果是 '''NaN'''；零被其它有穷数除结果是零，符号按照前面说过的规则决定。
+* 有穷的非零值被零除结果是有正负号的无穷大。符号按照前面说过的规则决定。
+*其它情况下，既没有无穷大也没有 '''NaN''' 参与运算，结果计算出来后会按照 [http://en.wikipedia.org/wiki/IEEE_floating_point#Roundings_to_nearest IEEE 754 round-to-nearest] 取到最接近的能表示的数。如果值过大不能表示，则结果为相应的正负无穷大。如果值过小不能表示，则结果为相应的正负零。ECMAScript 要求支持 IEEE 754 规定的渐进下溢。
+
+=== {{anchor|x11.5.3}}{{anchor|mod-operator}}使用 % 运算符 {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L6957-L6967|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.5.3}}
+'''%''' 运算符产生其运算符在除法中的余数。左操作数是被除数，右操作数是除数。
+
+{{note|在 C 和 C++ 中，余数运算符只接受整数为操作数；在 ECMAScript，它还接受浮点操作数。}}
+
+浮点数使用 '''%''' 运算符的余数运算与 IEEE 754 所定义的 “remainder” 运算不完全相同。IEEE 754 “remainder” 运算做邻近取整除法的余数计算，而不是舍尾除法，这样它的行为跟通常意义上的整数余数运算符行为不一致。而 ECMAScript 语言定义浮点操作 '''%''' 为与 Java 取余运算符一致；可以参照 C 库中的函数 fmod。
+
+ECMAScript 浮点数的取余法遵循 IEEE 754 二进制双精度幅度浮点算法规则：
+
+* 若两个操作数之一为 '''NaN'''，结果为 '''NaN'''。
+* 结果的符号等于被除数。
+* 若被除数是无穷大或者除数是零，或者两者皆是，结果就是 '''NaN'''。
+* 若被除数有穷而除数为无穷大，结果为被除数。
+* 若被除数为零且除数非零且有穷，结果与被除数相同。
+* 其它情况下，既没有零或无穷大，也没有 '''NaN''' 参与运算，从被除数 <var>n</var> 和除数 <var>d</var> 得到浮点数余数 <var>r</var> 以数学关系式 <var>r</var> = <var>n</var> ? (<var>d</var> × <var>q</var>) 定义，其中 <var>q</var> 是个整数，在 <var>n</var> / <var>d</var> 为负时为负，在 <var>n</var> / <var>d</var> 为正时为正，它应该在不超过 <var>n</var> 和 <var>d</var> 的商的前提下尽可能大。结果计算出来后会按照 [http://en.wikipedia.org/wiki/IEEE_floating_point#Roundings_to_nearest IEEE 754 round-to-nearest] 取到最接近的能表示的数。
+
+== {{anchor|x11.6}}加法运算符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.6}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.6}}
+
+
+
+
+{{syntax}}
+    ''<b id="AdditiveExpression">AdditiveExpression</b>'' :
+        ''{{toanchor|MultiplicativeExpression}}''
+        ''{{toanchor|AdditiveExpression}}'' '''+''' ''{{toanchor|MultiplicativeExpression}}''
+        ''{{toanchor|AdditiveExpression}}'' '''-''' ''{{toanchor|MultiplicativeExpression}}''
+
+=== {{anchor|x11.6.1}}{{anchor|addition-operator}}加法运算符（+） {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L6980-L6987|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.6.1}}
+
+加法运算符启动字符串相接或是数值相加。
+
+产生式 ''{{toanchor|AdditiveExpression}}'' ''':''' ''{{toanchor|AdditiveExpression}}'' '''+''' ''{{toanchor|MultiplicativeExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|AdditiveExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|MultiplicativeExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>lprim</var> 为 [[ES5/conversion#to-primitive|ToPrimitive]](<var>lval</var>)。
+# 令 <var>rprim</var> 为 [[ES5/conversion#to-primitive|ToPrimitive]](<var>rval</var>)。
+# 如果 [[ES5/types#Type|Type]](<var>lprim</var>) 为 '''String''' 或者 [[ES5/types#Type|Type]](<var>rprim</var>) 为 String，则：
+## 返回由 [[ES5/conversion#to-string|ToString]](<var>lprim</var>) 和 [[ES5/conversion#to-string|ToString]](<var>rprim</var>) 连接而成的字符串。
+# 返回将加法运算作用于 [[ES5/conversion#to-number|ToNumber]](<var>lprim</var>) 和 [[ES5/conversion#to-number|ToNumber]](<var>rprim</var>) 的结果。参见 [[#additive-operators|11.6.3]] 后的注解。
+
+{{note|在 '''第5步''' 和 '''第6步''' 中 '''ToPrimitive''' 的调用没有提供'''暗示类型'''。所有除了 '''Date''' 对象的 ECMAScript 原生对象会在没有提示的时候假设提示是 '''Number'''；'''Date''' 对象会假设提示是 '''String'''。宿主对象可以假设提示是任何东西。}}
+
+{{note|'''第7步''' 与关系比较算法的 '''第3步''' 不同（11.8.5），使用逻辑 “或” 而不是 “与”。}}
+
+=== {{anchor|x11.6.2}}减法运算符（-） {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L6910-L6917|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.6.2}}
+
+产生式 ''{{toanchor|AdditiveExpression}}'' ''':''' ''{{toanchor|AdditiveExpression}}'' '''-''' ''{{toanchor|MultiplicativeExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|AdditiveExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|MultiplicativeExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>lnum</var> 为 [[ES5/conversion#to-number|ToNumber]](<var>lval</var>)。
+# 令 <var>rnum</var> 为 [[ES5/conversion#to-number|ToNumber]](<var>rval</var>)。
+# 返回返回将减法运算作用于 <var>lnum</var> 和 <var>rnum</var> 的结果。参见 [[#additive-operators|11.6.3]] 后的注解。
+
+=== {{anchor|additive-operators}}加法作用于数字 {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L6900-L6907|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.6.3}}
+
+'''+''' 运算符作用于两个数字类型的操作数时表示加法，产生两个操作数之和。'''-''' 运算符表示剑法，产生两个数字之差。
+
+加法是满足交换律的运算，但是不总满足结合律。
+
+加法遵循 IEEE 754 二进制双精度幅度浮点算法规则：
+
+* 若两个操作数之一为 '''NaN'''，结果为 '''NaN'''。
+* 两个正负号相反的无穷之和为 '''NaN'''。
+* 两个正负号相同的无穷大之和是具有相同正负的无穷大。
+* 无穷大和有穷值之和等于操作数中的无穷大。
+* 两个负零之和为 '''-0'''。
+* 两个正零，或者两个正负号相反的零之和为 '''+0'''。
+* 零与非零有穷值之和等于非零的那个操作数。
+* 两个大小相等，符号相反的非零有穷值之和为 '''+0'''。
+* 其它情况下，既没有无穷大也没有 '''NaN''' 或者零参与运算，并且操作数要么大小不等，要么符号相同，结果计算出来后会按照 [http://en.wikipedia.org/wiki/IEEE_floating_point#Roundings_to_nearest IEEE 754 round-to-nearest] 取到最接近的能表示的数。如果值过大不能表示，则结果为相应的正负无穷大。如果值过小不能表示，则结果为相应的正负零。ECMAScript 要求支持 IEEE 754 规定的渐进下溢。
+
+'''-''' 运算符作用于两个数字类型时表示减法，产生两个操作数之差。左边操作数是被减数右边是减数。给定操作数 <var>a</var> 和 <var>b</var>，总是有 <var>a</var>–<var>b</var> 产生与 <var>a</var> + (-<var>b</var>) 产生相同结果。
+
+== {{anchor|x11.7}}移位运算符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.7}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.7}}
+
+
+
+
+{{syntax}}
+    ''<b id="ShiftExpression">ShiftExpression</b>'' :
+        ''{{toanchor|AdditiveExpression}}''
+        ''{{toanchor|ShiftExpression}}'' '''<<''' ''{{toanchor|AdditiveExpression}}''
+        ''{{toanchor|ShiftExpression}}'' '''>>''' ''{{toanchor|AdditiveExpression}}''
+        ''{{toanchor|ShiftExpression}}'' '''>>>''' ''{{toanchor|AdditiveExpression}}''
+
+=== {{anchor|x11.7.1}}左移位运算符（<<） {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L7396-L7403|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.7.1}}
+
+对左边参数执行右边参数指定大小的左移位运算。
+
+产生式 ''{{toanchor|ShiftExpression}}'' ''':''' ''{{toanchor|ShiftExpression}}'' '''<<''' ''{{toanchor|AdditiveExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|ShiftExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|AdditiveExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>lnum</var> 为 [[ES5/conversion#to-int32|ToInt32]](<var>lval</var>)。
+# 令 <var>rnum</var> 为 [[ES5/conversion#to-uint32|ToUint32]](<var>rval</var>)。
+# 令 <var>shiftCount</var> 为用掩码算出 <var>rnum</var> 的最后五个比特位，即计算 <var>rnum</var> & '''0x1F''' 的结果。
+# 返回 <var>lnum</var> 左移 <var>shiftCount</var> 比特位的结果。结果是一个有符号 32位 整数。
+
+=== {{anchor|x11.7.2}}带号右移位运算符（>>） {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L7416-L7423|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.7.2}}
+
+对左边参数执行右边参数指定大小的右移位带号填充运算。
+
+产生式 ''{{toanchor|ShiftExpression}}'' ''':''' ''{{toanchor|ShiftExpression}}'' '''>>''' ''{{toanchor|AdditiveExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|ShiftExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|AdditiveExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>lnum</var> 为 [[ES5/conversion#to-int32|ToInt32]](<var>lval</var>)。
+# 令 <var>rnum</var> 为 [[ES5/conversion#to-uint32|ToUint32]](<var>rval</var>)。
+# 令 <var>shiftCount</var> 为用掩码算出 <var>rnum</var> 的最后五个比特位，即计算 <var>rnum</var> & '''0x1F''' 的结果。
+# 返回 <var>lnum</var> 带符号扩展的右移 <var>shiftCount</var> 比特位的结果。将位用最大的比特填满。结果是一个有符号 32位 整数。
+
+=== {{anchor|x11.7.3}}不带号右移位运算符（>>>） {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L7406-L7413|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.7.3}}
+
+对左边参数执行右边参数指定大小的右移位填零运算。
+
+产生式 ''{{toanchor|ShiftExpression}}'' ''':''' ''{{toanchor|ShiftExpression}}'' '''>>>''' ''{{toanchor|AdditiveExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|ShiftExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|AdditiveExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>lnum</var> 为 [[ES5/conversion#to-uint32|ToUint32]](<var>lval</var>)。
+# 令 <var>rnum</var> 为 [[ES5/conversion#to-uint32|ToUint32]](<var>rval</var>)。
+# 令 <var>shiftCount</var> 为用掩码算出 <var>rnum</var> 的最后五个比特位，即计算 <var>rnum</var> & '''0x1F''' 的结果。
+# 返回 <var>lnum</var> 做零填充右移 <var>shiftCount</var> 比特位的结果。缺少的比特位填零。结果是一个无符号 32位 整数。
+
+== {{anchor|x11.8}}关系运算符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.8}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.8}}
+
+
+
+
+{{syntax}}
+    ''<b id="RelationalExpression">RelationalExpression</b>'' :
+        ''{{toanchor|ShiftExpression}}''
+        ''{{toanchor|RelationalExpression}}'' '''<''' ''{{toanchor|ShiftExpression}}''
+        ''{{toanchor|RelationalExpression}}'' '''>''' ''{{toanchor|ShiftExpression}}''
+        ''{{toanchor|RelationalExpression}}'' '''<=''' ''{{toanchor|ShiftExpression}}''
+        ''{{toanchor|RelationalExpression}}'' '''>=''' ''{{toanchor|ShiftExpression}}''
+        ''{{toanchor|RelationalExpression}}'' '''instanceof''' ''{{toanchor|ShiftExpression}}''
+        ''{{toanchor|RelationalExpression}}'' '''in''' ''{{toanchor|ShiftExpression}}''
+
+    ''<b id="RelationalExpressionNoIn">RelationalExpressionNoIn</b>'' :
+        ''{{toanchor|ShiftExpression}}''
+        ''{{toanchor|RelationalExpressionNoIn}}'' '''<''' ''{{toanchor|ShiftExpression}}''
+        ''{{toanchor|RelationalExpressionNoIn}}'' '''>''' ''{{toanchor|ShiftExpression}}''
+        ''{{toanchor|RelationalExpressionNoIn}}'' '''<=''' ''{{toanchor|ShiftExpression}}''
+        ''{{toanchor|RelationalExpressionNoIn}}'' '''>=''' ''{{toanchor|ShiftExpression}}''
+        ''{{toanchor|RelationalExpressionNoIn}}'' '''instanceof''' ''{{toanchor|ShiftExpression}}''
+
+{{note|“'''NoIn'''” 变种的存在是为了要避免把一个关系表达式里的 '''in''' 和一个 '''for语句''' 里的 '''in''' 搞混。}}
+
+{{semantics}}
+
+关系运算符的执行结果总是一个表示运算符代表的关系在两个参数之间成立与否的 '''Boolean''' 值。
+
+除了要执行内有的 ''{{toanchor|RelationalExpressionNoIn}}'' 而不是''{{toanchor|RelationalExpression}}'' 以外，产生式 ''{{toanchor|RelationalExpressionNoIn}}'' 的执行方式与产生式 ''{{toanchor|RelationalExpression}}'' 的执行方式相同。
+
+=== {{anchor|x11.8.1}}小于运算符（>） ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.8.1}}
+
+产生式 ''{{toanchor|RelationalExpression}}'' ''':''' ''{{toanchor|RelationalExpression}}'' '''<''' ''{{toanchor|ShiftExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|RelationalExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|ShiftExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>r</var> 为启用[[#relational-algorithm|抽象关系比较]] <var>lval</var> < <var>rval</var>（参见 [[#relational-algorithm|11.8.5]]) 的结果。
+# 如果 <var>r</var> 为 '''undefined'''，返回 '''false'''。否则，返回 <var>r</var>。
+
+=== {{anchor|x11.8.2}}大于运算符（>） ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.8.2}}
+
+产生式 ''{{toanchor|RelationalExpression}}'' ''':''' ''{{toanchor|RelationalExpression}}'' '''>''' ''{{toanchor|ShiftExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|RelationalExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|ShiftExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>r</var> 为启用[[#relational-algorithm|抽象关系比较]] <var>rval</var> < <var>lval</var> 的结果，参数 <var>LeftFirst</var> 设为 '''false'''。（参见 [[#relational-algorithm|11.8.5]])  
+# 如果 <var>r</var> 为 '''undefined'''，返回 '''false'''。否则，返回 <var>r</var>。
+
+=== {{anchor|x11.8.3}}小于等于运算符（<=） ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.8.3}}
+
+产生式 ''{{toanchor|RelationalExpression}}'' ''':''' ''{{toanchor|RelationalExpression}}'' '''<=''' ''{{toanchor|ShiftExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|RelationalExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|ShiftExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>r</var> 为启用[[#relational-algorithm|抽象关系比较]] <var>rval</var> < <var>lval</var> 的结果，参数 <var>LeftFirst</var> 设为 '''false'''。（参见 [[#relational-algorithm|11.8.5]])  
+# 如果 <var>r</var> 为 '''true''' 或者 '''undefined''' ，返回 '''false'''。否则，返回 '''true'''。
+
+=== {{anchor|x11.8.4}}大于等于运算符（>=） ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.8.4}}
+
+产生式 ''{{toanchor|RelationalExpression}}'' ''':''' ''{{toanchor|RelationalExpression}}'' '''>=''' ''{{toanchor|ShiftExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|RelationalExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|ShiftExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>r</var> 为启用[[#relational-algorithm|抽象关系比较]] <var>lval</var> < <var>rval</var> 的结果。（参见 [[#relational-algorithm|11.8.5]]) 
+# 如果 <var>r</var> 为 '''true''' 或者 '''undefined'''，返回 '''false'''。否则，返回 '''true'''。
+
+=== {{anchor|x11.8.5}}{{anchor|relational-algorithm}}抽象关系比较算法 {{v8|https://github.com/v8/v8/blob/master/src/runtime.js#L128-L161|}} {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L7463-L7473|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.8.5}}
+
+以 <var>x</var> 和 <var>y</var> 为值进行小于比较（<var>x</var> < <var>y</var> 的比较），会产生的结果可为 '''true'''、'''false''' 或 '''undefined'''（这说明 <var>x</var>、<var>y</var> 中最少有一个操作数是 '''NaN'''）。除了 <var>x</var> 和 <var>y</var>，这个算法另外需要一个名为 <var>LeftFirst</var> 的布尔值标记作为参数。这个标记用于解析顺序的控制，因为操作数 <var>x</var> 和 <var>y</var> 在执行的时候会有潜在可见的副作用。这个标志的存在是必须的，因为 ECMAScript 规定了表达式是从左到右顺序执行。<var>LeftFirst</var> 的默认值是 '''true'''，这表明在相关的表达式中，参数 <var>x</var> 出现在参数 <var>y</var> 之前。如果 <var>LeftFirst</var> 值是 '''false'''，情况会相反，操作数的执行必须是先 <var>y</var> 后 <var>x</var>。这样的一个小于比较的执行步骤如下：
+
+# 如果 <var>LeftFirst</var> 标志是 '''true'''，那么 
+## 让 <var>px</var> 为调用 [[ES5/conversion#to-primitive|ToPrimitive]](<var>x</var>, 暗示 '''Number''' 类型) 的结果。
+## 让 <var>py</var> 为调用 [[ES5/conversion#to-primitive|ToPrimitive]](<var>y</var>, 暗示 '''Number''' 类型) 的结果。
+# 否则解释执行的顺序需要反转，从而保证从左到右的执行顺序 
+## 让 <var>py</var> 为调用 [[ES5/conversion#to-primitive|ToPrimitive]](<var>y</var>, 暗示 '''Number''' 类型) 的结果。
+## 让 <var>px</var> 为调用 [[ES5/conversion#to-primitive|ToPrimitive]](<var>x</var>, 暗示 '''Number''' 类型) 的结果。
+# 如果 [[ES5/types#Type|Type]](<var>px</var>) 和 [[ES5/types#Type|Type]](<var>py</var>) 得到的结果不都是 '''String''' 类型，那么 
+## 让 <var>nx</var> 为调用 [[ES5/conversion#to-number|ToNumber]](<var>px</var>) 的结果。因为 <var>px</var> 和 <var>py</var> 都已经是[[ES5/types#primitive|基本数据类型]]（primitive values 也作原始值），其执行顺序并不重要。
+## 让 <var>ny</var> 为调用 [[ES5/conversion#to-number|ToNumber]](<var>py</var>) 的结果。
+## 如果 <var>nx</var> 是 '''NaN'''，返回 '''undefined'''。
+## 如果 <var>ny</var> 是 '''NaN'''，返回 '''undefined'''。
+## 如果 <var>nx</var> 和 <var>ny</var> 的数字值相同，返回 '''false'''。
+## 如果 <var>nx</var> 是 '''+0''' 且 <var>ny</var> 是 '''-0'''，返回 '''flase'''。
+## 如果 <var>nx</var> 是 '''-0''' 且 <var>ny</var> 是 '''+0'''，返回 '''false'''。
+## 如果 <var>nx</var> 是 '''+∞'''，返回 '''fasle'''。
+## 如果 <var>ny</var> 是 '''+∞'''，返回 '''true'''。
+## 如果 <var>ny</var> 是 '''-∞'''，返回 '''false'''。
+## 如果 <var>nx</var> 是 '''-∞'''，返回 '''true'''。
+## 如果 <var>nx</var> 数学上的值小于 <var>ny</var> 数学上的值（注意这些数学值都不能是无限的且不能都为 0），返回 '''ture'''。否则返回 '''false'''。
+# 否则，<var>px</var> 和 <var>py</var> 都是 Strings 类型 
+## 如果 <var>py</var> 是 <var>px</var> 的一个前缀，返回 '''false'''。（当字符串 <var>q</var> 的值可以是字符串 <var>p</var> 和一个其他的字符串 <var>r</var> 拼接而成时，字符串 <var>p</var> 就是 <var>q</var> 的前缀。注意：任何字符串都是自己的前缀，因为 <var>r</var> 可能是空字符串。）
+## 如果 <var>px</var> 是 <var>py</var> 的前缀，返回 '''true'''。
+## 让 <var>k</var> 成为最小的非负整数，能使得在 <var>px</var> 字符串中位置 <var>k</var> 的字符与字符串 <var>py</var> 字符串中位置 <var>k</var> 的字符不相同。（因为 <var>px</var> 与 <var>py</var> 不是彼此的前綴，这里 <var>k</var> 必然存在。）
+## 让 <var>m</var> 为字符串 <var>px</var> 中位置 <var>k</var> 的字符的编码单元值。
+## 让 <var>n</var> 成为字符串 <var>py</var> 中位置 <var>k</var> 的字符的编码单元值。
+## 如果 <var>m</var> < <var>n</var>，返回 '''true'''。否则，返回 '''false'''。
+
+{{note|使用或代替的时候要注意，这里的 '''第3步''' 和加号操作符 '''+''' 算法（11.6.1）的 '''第7步''' 的区别。}}
+
+{{note|'''String''' 类型的比较使用了其编码单元值的作为一个简单的词法表序列去比较。这里不打算使用更复杂的、语义化的字符或字符串序列，和 Unicode 规范的整理序列进行比较。因此，字符串的值和其对应的 Unicode 标准的值是不相同的。实际上，这个算法假定了所有字符串已经是正常化的格式。同时要注意，对于字符串拼接追加的字符的时候，UTF-16 编码单元值的词法表序列是不同于代码点值的序列的。}}
+
+=== {{anchor|x11.8.6}}instanceof 运算符 {{v8|https://github.com/v8/v8/blob/master/src/runtime.js#L361-L386|}} {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L1689-L1701|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.8.6}}
+
+产生式 ''{{toanchor|RelationalExpression}}''''':''' ''{{toanchor|RelationalExpression}}'' '''instanceof''' ''{{toanchor|ShiftExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|RelationalExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|ShiftExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 如果 [[ES5/types#Type|Type]](<var>rval</var>) 不是 '''Object'''，抛出一个 '''TypeError''' 异常。
+# 如果 <var>rval</var> 没有 [[ES5/types#HasInstance|<nowiki>[[HasInstance]]</nowiki>]] 内置方法，抛出一个 '''TypeError''' 异常。
+# 返回以参数 <var>lval</var> 调用 <var>rval</var> 的 [[ES5/types#HasInstance|<nowiki>[[HasInstance]]</nowiki>]] 内置方法的结果。
+
+=== {{anchor|x11.8.7}}in 运算符 {{v8|https://github.com/v8/v8/blob/master/src/runtime.js#L348-L354|}} {{v8|https://github.com/v8/v8/blob/master/src/runtime.cc#L5648-L5658|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.8.7}}
+
+产生式 ''{{toanchor|RelationalExpression}}'' ''':''' ''{{toanchor|RelationalExpression}}'' '''in''' ''{{toanchor|ShiftExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|RelationalExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|ShiftExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 如果 [[ES5/types#Type|Type]](<var>rval</var>) 不是 '''Object'''，抛出一个 '''TypeError''' 异常。
+# 返回以参数 [[ES5/conversion#to-string|ToString]](<var>lval</var>) 调用 <var>rval</var> 的 [[ES5/types#HasProperty|<nowiki>[[HasProperty]]</nowiki>]] 内置方法的结果。
+
+== {{anchor|x11.9}}等值运算符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.9}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.9}}
+
+
+
+
+{{syntax}}
+    ''<b id="EqualityExpression">EqualityExpression</b>'' :
+        ''{{toanchor|RelationalExpression}}''
+        ''{{toanchor|EqualityExpression}}'' '''==''' ''{{toanchor|RelationalExpression}}''
+        ''{{toanchor|EqualityExpression}}'' '''!=''' ''{{toanchor|RelationalExpression}}''
+        ''{{toanchor|EqualityExpression}}'' '''===''' ''{{toanchor|RelationalExpression}}''
+        ''{{toanchor|EqualityExpression}}'' '''!==''' ''{{toanchor|RelationalExpression}}''
+
+    ''<b id="EqualityExpressionNoIn">EqualityExpressionNoIn</b>'' :
+        ''{{toanchor|RelationalExpressionNoIn}}''
+        ''{{toanchor|EqualityExpressionNoIn}}'' '''==''' ''{{toanchor|RelationalExpressionNoIn}}''
+        ''{{toanchor|EqualityExpressionNoIn}}'' '''!=''' ''{{toanchor|RelationalExpressionNoIn}}''
+        ''{{toanchor|EqualityExpressionNoIn}}'' '''===''' ''{{toanchor|RelationalExpressionNoIn}}''
+        ''{{toanchor|EqualityExpressionNoIn}}'' '''!==''' ''{{toanchor|RelationalExpressionNoIn}}''
+
+{{semantics}}
+
+等值运算符的执行结果总是一个表示运算符代表的关系在两个参数之间成立与否的 '''Boolean''' 值。
+
+除了要执行内有的 ''{{toanchor|EqualityExpressionNoIn}}'' 与 ''{{toanchor|RelationalExpressionNoIn}}'' 而不是''{{toanchor|EqualityExpression}}'' 与 ''{{toanchor|RelationalExpression}}'' 以外，产生式 ''{{toanchor|EqualityExpressionNoIn}}'' 的执行方式与产生式 ''{{toanchor|EqualityExpression}}'' 的执行方式相同。
+
+=== {{anchor|x11.9.1}}等于运算符（==） ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.9.1}}
+
+产生式 ''{{toanchor|EqualityExpression}}'' ''':''' ''{{toanchor|EqualityExpression}}'' '''==''' ''{{toanchor|RelationalExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|EqualityExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|RelationalExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 返回做用[[#equility-algorithm|抽象相等比较算法]]于 <var>rval</var> == <var>lval</var>（参见 [[#equility-algorithm|11.9.3]]）的结果。
+
+=== {{anchor|x11.9.2}}不等于运算符（!=） ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.9.2}}
+
+产生式 ''{{toanchor|EqualityExpression}}'' ''':''' ''{{toanchor|EqualityExpression}}'' '''!=''' ''{{toanchor|RelationalExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|EqualityExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|RelationalExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>r</var> 为做用[[#equility-algorithm|抽象相等比较算法]]于 <var>rval</var> == <var>lval</var>（参见 [[#equility-algorithm|11.9.3]]）的结果。
+# 如果 <var>r</var> 为 '''true'''，返回 '''false'''。否则，返回 '''true'''。
+
+=== 抽象相等比较算法{{anchor|equility-algorithm}} {{v8|https://github.com/v8/v8/blob/master/src/runtime.js#L54-L105|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.9.3}}
+
+以 <var>x</var> 和 <var>y</var> 为值进行 <var>x</var> == <var>y</var> 比较会产生的结果可为 '''true''' 或 '''false'''。比较的执行步骤如下：
+
+# 若 [[ES5/types#Type|Type]](<var>x</var>) 与 [[ES5/types#Type|Type]](<var>y</var>) 相同， 则
+## 若 [[ES5/types#Type|Type]](<var>x</var>) 为 '''Undefined'''， 返回 '''true'''。
+## 若 [[ES5/types#Type|Type]](<var>x</var>)为 '''Null'''， 返回 '''true'''。
+## 若 [[ES5/types#Type|Type]](<var>x</var>)为 '''Number'''，则
+### 若 <var>x</var> 为 '''NaN'''，返回 '''false'''。
+### 若 <var>y</var> 为 '''NaN'''，返回 '''false'''。
+### 若 <var>x</var> 与 <var>y</var> 为相等数值，返回 '''true'''。
+### 若 <var>x</var> 为 '''+0''' 且 <var>y</var> 为 '''?0'''，返回 '''true'''。
+### 若 <var>x</var> 为 '''?0''' 且 <var>y</var> 为 '''+0'''，返回 '''true'''。
+### 返回 '''false'''。
+## 若 [[ES5/types#Type|Type]](<var>x</var>) 为 '''String'''，则当 <var>x</var> 和 <var>y</var> 为完全相同的字符序列（长度相等且相同字符在相同位置）时返回 '''true'''。否则，返回 '''false'''。
+## 若 [[ES5/types#Type|Type]](<var>x</var>) 为 '''Boolean'''，当 <var>x</var> 和 <var>y</var> 为同为 '''true''' 或者同为 '''false''' 时返回 '''true'''。否则，返回 '''false'''。
+## 当 <var>x</var> 和 <var>y</var> 为引用同一对象时返回 '''true'''。否则，返回 '''false'''。
+# 若 <var>x</var> 为 '''null''' 且 <var>y</var> 为 '''undefined'''，返回 '''true'''。
+# 若 <var>x</var> 为 '''undefined''' 且 <var>y</var> 为 '''null'''，返回 '''true'''。
+# 若 [[ES5/types#Type|Type]](<var>x</var>) 为 '''Number''' 且 [[ES5/types#Type|Type]](<var>y</var>) 为 '''String'''，返回 <var>x</var> == [[ES5/conversion#to-number|ToNumber]](<var>y</var>) 的结果。
+# 若 [[ES5/types#Type|Type]](<var>x</var>) 为 '''String''' 且 [[ES5/types#Type|Type]](<var>y</var>) 为 '''Number'''，返回比较 [[ES5/conversion#to-number|ToNumber]](<var>x</var>) == <var>y</var> 的结果。
+# 若 [[ES5/types#Type|Type]](<var>x</var>) 为 '''Boolean'''，返回比较 [[ES5/conversion#to-number|ToNumber]](<var>x</var>) == <var>y</var> 的结果。
+# 若 [[ES5/types#Type|Type]](<var>y</var>) 为 '''Boolean'''，返回比较 <var>x</var> == [[ES5/conversion#to-number|ToNumber]](<var>y</var>) 的结果。
+# 若 [[ES5/types#Type|Type]](<var>x</var>) 为 '''String''' 或 '''Number'''，且 [[ES5/types#Type|Type]](<var>y</var>) 为 '''Object'''，返回比较 <var>x</var> == [[ES5/conversion#to-primitive|ToPrimitive]](<var>y</var>) 的结果。
+# 若 [[ES5/types#Type|Type]](<var>x</var>) 为 '''Object''' 且 [[ES5/types#Type|Type]](<var>y</var>) 为 '''String''' 或 '''Number'''，返回比较 [[ES5/conversion#to-primitive|ToPrimitive]](<var>x</var>) == <var>y</var> 的结果。
+# 返回 '''false'''。
+
+{{note|根据上述等于的定义：
+
+* 字符串比较可以以：'''"" + a {{=}}{{=}} "" + b''' 硬性触发。
+* 数值比较可以以：'''+a {{=}}{{=}} +b''' 硬性触发。
+* 布尔比较可以以：'''!a {{=}}{{=}} !b''' 硬性触发。}}
+
+{{note|等于运算符有以下的不变量：
+
+* '''A !{{=}} B''' 与 '''!(A {{=}}{{=}} B)''' 相等。
+* 除了 '''A''' 与 '''B''' 的执行顺序以外，'''A {{=}}{{=}} B''' 与 '''B {{=}}{{=}} A''' 相等。}}
+
+{{note|等于运算符不总是可传递。举例来说，两个代表相同 '''String''' 值但是不同的 '''String''' 对象会分别与 '''String''' 值 '''{{=}}{{=}}'''，但是两个对象间不相等。}}
+
+{{note|String 的比较使用代码单元序列的简单等号比较。这里不打算使用更复杂的、语义化的字符或字符串序列，和 Unicode 规范的整理序列进行比较。因此，在 Unicode 标准中相等的 '''String''' 值可能在本算法中不相等。也就是，这个算法假定了所有字符串已经正规化。}}
+
+=== {{anchor|x11.9.4}}严格等于运算符（===） ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.9.4}}
+
+产生式 ''{{toanchor|EqualityExpression}}'' ''':''' ''{{toanchor|EqualityExpression}}'' '''===''' ''{{toanchor|RelationalExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|EqualityExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|RelationalExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 返回做用[[#strict-equality-comparison|严格等于比较算法]]于 <var>rval</var> === <var>lval</var>（参见 [[#strict-equality-comparison|11.9.6]]）的结果。
+
+=== {{anchor|x11.9.5}}严格不等于运算符（!==） ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.9.5}}
+
+产生式 ''{{toanchor|EqualityExpression}}'' ''':''' ''{{toanchor|EqualityExpression}}'' '''!==''' ''{{toanchor|RelationalExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|EqualityExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|RelationalExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>r</var> 为做用[[#strict-equality-comparison|严格等于比较算法]]于 <var>rval</var> === <var>lval</var>（参见 [[#strict-equality-comparison|11.9.6]]）的结果。
+# 如果 <var>r</var> 为 '''true'''，返回 '''false'''。否则，返回 '''true'''。
+
+=== {{anchor|strict-equality-comparison}}{{anchor|x11.9.6}}严格等于比较算法 {{v8|https://github.com/v8/v8/blob/master/src/runtime.js#L108-L123|}} ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.9.6}}
+
+比较 <var>x</var> === <var>y</var>，<var>x</var> 和 <var>y</var> 为值，需要产出 '''true''' 或 '''false'''。比较过程如下：
+
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 与 [[ES5/types#Type|Type]](<var>y</var>) 的结果不一致，返回 '''false'''。
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 结果为 '''Undefined'''，返回 '''true'''。
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 结果为 '''Null'''，返回 '''true'''。
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 结果为 '''Number'''，则 
+## 如果 <var>x</var> 为 '''NaN'''，返回 '''false'''。
+## 如果 <var>y</var> 为 '''NaN'''，返回 '''false'''。
+## 如果 <var>x</var> 与 <var>y</var> 为同一个数字，返回 '''true'''。
+## 如果 <var>x</var> 为 '''+0'''，<var>y</var> 为 '''-0'''，返回 '''true'''。
+## 如果 <var>x</var> 为 '''-0'''，<var>y</var> 为 '''+0'''，返回 '''true'''。
+## 返回 '''false'''。
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 结果为 '''String'''，如果 <var>x</var> 与 <var>y</var> 为完全相同的字符序列（相同的长度和相同的字符对应相同的位置），返回 '''true'''，否则，返回 '''false'''。
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 结果为 '''Boolean'''，如果 <var>x</var> 与 <var>y</var> 都为 '''true''' 或 '''false'''，则返回 '''true'''，否则，返回 '''false'''。
+# 如果 <var>x</var> 和 <var>y</var> 引用到同一个 '''Object''' 对象，返回 '''true'''，否则，返回 '''false'''。
+
+{{note| 此算法与 '''SameValue''' （9.12） 算法在对待 '''有符号零''' 和 '''NaN''' 上表现不同。}}
+
+== {{anchor|x11.10}}二元按位运算符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.10}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.10}}
+
+
+
+
+{{syntax}}
+    ''<b id="BitwiseANDExpression">BitwiseANDExpression</b>'' :
+        ''{{toanchor|EqualityExpression}}''
+        ''{{toanchor|BitwiseANDExpression}}'' '''&''' ''{{toanchor|EqualityExpression}}''
+
+    ''<b id="BitwiseANDExpressionNoIn">BitwiseANDExpressionNoIn</b>'' :
+        ''{{toanchor|EqualityExpressionNoIn}}''
+        ''{{toanchor|BitwiseANDExpressionNoIn}}'' '''&''' ''{{toanchor|EqualityExpressionNoIn}}''
+
+    ''<b id="BitwiseXORExpression">BitwiseXORExpression</b>'' :
+        ''{{toanchor|BitwiseANDExpression}}''
+        ''{{toanchor|BitwiseXORExpression}}'' '''^''' ''{{toanchor|BitwiseANDExpression}}''
+
+    ''<b id="BitwiseXORExpressionNoIn">BitwiseXORExpressionNoIn</b>'' :
+        ''{{toanchor|BitwiseANDExpressionNoIn}}''
+        ''{{toanchor|BitwiseXORExpressionNoIn}}'' '''^''' ''{{toanchor|BitwiseANDExpressionNoIn}}''
+
+    ''<b id="BitwiseORExpression">BitwiseORExpression</b>'' :
+        ''{{toanchor|BitwiseXORExpression}}''
+        ''{{toanchor|BitwiseORExpression}}'' '''|''' ''{{toanchor|BitwiseXORExpression}}''
+
+    ''<b id="BitwiseORExpressionNoIn">BitwiseORExpressionNoIn</b>'' :
+        ''{{toanchor|BitwiseXORExpressionNoIn}}''
+        ''{{toanchor|BitwiseORExpressionNoIn}}'' '''|''' ''{{toanchor|BitwiseXORExpressionNoIn}}''
+
+{{semantics}}
+
+产生式 <var>A</var> ''':''' <var>A</var> ''@'' <var>B</var>，其中 @ 是上述产生式中其中一个位运算符，按照下面的过程执行： {{v8|https://github.com/v8/v8/blob/master/src/runtime.js#L267-L286|and}} {{v8|https://github.com/v8/v8/blob/master/src/runtime.js#L289-L294|xor}} {{v8|https://github.com/v8/v8/blob/master/src/runtime.js#L260-L264|or}}
+
+# 令 <var>lref</var> 为解释执行 <var>A</var> 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 <var>B</var> 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>lnum</var> 为 [[ES5/conversion#to-int32|ToInt32]](<var>lval</var>)。
+# 令 <var>rnum</var> 为 [[ES5/conversion#to-int32|ToInt32]](<var>rval</var>)。
+# 返回作用位运算符 @ 作用到 <var>lnum</var> 和 <var>rnum</var> 的结果，是一个 32位 有符号整数。
+
+== {{anchor|x11.11}}二元逻辑运算符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.11}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.11}}
+
+
+
+
+{{syntax}}
+    ''<b id="LogicalANDExpression">LogicalANDExpression</b>'' :
+        ''{{toanchor|BitwiseORExpression}}''
+        ''{{toanchor|LogicalANDExpression}}'' '''&&''' ''{{toanchor|BitwiseORExpression}}''
+
+    ''<b id="LogicalANDExpressionNoIn">LogicalANDExpressionNoIn</b>'' :
+        ''{{toanchor|BitwiseORExpressionNoIn}}''
+        ''{{toanchor|LogicalANDExpressionNoIn}}'' '''&&''' ''{{toanchor|BitwiseORExpressionNoIn}}''
+
+    ''<b id="LogicalORExpression">LogicalORExpression</b>'' :
+        ''{{toanchor|LogicalANDExpression}}''
+        ''{{toanchor|LogicalORExpression}}'' '''||''' ''{{toanchor|LogicalANDExpression}}''
+
+    ''<b id="LogicalORExpressionNoIn">LogicalORExpressionNoIn</b>'' :
+        ''{{toanchor|LogicalANDExpressionNoIn}}''
+        ''{{toanchor|LogicalORExpressionNoIn}}'' '''||''' ''{{toanchor|LogicalANDExpressionNoIn}}''
+
+{{Semantics}}
+
+产生式 ''{{toanchor|LogicalANDExpression}}'' ''':''' ''{{toanchor|LogicalANDExpression}}'' '''&&''' ''{{toanchor|BitwiseORExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|LogicalANDExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 如果 [[ES5/conversion#to-boolean|ToBoolean]](<var>lval</var>) 为 '''false'''，返回 <var>lval</var>。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|BitwiseORExpression}}'' 的结果。
+# 返回 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+
+产生式 ''{{toanchor|LogicalORExpression}}'' ''':''' ''{{toanchor|LogicalORExpression}}'' '''||''' ''{{toanchor|LogicalANDExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|LogicalORExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 如果 [[ES5/conversion#to-boolean|ToBoolean]](<var>lval</var>) 为 '''true'''，返回 <var>lval</var>。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|LogicalANDExpression}}'' 的结果。
+# 返回 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+
+除了要执行内有的 ''{{toanchor|LogicalANDExpressionNoIn}}''、''{{toanchor|BitwiseORExpressionNoIn}}'' 与 ''{{toanchor|LogicalORExpressionNoIn}}'' 而不是''{{toanchor|LogicalANDExpression}}''、''{{toanchor|BitwiseORExpression}}'' 与 ''{{toanchor|LogicalORExpression}}'' 以外，产生式 ''{{toanchor|LogicalANDExpressionNoIn}}'' 与 ''{{toanchor|LogicalORExpressionNoIn}}'' 的执行方式与产生式 ''{{toanchor|LogicalANDExpression}}'' 与 ''{{toanchor|LogicalORExpression}}'' 的执行方式相同。
+
+{{note|'''&&''' 与 '''<nowiki>||</nowiki>''' 运算符产生的值不一定是布尔值。产生的值总是两个表达式其一。}}
+
+== {{anchor|x11.12}}条件运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L3010-L3027|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.12}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.12}}
+
+
+
+
+{{syntax}}
+    ''<b id="ConditionalExpression">ConditionalExpression</b>'' :
+        ''{{toanchor|LogicalORExpression}}''
+        ''{{toanchor|LogicalORExpression}}'' '''?''' ''{{toanchor|AssignmentExpression}}'' ''':''' ''{{toanchor|AssignmentExpression}}''
+
+    ''<b id="ConditionalExpressionNoIn">ConditionalExpressionNoIn</b>'' :
+        ''{{toanchor|LogicalORExpressionNoIn}}''
+        ''{{toanchor|LogicalORExpressionNoIn}}'' '''?''' ''{{toanchor|AssignmentExpressionNoIn}}'' ''':''' ''{{toanchor|AssignmentExpressionNoIn}}''
+
+{{Semantics}}
+
+产生式 ''{{toanchor|ConditionalExpression}}'' ''':''' ''{{toanchor|LogicalORExpression}}'' '''?''' ''{{toanchor|AssignmentExpression}}'' ''':''' ''{{toanchor|AssignmentExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|LogicalORExpression}}'' 的结果。
+# 如果 [[ES5/conversion#to-boolean|ToBoolean]]([[ES5/types#GetValue|GetValue]](<var>lref</var>)) 为 '''true'''，那么：
+## 令 <var>trueRef</var> 为解释执行第一个 ''{{toanchor|AssignmentExpression}}'' 的结果。
+## 返回 [[ES5/types#GetValue|GetValue]](<var>trueRef</var>)。
+# 否则
+## 令 <var>falseRef</var> 为解释执行第二个 ''{{toanchor|AssignmentExpression}}'' 的结果。
+## 返回 [[ES5/types#GetValue|GetValue]](<var>falseRef</var>)。
+
+除了要执行内有的 ''{{toanchor|LogicalORExpressionNoIn}}''、''{{toanchor|AssignmentExpression}}'' 与 ''{{toanchor|AssignmentExpressionNoIn}}'' 而不是''{{toanchor|LogicalORExpression}}''、''{{toanchor|AssignmentExpression}}'' 与 ''{{toanchor|AssignmentExpression}}'' 以外，产生式 ''{{toanchor|ConditionalExpressionNoIn}}'' 的执行方式与产生式 ''{{toanchor|ConditionalExpression}}''  的执行方式相同。
+
+{{note|在 ECMAScript 里 '''''ConditionalExpression''''' 的语法与 C、Java 的语法有一点不同，C、Java 允许第二个子表达式可以是任意的 '''''Expression''''' 但是限制第三个表达式必须是 '''''ConditionalExpression'''''。ECMAScript 在这里不同的理由是让两支条件都可以使用赋值表达式并消除既无用解析又困难的情形：在中间的表达式使用逗号表达式。}}
+
+== {{anchor|x11.13}}赋值运算符 {{v8|https://github.com/v8/v8/blob/3.22/src/parser.cc#L2913|}} ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.13}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.13}}
+
+
+
+
+{{syntax}}
+    ''<b id="AssignmentExpression">AssignmentExpression</b>'' :
+        ''{{toanchor|ConditionalExpression}}''
+        ''{{toanchor|LeftHandSideExpression}}'' ''{{toanchor|AssignmentOperator}}'' ''{{toanchor|AssignmentExpression}}''
+
+    ''<b id="AssignmentExpressionNoIn">AssignmentExpressionNoIn</b>'' :
+        ''{{toanchor|ConditionalExpressionNoIn}}''
+        ''{{toanchor|LeftHandSideExpression}}'' ''{{toanchor|AssignmentOperator}}'' ''{{toanchor|AssignmentExpressionNoIn}}''
+
+    ''<b id="AssignmentOperator">AssignmentOperator</b>'' : 以下之一 
+        '''= *= /= %= += -= <<= >>= >>>= &= ^= |=''' 
+
+{{Semantics}}
+
+除了要执行内有的 ''{{toanchor|ConditionalExpressionNoIn}}'' 与 ''{{toanchor|ConditionalExpressionNoIn}}'' 而不是''{{toanchor|ConditionalExpression}}'' 与 ''{{toanchor|AssignmentExpression}}'' 以外，产生式 ''{{toanchor|AssignmentExpressionNoIn}}'' 的执行方式与产生式 ''{{toanchor|AssignmentExpression}}''  的执行方式相同。
+
+=== {{anchor|x11.13.1}}{{anchor|simple-assignment}}简单赋值（=） ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.13.1}}
+
+产生式 ''{{toanchor|AssignmentExpression}}'' ''':''' ''{{toanchor|LeftHandSideExpression}}'' '''=''' ''{{toanchor|AssignmentExpression}}'' 按照下面的过程执行 :
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|LeftHandSideExpression}}'' 的结果。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|AssignmentExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 抛出一个 '''SyntaxError''' 异常，当以下条件都成立 :
+#* [[ES5/types#Type|Type]](<var>lref</var>) 为 [[ES5/types#Reference|Reference]]
+#* [[ES5/types#IsStrictReference|IsStrictReference]](<var>lref</var>) 为 '''true'''
+#* [[ES5/types#Type|Type]]([[ES5/types#GetBase|GetBase]](<var>lref</var>)) 为[[ES5/execution#environment-record|环境记录项]]
+#* [[ES5/types#GetReferencedName|GetReferencedName]](<var>lref</var>) 为 '''"eval"''' 或 '''"arguments"'''
+# 调用 [[ES5/types#PutValue|PutValue]](<var>lref</var>, <var>rval</var>)。
+# 返回 <var>rval</var>。
+
+{{note|当赋值出现在严格模式代码的时候，赋值的 '''''LeftHandSideExpression''''' 必须不被解释执行为一个不可解析的引用。若这种情形发生，则赋值的时候用户代理会抛出 '''ReferenceError''' 例外。'''''LeftHandSideExpression''''' 也不可以是一个特性值是 {<nowiki>[[Writable]]</nowiki>: '''false'''} 的数据属性，或是特性值是 {<nowiki>[[Set]]</nowiki>: '''undefined'''} 的访问器属性，或是 '''<nowiki>[[Extensible]]</nowiki>''' 内部属性是 '''false''' 的对象尚未存在的属性引用。在这些情况下用户代理会抛出 '''TypeError''' 异常。}}
+
+=== {{anchor|x11.13.2}}组合赋值（op=） ===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.13.2}}
+
+产生式 ''{{toanchor|AssignmentExpression}}'' ''':''' ''{{toanchor|LeftHandSideExpression}}'' ''@'''''=''' ''{{toanchor|AssignmentExpression}}''，其中 @ 表示上述的运算符其一，按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|LeftHandSideExpression}}'' 的结果。
+# 令 <var>lval</var> 为 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|AssignmentExpression}}'' 的结果。
+# 令 <var>rval</var> 为 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+# 令 <var>r</var> 为作用运算符 @ 于 <var>lval</var> 和 <var>rval</var> 的结果。
+# 抛出一个 '''SyntaxError''' 异常，当以下条件都成立 :
+#* [[ES5/types#Type|Type]](<var>lref</var>) 为 [[ES5/types#Reference|Reference]]
+#* [[ES5/types#IsStrictReference|IsStrictReference]](<var>lref</var>) 为 '''true'''
+#* [[ES5/types#Type|Type]]([[ES5/types#GetBase|GetBase]](<var>lref</var>)) 为[[ES5/execution#environment-record|环境记录项]]
+#* [[ES5/types#GetReferencedName|GetReferencedName]](<var>lref</var>) 为 '''"eval"''' 或 '''"arguments"'''
+# 调用 [[ES5/types#PutValue|PutValue]](<var>lref</var>, <var>r</var>)。
+# 返回 <var>r</var>。
+
+{{note|参见 11.13.1 的备注。}}
+
+== {{anchor|x11.14}}逗号运算符 ==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-11.14}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch11/11.14}}
+
+
+
+
+{{syntax}}
+    ''<b id="Expression">Expression</b>'' :
+        ''{{toanchor|AssignmentExpression}}''
+        ''{{toanchor|Expression}}'' ''',''' ''{{toanchor|AssignmentExpression}}''
+
+    ''<b id="ExpressionNoIn">ExpressionNoIn</b>'' :
+        ''{{toanchor|AssignmentExpressionNoIn}}''
+        ''{{toanchor|ExpressionNoIn}}'' ''',''' ''{{toanchor|AssignmentExpressionNoIn}}''
+
+{{semantics}}
+
+产生式 ''{{toanchor|Expression}}'' ''':''' ''{{toanchor|Expression}}'' ''',''' ''{{toanchor|AssignmentExpression}}'' 按照下面的过程执行：
+
+# 令 <var>lref</var> 为解释执行 ''{{toanchor|Expression}}'' 的结果。
+# 调用 [[ES5/types#GetValue|GetValue]](<var>lref</var>)。
+# 令 <var>rref</var> 为解释执行 ''{{toanchor|AssignmentExpression}}'' 的结果。
+# 返回 [[ES5/types#GetValue|GetValue]](<var>rref</var>)。
+
+除了要执行内有的 ''{{toanchor|ExpressionNoIn}}'' 与 ''{{toanchor|AssignmentExpressionNoIn}}'' 而不是 ''{{toanchor|Expression}}'' 与 ''{{toanchor|AssignmentExpression}}'' 以外，产生式 ''{{toanchor|ExpressionNoIn}}'' 的执行方式与产生式 ''{{toanchor|Expression}}''  的执行方式相同。
+
+{{note|就算值不会用到，用户代理仍必须调用 '''GetValue'''，因为可能有可观测的副作用。}}
