@@ -1,0 +1,460 @@
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09}}
+
+ECMAScript运行环境会在需要时执行自动类型转换。定义一套关于转换的抽象操作有助于阐明某些结构的语义。这些抽象操作不是语言本身的一部分；它们被定义在这里是为了协助语言的语义规范。这些关于转换的抽象操作是多态的，它们可以接受任何[[ES5/types#language-type|ECMAScript语言类型]]，但不能接受[[ES5/types#specification-type|规范类型]]。
+
+=={{anchor|x9.1}}{{anchor|to-primitive}}ToPrimitive==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.1}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.1}}
+
+'''ToPrimitive''' 抽象操作接受一个值，和一个可选的<var>期望类型</var>作参数。'''ToPrimitive''' 运算符把其值参数转换为非对象类型。如果对象有能力被转换为不止一种原语类型，可以使用可选的<var>期望类型</var>来暗示那个类型。根据下表完成转换： {{v8|https://github.com/v8/v8/blob/3.22/src/runtime.js#L498-L508|}}
+
+{|border="1" style="border-collapse:collapse" cellpadding="5" align="center"
+|- style="background:#EEE"
+!nowrap| 输入类型 
+! 结果 
+|-
+| 未定义 
+| 结果等于输入的参数（不转换）。
+|-
+| 空值 
+| 结果等于输入的参数（不转换）。
+|-
+| 布尔值 
+| 结果等于输入的参数（不转换）。
+|-
+| 数值 
+| 结果等于输入的参数（不转换）。
+|-
+| 字符串 
+| 结果等于输入的参数（不转换）。
+|-
+| 对象 
+| 返回该对象的默认值。调用该对象的内部方法  [[ES5/types#DefaultValue|&#x5B;&#x5B;DefaultValue&#x5D;&#x5D;]] 来恢复这个默认值，调用时传递暗示<var>期望类型</var>（所有 ECAMScript 本地对象的 [[ES5/types#DefaultValue|&#x5B;&#x5B;DefaultValue&#x5D;&#x5D;]] 一樣）。
+|}
+
+=={{anchor|x9.2}}{{anchor|to-boolean}}ToBoolean==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.2}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.2}}
+
+'''ToBoolean''' 抽象操作根据下表将其参数转换为布尔值类型的值： {{v8|https://github.com/v8/v8/blob/3.22/src/runtime.js#L511-L518|}}
+
+{|border="1" style="border-collapse:collapse" cellpadding="5" align="center"
+|- style="background:#EEE"
+!nowrap| 输入类型 
+! 结果 
+|-
+| 未定义 
+| '''false'''
+|-
+| 空值 
+| '''false'''
+|- 
+| 布尔值 
+| 结果等于输入的参数（不转换）。
+|-
+| 数值 
+| 如果参数是 '''+0''', '''-0''', 或 '''NaN'''，结果为 '''false''' ；否则结果为 '''true'''。
+|-
+| 字符串 
+| 如果参数是空字符串（其长度为零），结果为 '''false'''，否则结果为 '''true'''。
+|-
+| 对象 
+| '''true'''
+|}
+
+=={{anchor|x9.3}}{{anchor|to-number}}ToNumber==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.3}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.3}}
+
+'''ToNumber''' 抽象操作根据下表将其参数转换为数值类型的值：{{v8|https://github.com/v8/v8/blob/3.22/src/runtime.js#L521-L532|}}
+
+{|border="1" style="border-collapse:collapse" cellpadding="5" align="center"
+|- style="background:#EEE"
+!nowrap| 输入类型 
+! 结果 
+|-
+| 未定义 
+| '''NaN'''
+|-
+| 空值 
+| '''+0'''
+|-
+| 布尔值 
+| 如果参数是 '''true'''，结果为 '''1'''。如果参数是 '''false'''，此结果为 '''+0'''。
+|-
+| 数字 
+| 结果等于输入的参数（不转换）。
+|- 
+| 字符串 
+| 参见下文的文法和注释。
+|-
+| 对象 
+| 应用下列步骤：
+
+# 令<var>primValue</var>为 {{toanchor|ToPrimitive}}(<var>输入参数</var>, 暗示<var>数值类型</var>)。
+# 返回 '''ToNumber'''(<var>primValue</var>)。
+|}
+
+==={{anchor|x9.3.1}}对字符串类型应用 ToNumber===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.3.1}}
+
+对字符串应用 '''ToNumber''' 时，对输入字符串应用如下文法。如果此文法无法将字符串解释为 ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' 的扩展，那么 '''ToNumber''' 的结果为 '''NaN'''。 {{v8|https://github.com/v8/v8/blob/3.22/src/runtime.cc#L6078|}}
+
+  ''<b id="ToNumber-StringNumericLiteral">StringNumericLiteral</b>'' :::
+    ''[[#ToNumber-StrWhiteSpace|StrWhiteSpace]]<sub>opt</sub>''
+    ''[[#ToNumber-StrWhiteSpace|StrWhiteSpace]]<sub>opt</sub>'' ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]<sub>opt</sub>'' ''[[#ToNumber-StrWhiteSpace|StrWhiteSpace]]<sub>opt</sub>''
+
+  ''<b id="ToNumber-StrWhiteSpace">StrWhiteSpace</b>'' :::
+    ''[[#ToNumber-StrWhiteSpaceChar|StrWhiteSpaceChar]]'' ''[[#ToNumber-StrWhiteSpace|StrWhiteSpace]]<sub>opt</sub>''
+
+  ''<b id="ToNumber-StrWhiteSpaceChar">StrWhiteSpaceChar</b>'' :::
+    ''[[ES5/lexical#white-space|WhiteSpace]]''
+    ''[[ES5/lexical#line-terminator|LineTerminator]]''
+
+  ''<b id="ToNumber-StrNumericLiteral">StrNumericLiteral</b>'' :::
+    ''[[#ToNumber-StrDecimalLiteral|StrDecimalLiteral]]''
+    ''[[#ToNumber-HexIntegerLiteral|HexIntegerLiteral]]''
+
+  ''<b id="ToNumber-StrDecimalLiteral">StrDecimalLiteral</b>'' :::
+    ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]''
+    '''+''' ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]''
+    '''-''' ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]''
+
+  ''<b id="ToNumber-StrUnsignedDecimalLiteral">StrUnsignedDecimalLiteral</b>'' :::
+    '''Infinity'''
+    ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' '''.''' ''[[#ToNumber-DecimalDigits|DecimalDigits]]<sub>opt</sub> [[#ToNumber-ExponentPart|ExponentPart]]<sub>opt</sub>''
+    '''.''' ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' ''[[#ToNumber-ExponentPart|ExponentPart]]<sub>opt</sub>''
+    ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' ''[[#ToNumber-ExponentPart|ExponentPart]]<sub>opt</sub>''
+
+  ''<b id="ToNumber-DecimalDigits">DecimalDigits</b>'' :::
+    ''[[#ToNumber-DecimalDigit|DecimalDigit]]''
+    ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' ''[[#ToNumber-DecimalDigit|DecimalDigit]]''
+
+  ''<b id="ToNumber-DecimalDigit">DecimalDigit</b>'' ::: '''one of'''
+    '''0''' '''1''' '''2''' '''3''' '''4''' '''5''' '''6''' '''7''' '''8''' '''9'''
+
+  ''<b id="ToNumber-ExponentPart">ExponentPart</b>'' :::
+    ''[[#ToNumber-ExponentIndicator|ExponentIndicator]]'' ''[[#ToNumber-SignedInteger|SignedInteger]]''
+
+  ''<b id="ToNumber-ExponentIndicator">ExponentIndicator</b>'' ::: '''one of'''
+    '''e''' '''E'''
+
+  ''<b id="ToNumber-SignedInteger">SignedInteger</b>'' :::
+    ''[[#ToNumber-DecimalDigit|DecimalDigit]]''
+    '''+''' ''[[#ToNumber-DecimalDigit|DecimalDigit]]''
+    '''-''' ''[[#ToNumber-DecimalDigit|DecimalDigit]]''
+
+  ''<b id="ToNumber-HexIntegerLiteral">HexIntegerLiteral</b>'' :::
+    '''0x''' ''[[#ToNumber-HexDigit|HexDigit]]''
+    '''0X''' ''[[#ToNumber-HexDigit|HexDigit]]''
+    ''[[#ToNumber-HexIntegerLiteral|HexIntegerLiteral]]'' ''[[#ToNumber-HexDigit|HexDigit]]''
+
+  ''<b id="ToNumber-HexDigit">HexDigit</b>'' ::: '''one of'''
+    '''0''' '''1''' '''2''' '''3''' '''4''' '''5''' '''6''' '''7''' '''8''' '''9''' '''a''' '''b''' '''c''' '''d''' '''e''' '''f''' '''A''' '''B''' '''C''' '''D''' '''E''' '''F'''
+
+需要注意到 ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' 和 ''[[ES5/lexical#numeric-literals|NumericLiteral]]'' 语法上的不同：
+
+* ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' 的前后可以有若干的[[ES5/lexical#white-space|空白字符]]或[[ES5/lexical#line-terminator|行终止符]]。
+* 十进制的 ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' 可有任意位数的 '''0''' 在前头。
+* 十进制的 ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' 可有指示其符号的 '''+''' 或 '''-''' 前缀。
+* 空的，或只包含空白的 ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' 會被转换为 '''+0'''。
+
+字符串到[[ES5/types#Number|数字值]]的转换，大体上类似于判定 ''[[ES5/lexical#numeric-literals|NumericLiteral]]'' 的[[ES5/types#Number|数字值]]，不过有些细节上的不同，所以，这里给出了把 ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' 转换为数值类型的值的全部过程。这个值分两步来判定：首先，从 ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' 中导出数学值；第二步，以下面所描述的方式对该数学值进行舍入。
+
+* ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' ::: ''[empty]'' 的数学值是 '''0'''。
+* ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' ::: ''[[#ToNumber-StrWhiteSpace|StrWhiteSpace]]'' 的数学值是 '''0'''。
+* ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' ::: ''[[#ToNumber-StrWhiteSpace|StrWhiteSpace]]<sub>opt</sub>'' ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' ''[[#ToNumber-StrWhiteSpace|StrWhiteSpace]]<sub>opt</sub>'' 的数学值是里面的 ''[[#ToNumber-StringNumericLiteral|StringNumericLiteral]]'' 部分，无论前后是否存在空白。
+* ''[[#ToNumber-StrNumericLiteral|StrNumericLiteral]]'' ::: ''[[#ToNumber-StrDecimalLiteral|StrDecimalLiteral]]'' 的数学值是 ''[[#ToNumber-StrDecimalLiteral|StrDecimalLiteral]]'' 的数学值。
+* ''[[#ToNumber-StrNumericLiteral|StrNumericLiteral]]'' ::: ''[[#ToNumber-HexIntegerLiteral|HexIntegerLiteral]]'' 的数学值是 ''[[#ToNumber-HexIntegerLiteral|HexIntegerLiteral]]'' 的数学值。
+* ''[[#ToNumber-StrDecimalLiteral|StrDecimalLiteral]]'' ::: ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' 的数学值是 ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' 的数学值。
+* ''[[#ToNumber-StrDecimalLiteral|StrDecimalLiteral]]'' ::: '''+''' ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' 的数学值是 ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' 的数学值。
+* ''[[#ToNumber-StrDecimalLiteral|StrDecimalLiteral]]'' ::: '''-''' ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' 的数学值是 ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' 的数学值的负数。 （需要注意的是，如果 ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' 的数学值是 '''0''', 其负数也是 '''0'''。下面中描述的舍入规则会合适地处理小于数学零到浮点数 '''+0''' 或 '''-0''' 的变换。）
+* ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' ::: '''Infinity''' 的数学值是 '''10<sup>10000'''</sup>（一个大到会舍入为 '''+∞''' 的值）。
+* ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' ::: ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' '''.''' 的数学值是 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值。 
+* ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' ::: ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' '''.''' ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值是第一个 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值加（第二个 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值乘以 '''10<sup>-<var>n</var></sup>'''），这里的 <var>n</var> 是第二个 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的字符数量。
+* ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' ::: ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' '''.''' ''[[#ToNumber-ExponentPart|ExponentPart]]'' 的数学值是 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值乘以 '''10<sup><var>e</var></sup>''', 这里的 <var>e</var> 是 ''[[#ToNumber-ExponentPart|ExponentPart]]'' 的数学值。
+* ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' ::: ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' '''.''' ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' ''[[#ToNumber-ExponentPart|ExponentPart]]'' 的数学值是（第一个 [[#ToNumber-DecimalDigits|DecimalDigits]] 的数学值加（第二个 [[#ToNumber-DecimalDigits|DecimalDigits]] 的数学值乘以 '''10<sup>-<var>n</var></sup>'''））乘以 '''10<sup><var>e</var></sup>'''，这里的 <var>n</var> 是 第二个 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 中的字符个数，<var>e</var> 是 ''[[#ToNumber-ExponentPart|ExponentPart]]'' 的数学值。
+* ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' ::: '''.''' ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值是 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值乘以 '''10<sup>-<var>n</var></sup>'''，这里的 <var>n</var> 是 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 中的字符个数。
+* ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' ::: '''.''' ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' ''[[#ToNumber-ExponentPart|ExponentPart]]'' 的数学值是 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值乘以 '''10<sup><var>e</var>-<var>n</var></sup>'''，这里的 <var>n</var> 是 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 中的字符个数，<var>e</var> 是 ''[[#ToNumber-ExponentPart|ExponentPart]]'' 的数学值。
+* ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' ::: ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值是 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值。
+* ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' ::: ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' ''[[#ToNumber-ExponentPart|ExponentPart]]'' 的数学值是 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值乘以 '''10<sup><var>e</var></sup>'''，这里的 <var>e</var> 是 ''[[#ToNumber-ExponentPart|ExponentPart]]'' 的数学值。
+* ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' ::: ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' 是 ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' 的数学值。 
+* ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' ::: ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' 的数学值。是（ ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值乘以 '''10'''）加 ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' 的数学值。
+* ''[[#ToNumber-ExponentPart|ExponentPart]]'' ::: ''[[#ToNumber-ExponentIndicator|ExponentIndicator]] ''[[#ToNumber-SignedInteger|SignedInteger]]'' 的数学值是 ''[[#ToNumber-SignedInteger|SignedInteger]]'' 的数学值。
+* ''[[#ToNumber-SignedInteger|SignedInteger]]'' ::: ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值是 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值。
+* ''[[#ToNumber-SignedInteger|SignedInteger]]'' ::: '''+''' ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值是 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值。 
+* [[#ToNumber-SignedInteger|SignedInteger]] ::: '''-''' ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 是 ''[[#ToNumber-DecimalDigits|DecimalDigits]]'' 的数学值的负数。
+* ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' ::: '''0''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''0''' 的数学值是 '''0'''。
+* ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' ::: '''1''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''1''' 的数学值是 '''1'''。
+* ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' ::: '''2''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''2''' 的数学值是 '''2'''。
+* ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' ::: '''3''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''3''' 的数学值是 '''3'''。
+* ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' ::: '''4''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''4''' 的数学值是 '''4'''。
+* ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' ::: '''5''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''5''' 的数学值是 '''5'''。
+* ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' ::: '''6''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''6''' 的数学值是 '''6'''。
+* ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' ::: '''7''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''7''' 的数学值是 '''7'''。
+* ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' ::: '''8''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''8''' 的数学值是 '''8'''。
+* ''[[#ToNumber-DecimalDigit|DecimalDigit]]'' ::: '''9''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''9''' 的数学值是 '''9'''。
+* ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''a''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''A''' 的数学值是 '''10'''。
+* ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''b''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''B''' 的数学值是 '''11'''。
+* ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''c''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''C''' 的数学值是 '''12'''。
+* ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''d''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''D''' 的数学值是 '''13'''。
+* ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''e''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''E''' 的数学值是 '''14'''。
+* ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''f''' 或 ''[[#ToNumber-HexDigit|HexDigit]]'' ::: '''F''' 的数学值是 '''15'''。
+* ''[[#ToNumber-HexIntegerLiteral|HexIntegerLiteral]]'' ::: '''0x''' ''[[#ToNumber-HexDigit|HexDigit]]'' 的数学值是 ''[[#ToNumber-HexDigit|HexDigit]]'' 的数学值。
+* ''[[#ToNumber-HexIntegerLiteral|HexIntegerLiteral]]'' ::: '''0X''' ''[[#ToNumber-HexDigit|HexDigit]]'' 的数学值是 ''[[#ToNumber-HexDigit|HexDigit]]'' 的数学值。
+* ''[[#ToNumber-HexIntegerLiteral|HexIntegerLiteral]]'' ::: ''[[#ToNumber-HexIntegerLiteral|HexIntegerLiteral]]'' ''[[#ToNumber-HexDigit|HexDigit]]'' 的数学值是（''[[#ToNumber-HexIntegerLiteral|HexIntegerLiteral]]''　的数学值乘以 '''16'''）加 ''[[#ToNumber-HexDigit|HexDigit]]'' 的数学值。
+
+一旦字符串数值常量的数学值被精确地确定，接下来就会被舍入为数值类型的一个值。如果数学值是 '''0'''，那么舍入值为 '''+0'''，否则如果字符串数值常量中第一个非空白字符是 ‘'''-'''’，舍入值为 '''-0'''。对于其它情况，舍入后的值必须是其数学值的[[ES5/types#Number|数字值]]。如果该字面量包含一个 ''[[#ToNumber-StrUnsignedDecimalLiteral|StrUnsignedDecimalLiteral]]'' 且该字面量大于 '''20''' 位<b title="significant digit">有效数字</b>，则此数字的值是下面两种之一：一是将其 '''20''' 位之后的每个数位用 '''0''' 替换，产生此字符串解析出的数学值的[[ES5/types#Number|数字值]]；二是将其 '''20''' 位之后的每个数位用 '''0''' 替换，并在第 '''20''' 位<b title="significant digit">有效数字</b>加一，产生此字符串解析出的数学值的[[ES5/types#Number|数字值]]{{question||64位IEEE754浮点数在16位十进制之后就开始近似了，此处定义20位以及其后的近似是否有意义？}}。判断一个数位是否为有效数位，首先它不能是 ''[[#ToNumber-ExponentPart|ExponentPart]]'' 的一部分，且
+* 它不是 '''0'''；或 
+* 它的左边是一个非零值，右边是一个不在 ''[[#ToNumber-ExponentPart|ExponentPart]]'' 中的非零值。
+
+=={{anchor|x9.4}}{{anchor|to-integer}}ToInteger==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.4}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.4}}
+
+'''ToInteger''' 抽象操作将其参数转换为整数值。{{v8|https://github.com/v8/v8/blob/3.22/src/runtime.js#L582-L586|}}
+
+此运算符功能如下所示：
+
+# 令 <var>number</var> 为对输入的参数调用 [[#to-number|ToNumber]] 的结果。
+# 如果 <var>number</var> 是 '''NaN''' 则返回 '''+0'''。
+# 如果 <var>number</var> 是 '''+0'''、 '''-0'''、 '''+∞''' 或 '''-∞''' 则返回 <var>number</var>。
+# 返回计算 [[ES5/notation#sign|sign]](<var>number</var>)×[[ES5/notation#floor|floor]]([[ES5/notation#abs|abs]](<var>number</var>)) 的结果。
+
+=={{anchor|x9.5}}{{anchor|to-int32}}ToInt32：（32 位有符号整数）==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.5}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.5}}
+
+'''ToInt32''' 抽象操作将其参数转换为 在 '''-2<sup>31</sup>''' 到 '''2<sup>31</sup>-1''' 闭区间内的 '''2<sup>32</sup>''' 个整数中的任意一个。{{v8|https://github.com/v8/v8/blob/3.22/src/runtime.js#L596-L600|}}
+
+此运算符功能如下所示：
+
+# 令 <var>number</var> 为对输入的参数调用 [[#to-number|ToNumber]] 的结果。
+# 如果 <var>number</var> 是 '''NaN'''、 '''+0'''、 '''-0'''、 '''+∞''' 或 '''-∞''' 则返回 '''+0'''。
+# 令 <var>posInt</var> 为 [[ES5/notation#sign|sign]](<var>number</var>)×[[ES5/notation#floor|floor]]([[ES5/notation#abs|abs]](<var>number</var>)) 的结果。
+# 令 <var>int32bit</var> 为 <var>posInt</var> [[ES5/notation#modulo|modulo]] '''2<sup>32</sup>'''；也就是说，假如有一个数值类型的有限正整数 <var>k</var> ，它小于 '''2<sup>32</sup>''' ，那么 <var>posInt</var> 与 <var>k</var> 在数学上可能相差 '''2<sup>32</sup>''' 的整数倍。
+# 如果 <var>int32bit</var> 大于或等于 '''2<sup>31</sup>''' 则返回 <var>int32bit</var>-'''2<sup>32</sup>''' 否则返回 <var>int32bit</var>。
+{{note|上面对 '''ToInt32''' 的定义中：
+* '''ToInt32''' 抽象操作是幂等的：对同一个值调用一次和调用两次这个操作会得到同样的结果。
+* 对于任意的 '''x''' 值，'''ToInt32'''('''ToUint32'''('''x''')) 总是等价于 '''ToInt32'''('''x''')。（它延续了后者将 '''+∞''' 和 '''-∞''' 映射到 '''+0''' 的性质）
+* '''ToInt32''' 会将 '''-0''' 映射到 '''+0'''。}}
+
+=={{anchor|x9.6}}{{anchor|to-uint32}}ToUint32：（32 位无符号整数）==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.6}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.6}}
+
+'''ToUint32''' 抽象操作将其参数转换为 在 '''0''' 到 '''2<sup>32</sup>-1''' 闭区间内的 '''2<sup>32</sup>''' 个整数中的任意一个。 {{v8|https://github.com/v8/v8/blob/3.22/src/runtime.js#L589-L593|}}
+
+此运算符功能如下所示：
+
+# 令 <var>number</var> 为对输入的参数调用 [[#to-number|ToNumber]] 的结果。
+# 如果 <var>number</var> 是 '''NaN'''、 '''+0'''、 '''-0'''、 '''+∞''' 或 '''-∞''' 则返回 '''+0'''。
+# 令 <var>posInt</var> 为 [[ES5/notation#sign|sign]](<var>number</var>)×[[ES5/notation#floor|floor]]([[ES5/notation#abs|abs]](<var>number</var>)) 的结果。
+# 令 <var>int32bit</var> 为 <var>posInt</var> [[ES5/notation#modulo|modulo]] '''2<sup>32</sup>'''；也就是说，假如有一个数值类型的有限正整数 <var>k</var> ，它小于 '''2<sup>32</sup>''' ，那么 <var>posInt</var> 与 <var>k</var> 在数学上可能相差 '''2<sup>32</sup>''' 的整数倍。
+# 返回 <var>int32bit</var>。
+{{note|上面对 '''ToUint32''' 的定义中：
+* '''ToUint32''' 与 '''ToInt32''' 之间唯有 '''第5步''' 不同。
+* '''ToUint32''' 抽象操作是幂等的：对同一个值调用一次和调用两次这个操作会得到同样的结果。
+* 对于任意的 '''x''' 值，'''ToUint32'''('''ToInt32'''('''x''')) 总是等价于 '''ToUint32'''('''x''')。（它延续了后者将 '''+∞''' 和 '''-∞''' 映射到 '''+0''' 的性质）
+* '''ToUint32''' 会将 '''-0''' 映射到 '''+0'''。}}
+
+=={{anchor|x9.7}}{{anchor|to-uint16}}ToUint16：（16 位无符号整数）==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.7}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.7}}
+
+'''ToUint16''' 抽象操作将其参数转换为 在 '''0''' 到 '''2<sup>16</sup>-1''' 闭区间内的 '''2<sup>16</sup>''' 个整数中的任意一个。{{extra note|ES5/builtins#x15.5.3.2|ToUint16抽象操作仅用于String.fromCharCode}}
+
+此运算符功能如下所示：
+
+# 令 <var>number</var> 为对输入的参数调用 [[#to-number|ToNumber]] 的结果。
+# 如果 <var>number</var> 是 '''NaN'''、 '''+0'''、 '''-0'''、 '''+∞''' 或 '''-∞''' 则返回 '''+0'''。
+# 令 <var>posInt</var> 为 [[ES5/notation#sign|sign]](<var>number</var>)×[[ES5/notation#floor|floor]]([[ES5/notation#abs|abs]](<var>number</var>)) 的结果。
+# 令 <var>int16bit</var> 为 <var>posInt</var> [[ES5/notation#modulo|modulo]] '''2<sup>16</sup>'''；也就是说，假如有一个数值类型的有限正整数 <var>k</var> ，它小于 '''2<sup>16</sup>''' ，那么 <var>posInt</var> 与 <var>k</var> 在数学上可能相差 '''2<sup>16</sup>''' 的整数倍。
+# 返回 <var>int16bit</var>。
+
+{{note| 上面给出的 '''ToUint16''' 的定义中：
+* '''ToUint16''' 和 '''ToUint32 ''' 之间唯一的不同是 '''第4步''' 中，'''2<sup>16</sup>''' 取代了 '''2<sup>32</sup>'''。
+* '''ToUint16''' 会将 '''-0''' 映射为 '''+0'''。}}
+
+=={{anchor|x9.8}}{{anchor|to-string}}ToString==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.8}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.8}}
+
+'''ToString''' 运算符根据下表将其参数转换为字符串类型的值：{{v8|https://github.com/v8/v8/blob/3.22/src/runtime.js#L546-L553|}}
+
+{|border="1" style="border-collapse:collapse" cellpadding="5" align="center"
+|- style="background:#EEE"
+!nowrap| 输入类型 
+! 结果 
+|-
+| 未定义 
+| '''"undefined"'''
+|-
+| 空值 
+| '''"null"'''
+|-
+| 布尔值 
+| 如果参数是 '''true'''，那么结果为 '''"true"'''。
+
+如果参数是 '''false'''，那么结果为 '''"false"'''。
+|-
+| 数值 
+| 见 [[#x9.8.1|9.8.1]]。
+|-
+| 字符串 
+| 返回输入的参数（不转换）。
+|-
+| 对象 
+| 应用下列步骤：
+# 令 <var>primValue</var> 为 [[#to-primitive|ToPrimitive]](<var>输入参数</var>, 暗示<var>字符串类型</var>)。
+# 返回 '''ToString'''(<var>primValue</var>)。
+|}
+
+==={{anchor|x9.8.1}}对数值类型应用 ToString===
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.8.1}}
+
+[[#to-string|ToString]] 抽象操作将数字 <var>m</var> 转换为字符串格式的给出如下所示：{{v8|https://github.com/v8/v8/blob/3.22/src/runtime.cc#L6760-L6768|}}
+
+# 如果 <var>m</var> 是 '''NaN'''，返回字符串 '''"NaN"'''。
+# 如果 <var>m</var> 是 '''+0''' 或 '''-0'''，返回字符串 '''"0"'''。
+# 如果 <var>m</var> 小于零，返回连接 '''"-"''' 和 [[#to-string|ToString]](-<var>m</var>) 的字符串。
+# 如果 <var>m</var> 无限大，返回字符串 '''"Infinity"'''。
+# 否则，令 <var>n</var>、<var>k</var> 和 <var>s</var> 皆为整数，且满足 <var>k</var> ≥ '''1''' 且 '''10<sup><var>k</var>-1</sup>''' ≤ <var>s</var> < '''10<sup><var>k</var></sup>''' 、 <var>s</var>×'''10<sup><var>n</var>-<var>k</var></sup>''' 的数字值为 <var>m</var> 且 <var>k</var> 足够小。注意 <var>k</var> 是 <var>s</var> 的十进制位数。<var>s</var> 不能被 '''10''' 整除，且 <var>s</var> 的至少要求的有效数字位数不一定要被这些标准唯一确定。 {{extra note||<nowiki>s表示m数学值去掉小数点和头尾的0后的数，k表示s的位数。n表示m转换成s的过程中数位右移的位数再加k，也就是说如果是右移动则n>k，左移动则n<k，没有移动则n=k。例如：&#13;m=100,s=1,k=1,n=2+k=3&#13;m=3.14,s=314,k=3,n=-2+k=1&#13;m=0.02,s=2,k=1,n=-2+k=-1</nowiki>}}
+# 如果 <var>k</var> ≤ <var>n</var> ≤ '''21'''，返回由 <var>k</var> 个 <var>s</var> 在十进制表示中的数字组成的字符串（有序的，开头没有零），后面连接 <var>n</var>-<var>k</var> 个 '''"0"''' 字符。
+# 如果 '''0''' < <var>n</var> ≤ '''21'''，返回由 <var>s</var> 在十进制表示中的、最多 <var>n</var> 个有效数字组成的字符串，后面跟随一个小数点 '''"."'''，再后面是余下的 <var>k</var>-<var>n</var> 个 <var>s</var> 在十进制表示中的数字。
+# 如果 '''-6''' < <var>n</var> ≤ '''0'''，返回由字符 '''"0"''' 组成的字符串，后面跟随一个小数点 '''"."'''，再后面是 -<var>n</var> 个 '''"0"''' 字符，最后是 <var>k</var> 个 <var>s</var> 在十进制表示中的数字。
+# 否则，如果 <var>k</var> = '''1'''，返回由单个数字 <var>s</var> 组成的字符串，后面跟随小写字母 '''"e"'''，根据 <var>n</var>-'''1''' 是正或负，再后面是一个加号 '''"+"''' 或减号 '''"-"''' ，再往后是整数 [[ES5/notation#abs|abs]](<var>n</var>-'''1''') 的十进制表示（没有前置的零）。
+# 返回由 <var>s</var> 在十进制表示中的、最多的有效数字组成的字符串，后面跟随一个小数点 '''"."'''，再后面是余下的是 <var>k</var>-'''1''' 个 <var>s</var> 在十进制表示中的数字，再往后是小写字母 '''"e"'''，根据 <var>n</var>-'''1''' 是正或负，再后面是一个加号 '''"+"''' 或减号 '''"-"''' ，再往后是整数 [[ES5/notation#abs|abs]](<var>n</var>-'''1''') 的十进制表示（没有前置的零）。
+
+{{note|下面的评语可能对指导实现有用，但不是本标准的常规要求。
+
+* 如果 '''x''' 是除 '''-0''' 以外的任一数字值，那么 '''ToNumber'''('''ToString'''('''x''')) 与 '''x''' 是完全相同的数字值。
+* '''s''' 至少要求的有效数字位数并非总是由 '''第5步''' 中所列的要求唯一确定。
+}}
+{{note|对于那些提供了比上面的规则所要求的更精确的转换的实现，我们推荐下面这个步骤 5 的可选版本，作为指导：
+
+否则，令 '''n''', '''k''', 和 '''s''' 是整数，使得 '''k''' ≥ 1, 10<sup>'''k'''-1</sup> ≤ '''s''' < '''10<sup>k</sup>'''，'''s'''×'''10'''<sup>'''n'''-'''k'''</sup> 的数字值是 '''m'''，且 '''k''' 足够小。如果有数倍于 '''s''' 的可能性，选择 '''s''' × '''10'''<sup>'''n'''-'''k'''</sup> 最接近于 '''m''' 的值作为 '''s''' 的值。如果 '''s''' 有两个这样可能的值，选择是偶数的那个。要注意的是，'''k''' 是 '''s''' 在十进制表示中的数字的个数，且 '''s''' 不被 '''10''' 整除。
+}}
+{{note|ECMAScript 的实现者们可能会发现，David M 所写的关于浮点数进行二进制到十进制转换方面的文章和代码很有用：<br/>
+Gay, David M. Correctly Rounded Binary-Decimal and Decimal-Binary<br/>
+Conversions. Numerical Analysis Manuscript 90-10. AT&T Bell<br/>
+Laboratories (Murray Hill, New Jersey). November 30, 1990. 在这里取得<br/>
+http://cm.bell-labs.com/cm/cs/doc/90/4-10.ps.gz 。有关的代码在这里<br/>
+http://cm.bell-labs.com/netlib/fp/dtoa.c.gz 还有<br/>
+http://cm.bell-labs.com/netlib/fp/g_fmt.c.gz 。这些都可在众多的 netlib 镜像站点上找到。
+}}
+
+=={{anchor|x9.9}}{{anchor|to-object}}ToObject==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.9}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.9}}
+
+'''ToObject''' 抽象操作根据下表将其参数转换为对象类型的值：{{v8|https://github.com/v8/v8/blob/3.22/src/runtime.js#L569-L579|}}
+
+{|border="1" style="border-collapse:collapse" cellpadding="5" align="center"
+|- style="background:#EEE"
+!nowrap| 输入类型 
+! 结果 
+|-
+| 未定义 
+| 抛出 '''TypeError''' 异常。
+|-
+| 空值 
+| 抛出 '''TypeError''' 异常。
+|-
+| 布尔值 
+| 创建一个新的 [[ES5/builtins#x15.6|Boolean]] 对象，其 [[ES5/types#PrimitiveValue|&#x5B;&#x5B;PrimitiveValue&#x5D;&#x5D;]] 属性被设为该参数的值。
+|-
+| 数值 
+| 创建一个新的 [[ES5/builtins#x15.7|Number]] 对象，其 [[ES5/types#PrimitiveValue|&#x5B;&#x5B;PrimitiveValue&#x5D;&#x5D;]] 属性被设为该参数的值。
+|-
+| 字符串 
+| 创建一个新的 [[ES5/builtins#x15.8|String]] 对象，其 [[ES5/types#PrimitiveValue|&#x5B;&#x5B;PrimitiveValue&#x5D;&#x5D;]] 属性被设为该参数的值。
+|-
+| 对象 
+| 结果是输入的参数（不转换）。
+|}
+
+=={{anchor|CheckObjectCoercible}}{{anchor|x9.10}}CheckObjectCoercible==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.10}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.10}}
+
+根据 '''表15''' 定义，抽象操作 <b>CheckObjectCoercible</b> 在其参数无法用 [[#to-object|ToObject]] 转换成对象的情况下抛出一个异常：{{v8|https://github.com/v8/v8/blob/3.22/src/macros.py#L125|}}
+
+
+{|border="1" style="border-collapse:collapse" cellpadding="5" align="center"
+|+ '''表15 - CheckObjectCoercible 结果'''
+|- style="background:#EEE"
+!nowrap| 输入类型 
+! 结果 
+|-
+| 未定义 
+| 抛出一个 '''TypeError''' 异常 
+|-
+| 空值 
+| 抛出一个 '''TypeError''' 异常 
+|-
+| 布尔值 
+| 返回 
+|-
+| 数值 
+| 返回 
+|-
+| 字符串 
+| 返回 
+|-
+| 对象 
+| 返回 
+|}
+
+=={{anchor|x9.11}}{{anchor|is-callable}}IsCallable==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.11}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.11}}
+
+根据 '''表16'''，抽象操作 '''IsCallable''' 确定其必须是 ECMAScript 语言值的参数是否是一个可调用对象：{{v8|https://github.com/v8/v8/blob/3.22/src/macros.py#L135-L140|}}
+
+{|border="1" style="border-collapse:collapse" cellpadding="5" align="center"
+|+ '''表16 - IsCallable 结果'''
+|- style="background:#EEE"
+!nowrap| 输入类型 
+! 结果 
+|-
+| 未定义 
+| 返回 '''false'''。
+|-
+| 空值 
+| 返回 '''false'''。
+|-
+| 布尔值 
+| 返回 '''false'''。
+|-
+| 数值 
+| 返回 '''false'''。
+|-
+| 字符串 
+| 返回 '''false'''。
+|-
+| 对象 
+| 如果参数对象包含一个 [[ES5/types#Call|<nowiki>[[Call]]</nowiki>]] 内部方法，则返回 '''true'''，否则返回 '''false'''。
+|}
+
+=={{anchor|x9.12}}{{anchor|samevalue}}{{anchor|SameValue}}SameValue 算法==
+{{eng ver|http://ecma-international.org/ecma-262/5.1/#sec-9.12}}
+{{test262|http://hg.ecmascript.org/tests/test262/file/f2b232b08824/test/suite/ch09/9.12}}
+
+内部严格比较操作 '''SameValue'''(<var>x</var>,<var>y</var>)，<var>x</var> 和 <var>y</var> 为 ECMAScript [[ES5/types#language-type|语言中的值]]，需要产出 '''true''' 或 '''false'''。{{extra note|| 这个算法在 <nowiki>[[DefineOwnProperty]]</nowiki> 中用在检验新的值是不是与旧的一样。测试资料：&#xA;&#xA;(function(){&#xA;&#9;'use strict';&#xA;&#9;var x {{=}} {data: +0};&#xA;&#9;Object.freeze(x);&#xA;&#9;Object.defineProperty(x, &#x22;data&#x22;, {value: -0});&#xA;})()}} {{extra note||此算法与严格等于比较算法在对待有符号的零和NaN上表现不同}} {{v8|https://github.com/v8/v8/blob/3.22/src/runtime.js#L603-L612|}}
+
+比较过程如下：
+
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 与 [[ES5/types#Type|Type]](<var>y</var>) 的结果不一致，返回 '''false'''，否则 
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 结果为 '''Undefined'''，返回 '''true'''
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 结果为 '''Null'''，返回 '''true'''
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 结果为 '''Number'''，则 
+## 如果 <var>x</var> 为 '''NaN'''，且 <var>y</var> 也为 '''NaN'''，返回 '''true'''
+## 如果 <var>x</var> 为 '''+0'''，<var>y</var> 为 '''-0'''，返回 '''false'''
+## 如果 <var>x</var> 为 '''-0'''，<var>y</var> 为 '''+0'''，返回 '''false'''
+## 如果 <var>x</var> 与 <var>y</var> 为同一个数字，返回 '''true'''
+## 返回 '''false'''
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 结果为 '''String'''，如果 <var>x</var> 与 <var>y</var> 为完全相同的字符序列（相同的长度和相同的字符对应相同的位置），返回 '''true'''，否则，返回 '''false'''
+# 如果 [[ES5/types#Type|Type]](<var>x</var>) 结果为 '''Boolean'''，如果 <var>x</var> 与 <var>y</var> 都为 '''true''' 或 '''false'''，则返回 '''true'''，否则，返回 '''false'''
+# 如果 <var>x</var> 和 <var>y</var> 引用到同一个 '''Object''' 对象，返回 '''true'''，否则，返回 '''false'''
