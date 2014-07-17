@@ -6,25 +6,23 @@ ECMAScript是一种在宿主环境中执行计算并处理计算对象的面向�
 
 ECMAScript最初被设计为**Web脚本语言**，提供一种机制，使浏览器中的网页更加活跃，使基于Web的客户端/服务器架构能够执行服务器计算。ECMAScript 可以为各种宿主环境提供核心的脚本功能，因此本文档为不依赖特定宿主环境的核心脚本语言作出规范。
 
-ECMAScript的一些机能和其他编程语言的类似；特别是下列文献所描述的Java?、Self和Scheme：
+ECMAScript的一些机能和其他编程语言的类似；特别是下列文献所描述的Java<sup>TM</sup>、Self和Scheme：
 
--   Gosling, James, Bill Joy and Guy Steele. The Java? Language Specification. Addison Wesley Publishing Co., 1996.
+-   Gosling, James, Bill Joy and Guy Steele. The Java<sup>TM</sup> Language Specification. Addison Wesley Publishing Co., 1996.
 -   Ungar, David, and Smith, Randall B. Self: The Power of Simplicity. OOPSLA '87 Conference Proceedings, pp. 227–241, Orlando, FL, October 1987.
 -   IEEE Standard for the Scheme Programming Language. IEEE Std 1178-1990.
 
-Web 脚本语言
-------------
+## Web脚本语言
 
-WEB 浏览器为了增加客户端的计算能力而引入 ECMAScript 宿主环境，例如，它提供的对象有：windows，menus，pop-ups，dialog boxes，text areas，anchors，frames，history，cookies 及输入 / 输出等等。进一步来说，WEB 浏览器中提供的这种宿主环境可以让脚本代码处理诸如改变焦点、页面和图片的加载、卸载、错误和放弃，选择，表单提交和鼠标交互等等事件。脚本代码出现在 HTML 中，显示出来的页面则是一个由用户接口元素、已确定计算出来的文本以及图片的集合。脚本代码根据用户的交互而做出反应，并不需要存在一个主程序。
+Web浏览器为增加客户端的计算能力而引入ECMAScript宿主环境；例如，它提供的对象有：window、menu、pop-up、dialog boxe、text area、anchor、frame、history、cookie和input/output等等。进一步来说，Web浏览器所提供的这种宿主环境可以让脚本代码处理诸如改变焦点、页面和图片的加载、卸载、错误和终止、选择、表单提交以及鼠标交互等事件。脚本代码出现在HTML中，显示出来的页面则是一个由用户接口元素、已确定计算出来的文本以及图片所组成的集合。脚本代码根据用户交互做出反应，所以并不需要主程序。
 
-WEB 服务器为了服务端的计算提供了完全不一样的宿主环境，包括的对象有：requrests，clients，files 以及数据锁定和分享机制。通过浏览器端脚本及服务端脚本的配合使用，在为基于 WEB 方式的应用程序提供可定制的用户接口的同时时，也将计算分布到客户端和服务端进行。
+Web服务器为增加服务端的计算能力而提供了完全不同的宿主环境；其所提供的对象有：requrest、client、file，以及数据锁定和分享机制。综合使用浏览器端和服务器端脚本代码，则可在为基于Web的应用程序提供可定制的用户接口的同时，将计算分布到客户端和服务端进行。
 
-每一种支持 ECMAScript 的 WEB 浏览器和服务器都将它们自身的宿主环境作为 ECMAScript 的补充，以使得 ECMAScript 的执行环境变得完整。
+每一种支持ECMAScript的Web浏览器和服务器都将其自身的宿主环境作为ECMAScript的补充，使得ECMAScript的执行环境变得愈发完整。
 
-语言概述
---------
+## 语言概述
 
-下面是非正式的 ECMAScript 概述 —— 并未描述语言的所有部分。此概述并非标准的一部分。
+本节是非正式的ECMAScript概述 --- 仅描述该语言的部分内容。本概述不是标准的一部分。
 
 ECMAScript 是基于对象的：基本语言和宿主设施都由对象提供，ECMAScript 程序是一组可通信的对象。ECMAScript <b title="objects">对象</b>是<b title="properties">属性</b>的集合，每个属性有零个或多个 [特性](ES5/types#property-attributes "wikilink")，以及属性的使用方式。例如，当设置一个属性的[Writable](ES5/types#table5-Writable "wikilink") 特性为 **false** 时，任何试图更改此属性值的 ECMAScript 代码的都会执行失败。属性是一个容器，它可以存放其他 <b title="objects">对象</b>、<b title="primitive values">原始值</b>、<b title="functions">函数</b>。原始值是以下内置类型之一的成员：[Undefined](ES5/types#Undefined "wikilink")、[Null](ES5/types#Null "wikilink")、[Boolean](ES5/types#Boolean "wikilink")、[Number](ES5/types#Number "wikilink")、[String](ES5/types#String "wikilink")；对象是剩下的内置类型 [Object](ES5/types#Object "wikilink") 的成员；函数是<b title="callable object">可调用的对象</b>。<b title="method">方法</b>是通过属性与对象关联的函数。
 
