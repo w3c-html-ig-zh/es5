@@ -62,119 +62,157 @@ ECMAScript的严格模式变体通常被称为该语言的<b title="strict mode"
 
 ### 类型
 
-本规范 [第8章](ES5/types "wikilink") 定义数据的集合。
+本规范[第8章](ES5/types "wikilink")定义数据值的集合。
 
 ### <span title="primitive value">原始值</span>
 
-在本规范的 [第8章](ES5/types "wikilink") 定义的 **Undefined**、**Null**、**Boolean**、**Number**、**String** 类型之一的成员。
+本规范[第8章](ES5/types "wikilink")定义的**Undefined**、**Null**、**Boolean**、**Number**、**String** 类型之一的成员。
+
+注：原始值可以直接表示语言实现的最底层数据。
 
 ### <span title="object">对象</span>
 
 对象类型的成员。
 
+注：对象是属性的集合，并有一个原型对象。原型可以是空值。
+
 ### <span title="constructor">构造器</span>
 
 创建和初始化对象的函数对象。
+
+注构造器的“**prototype***”属性是一个原型对象，用来实现继承和共享属性。
 
 ### <span title="prototype">原型</span>
 
 为其他对象提供共享属性的对象。
 
+注：当构造器创建一个对象时，为解决对属性的引用，该对象会隐式引用构造器的“**prototype**”属性。通过程序表达式 <var>constructor.**prototype**</var>可以引用构造器的“**prototype**”属性；同时通过继承的方式，所有共享此原型的对象可以共享该对象原型中的属性。此外，通过使用内置函数**Object.create**明确指定原型来创建一个新对象。
+
 ### <span title="native object">原生对象</span>
 
-ECMAScript 实现中完全由本规范定义其语义而不掺入任何宿主环境定义的对象。
+ECMAScript实现中完全由本规范定义其语义而不掺入任何宿主环境定义的对象。
+
+注：标准的原生对象由本规范定义。有些原生对象是内置的，其他的可在ECMAScript程序执行过程中构建。
 
 ### <span title="built-in object">内置对象</span>
 
-由 ECMAScript 实现提供，独立于宿主环境的对象，ECMAScript 程序开始执行时就存在。
+由ECMAScript实现提供的独立于宿主环境的对象；该对象在ECMAScript程序开始执行时就存在。
+
+注：标准的内置对象由本规范定义。ECMAScript实现可以指定和定义其他的。所有内置对象都是原生对象。<b titile="built-in constructor">内置构造器</b>既是内置对象又是构造器。
 
 ### <span title="host object">宿主对象</span>
 
-由宿主环境提供的对象，用于完善 ECMAScript 执行环境。
+由宿主环境提供的对象，用于完善ECMAScript执行环境。
 
-### <span title="undefined value">undefined 值</span>
+注：任何不是原生对象的对象就是宿主对象。
 
-说明一个变量没有被分配值的一个原始值。
+### <span title="undefined value">undefined值</span>
 
-### <span title="Undefined type">Undefined 类型</span>
+变量未被赋值时的原始值。
 
-**undefined** 值是 '''Undefined ''' 类型绝无仅有的一个值。
+### <span title="Undefined type">Undefined类型</span>
 
-### <span title="null value">null 值</span>
+其值仅为**undefined**的类型。
 
-代表对象值故意留空的一个原始值。
+### <span title="null value">null值</span>
 
-### <span title="Null type">Null 类型</span>
+任何对象故意留空的原始值。
 
-**null** 值是 **Null** 类型绝无仅有的一个值。
+### <span title="Null type">Null类型</span>
 
-### <span title="Boolean value">Boolean 值</span>
+其值仅为**null**的类型。
 
-**Boolean** 类型的成员。
+### <span title="Boolean value">Boolean值</span>
 
-### <span title="Boolean type">Boolean 类型</span>
+**Boolean**类型的成员。
 
-由原始值 **true** 和 **false** 组成的类型。
+注：仅有两个Boolean值，**true**和**false**。
 
-### <span title="Boolean object">Boolean 对象</span>
+### <span title="Boolean type">Boolean类型</span>
 
-**Object** 类型的成员，它是标准内置构造器 [Boolean](ES5/builtins#x15.6 "wikilink") 的实例。
+由原始值**true**和**false**组成的类型。
 
-### <span title="String value">String 值</span>
+### <span title="Boolean object">Boolean对象</span>
 
-原始值，它是零个或多个16位无符号整数组成的有限有序序列。
+**Object**类型的成员，标准内置构造器[Boolean](ES5/builtins#x15.6 "wikilink")的实例。
 
-### <span title="String type">String 类型</span>
+注：可使用**new**表达式，以一个Boolean值为参数调用**Boolean**构造器来创建Boolean对象。由此产生的对象包含一个值为该Boolean值的内部属性。Boolean对象可强制转换为Boolean值。
 
-所有可能的 **String** 值的集合。
+### <span title="String value">String值</span>
 
-### <span title="String object">String 对象</span>
+原始值，由零或多个16位无符号整数组成的有限有序序列。
 
-**Object** 类型的成员，它是标准内置构造器 [String](ES5/builtins#x15.5 "wikilink") 的实例。
+注：String值是String类型的成员。通常序列中的每个整数值代表UTF-16文本中的单个16位单元。然而，对于该值，ECMAScript仅要求必须是16位无符号整数，除此之外没有任何限制或要求。
 
-### <span title="Number value">Number 值</span>
+### <span title="String type">String类型</span>
 
-原始值，对应一个64位双精度二进制 IEEE754 值。
+所有可能的String值的集合。
 
-### <span title="Number type">Number 类型</span>
+### <span title="String object">String对象</span>
 
-所有可能的数字值的集合，包括特殊的“Not-a-Number”(**NaN**) 值、正无穷、负无穷。
+**Object**类型的成员，标准内置构造器[String](ES5/builtins#x15.5 "wikilink")的实例。
 
-### <span title="Number object">Number 对象</span>
+注：可使用**new**表达式，以一个String值为参数调用**String**构造器来创建String对象。由此产生的对象包含一个值为该String值的内部属性。通过调用**String**构造器，可将String对象强制转换为String值（15.5.1）。
 
-对象类型的成员，它是标准内置构造器 [Number](ES5/builtins#x15.7 "wikilink") 的一个实例。
+### <span title="Number value">Number值</span>
+
+原始值，对应一个64位双精度二进制IEEE754值。
+
+### <span title="Number type">Number类型</span>
+
+所有可能的数字值的集合，包括特殊的“Not-a-Number”(**NaN**)值、正无穷、负无穷。
+
+### <span title="Number object">Number对象</span>
+
+**Object**类型的成员，标准内置构造器[Number](ES5/builtins#x15.7 "wikilink")的实例。
+
+注：可使用**new**表达式，以一个Number值为参数调用**Number**构造器来创建Number对象。由此产生的对象包含一个值为该Number值的内部属性。通过调用**Number**构造器，可将Number对象强制转换为Number值（15.7.1）。
 
 ### Infinity
 
-正无穷 **Number** 值。
+正无穷Number值。
 
 ### NaN
 
-值为 IEEE 754“Not-a-Number”的 **Number** 值。
+值为IEEE754“Not-a-Number”的Number值。
 
 ### <span title="function">函数</span>
 
-**Object** 类型的成员，标准内置构造器 [Function](ES5/builtins#x15.3 "wikilink") 的一个实例，并且可作为<b title="subroutine">子程序</b>被调用。
+**Object**类型的成员，标准内置构造器[Function](ES5/builtins#x15.3 "wikilink")的实例，并且可作为<b title="subroutine">子程序</b>被调用。
+
+注：函数除了拥有命名的属性，还包含可执行代码、状态，用来确定被调用时的行为。函数的代码不局限于ECMAScript语言。
 
 ### <span title="built-in function">内置函数</span>
 
-属于**函数**的内置对象。
+属于函数的内置对象。
+
+注：比如**parseInt**和**Math.exp**就是内置函数。一种实现可以提供本规范未描述的依赖于实现的内置函数。
 
 ### <span title="property">属性</span>
 
 一个名称和一个值之间的关联；属性本身是对象的一部分。
 
+注：根据属性形式的不同，属性值即可直接表现为一个数据值（原始值、对象、函数对象），又可间接地通过一对访问器函数来表现。
+
+译者注：原文的说法有点费解，但从先前定义对象时的“对象是属性的集合”来看，属性就是对象这个“集合”中的一个“元素”，而属性本身的定义是“一个名称和一个值之间的关联”。
+
 ### <span title="method">方法</span>
 
 作为属性值的函数。
+
+注：当函数被作为对象的方法调用时，此对象将作为**this**值传递给函数。
 
 ### <span title="built-in method">内置方法</span>
 
 属于内置函数的方法。
 
+注：标准内置方法由本规范定义。ECMAScript的实现可以指定并提供非本规范定义的内置方法。
+
+译者注：当一个内置函数被作为一个非内置对象的属性时还是内置方法吗？译者觉得此处应该定义为“作为内置对象属性的内置函数”。
+
 ### <span title="attribute">特性</span>
 
-用于定义属性的一些特征的内部值。
+用于定义属性的某些特征的内部值。
 
 ### <span title="own property">自身属性</span>
 
@@ -182,5 +220,4 @@ ECMAScript 实现中完全由本规范定义其语义而不掺入任何宿主环
 
 ### <span title="inherited property">继承属性</span>
 
-不是对象的自身属性，但是对象原型的属性（可以是自身或继承的）。
-
+不是对象的自身属性，而是对象原型的属性（可以是原型自身的或继承的属性）。
