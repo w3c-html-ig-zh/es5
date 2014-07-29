@@ -18,9 +18,9 @@
 
 ### 数字字符串文法
 
-用于将字符串转换为数字值的另一种文法。此文法与词法的一部分类似，都与数字字面量有关，并且它有作为[终结符的](#terminal "wikilink")[SourceCharacter](ES5/source#SourceCharacter "wikilink")。此文法出现在 [9.3.1](ES5/conversion#x9.3.1 "wikilink") 。
+用于将字符串转换为数字值的另一种文法。此文法与部分词法类似，都与数字字面量有关；该文法有作为[终结符](#terminal "wikilink")的*[SourceCharacter](ES5/source#SourceCharacter "wikilink")*。此文法将出现在[9.3.1](ES5/conversion#x9.3.1 "wikilink") 。
 
-三个冒号“:::”作为分隔符分割数字字符串文法的[产生式](#production "wikilink")。
+三冒号“:::”作为分隔符分割数字字符串文法的[产生式](#production "wikilink")。
 
 ### 句法
 
