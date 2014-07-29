@@ -1,11 +1,10 @@
-句法和词法
-----------
+## 句法和词法
 
 ### 上下文无关文法
 
-一个<b title="Context-Free Grammar">上下文无关文法</b>由一定数量的[产生式组成](#production "wikilink")。每个[产生式的](#production "wikilink")<b title="left-hand side">左边部分</b> 是一个被称为[非终结符的抽象符号](#nonterminal "wikilink")，<b title="right-hand side">右边部分</b>是零或多个[非终结符和](#nonterminal "wikilink")[终结符的有序排列](#terminal "wikilink")。任何文法，它的[终结符都来自指定的](#terminal "wikilink")<b title="alphabet">字母集</b>。
+<b title="Context-Free Grammar">上下文无关文法</b>由一系列的[产生式](#production "wikilink")组成。每个产生式的<b title="left-hand side">左边部分</b>是一个被称为[非终结符](#nonterminal "wikilink")的抽象符号，<b title="right-hand side">右边部分</b>是零或多个[非终结符](#nonterminal "wikilink")和[终结符](#terminal "wikilink")的序列。任何文法，其[终结符](#terminal "wikilink")都来自指定的<b title="alphabet">字母集</b>。
 
-当从一个叫做<b title="goal symbol">目标符</b>的特殊[非终结符组成的句子起始](#nonterminal "wikilink")，那么给出的**上下文无关文法**就表示<b title="language">语言</b>，即：将[产生式右边序列的](#production "wikilink")[非终结符当作左边](#nonterminal "wikilink")，进行反复替换的结果就成为可能的[终结符序列集合](#terminal "wikilink")（可能无限）。
+当从一个名为<b title="goal symbol">目标符</b>的由特殊非终结符组成的句子开始，给定的上下文无关文法就表示了<b title="language">语言</b>，即：将[产生式](#production "wikilink")右边序列的[非终结符](#nonterminal "wikilink")当作左边，进行反复替换,其结果就成为可能的[终结符序列集合](#terminal "wikilink")（该集合可能无限）。
 
 ### 词法和正则的文法
 
