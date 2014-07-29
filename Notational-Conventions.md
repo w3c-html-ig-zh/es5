@@ -6,15 +6,15 @@
 
 当从一个名为<b title="goal symbol">目标符</b>的由特殊非终结符组成的句子开始，给定的上下文无关文法就表示了<b title="language">语言</b>，即：将[产生式](#production "wikilink")右边序列的[非终结符](#nonterminal "wikilink")当作左边，进行反复替换,其结果就成为可能的[终结符序列集合](#terminal "wikilink")（该集合可能无限）。
 
-### 词法和正则的文法
+### 词法和正则表达式文法
 
-[第7章给出了](ES5/lexical "wikilink") ECMAScript 的<b title="lexical grammar">词法</b>。此文法的[终结符字符](#terminal "wikilink")（Unicode 代码单元）符合[第6章定义的](ES5/source "wikilink") *[SourceCharacter](ES5/source#SourceCharacter "wikilink")* 的规则。它定义了一套[产生式](#production "wikilink")，从目标符 *[InputElementDiv](ES5/lexical#InputElementDiv "wikilink")* 或 *[InputElementRegExp](ES5/lexical#InputElementRegExp "wikilink")* 起始，描述了如何将这样的字符序列转换成一个**输入元素**序列。
+[第7章](ES5/lexical "wikilink")给出了ECMAScript的<b title="lexical grammar">词法</b>。该文法的[终结符字符](#terminal "wikilink")（Unicode代码单元）符合[第6章](ES5/source "wikilink")定义的*[SourceCharacter](ES5/source#SourceCharacter "wikilink")*的规则。该词法定义了一组[产生式](#production "wikilink")，从目标符*[InputElementDiv](ES5/lexical#InputElementDiv "wikilink")*或*[InputElementRegExp](ES5/lexical#InputElementRegExp "wikilink")*开始，描述了如何将诸如此类的字符序列转换成一个输入元素序列。
 
-[空白字符和](ES5/lexical#white-space "wikilink")[注释之外的](ES5/lexical#comments "wikilink")**输入元素**构成 ECMAScript 句法的[终结符](#terminal "wikilink")，它们被称为 ECMAScript 的 <b title="tokens" id="Token">Token</b>。这些 [Token](#Token "wikilink") 是，ECMAScript 语言的[保留字](ES5/lexical#reserved-words "wikilink")、[标识符](ES5/lexical#x7.6 "wikilink")、[字面量](ES5/lexical#literals "wikilink")、[标点符号](ES5/lexical#x7.7 "wikilink")。此外，[行终止符虽然不被视为](ES5/lexical#line-terminator "wikilink") [Token](#Token "wikilink")，但会成为**输入元素**流的一部分，用于引导处理 [自动插入分号](ES5/lexical#x7.9 "wikilink")。[空白字符和](ES5/lexical#white-space "wikilink")[单行注释会被简单地丢弃](ES5/lexical#SingleLineComment "wikilink")，不会出现在句法的**输入元素**流中。如果一个[多行注释](ES5/lexical#MultiLineComment "wikilink")（即形式为“/\*...\*/”的注释，不管是否跨越多行）不包含[行终止符也会简单地丢弃](ES5/lexical#line-terminator "wikilink")，但如果一个[多行注释包含一个或多个](ES5/lexical#MultiLineComment "wikilink")[行终止符](ES5/lexical#line-terminator "wikilink")，那么，注释会被替换为一个[行终止符](ES5/lexical#line-terminator "wikilink")，成为**句法**的**输入元素**流的一部分。
+除[空白字符](ES5/lexical#white-space "wikilink")和[注释](ES5/lexical#comments "wikilink")之外的**输入元素**构成了ECMAScript句法的[终结符](#terminal "wikilink")，同时这些输入元素被称为 ECMAScript的<b title="tokens" id="Token">Token</b>。这些[Token](#Token "wikilink")是ECMAScript语言的[保留字](ES5/lexical#reserved-words "wikilink")、[标识符](ES5/lexical#x7.6 "wikilink")、[字面量](ES5/lexical#literals "wikilink")及[标点符号](ES5/lexical#x7.7 "wikilink")。此外，[行终止符](ES5/lexical#line-terminator "wikilink")虽然不被视为[Token](#Token "wikilink")，但会成为**输入元素**流的一部分，用于引导处理[自动插入分号](ES5/lexical#x7.9 "wikilink")。[空白字符](ES5/lexical#white-space "wikilink")和[单行注释](ES5/lexical#SingleLineComment "wikilink")会被简单地丢弃，而不会出现在句法的**输入元素**流中。如果一个[多行注释](ES5/lexical#MultiLineComment "wikilink")（即形式为“/\*...\*/”的注释，不管其是否跨行）不包含[行终止符](ES5/lexical#line-terminator "wikilink")也会被简单地丢弃；但如果一个[多行注释](ES5/lexical#MultiLineComment "wikilink")包含一个或多个[行终止符](ES5/lexical#line-terminator "wikilink")，那么注释会被替换为一个[行终止符](ES5/lexical#line-terminator "wikilink")，进而成为**句法**的**输入元素**流的一部分。
 
-[15.10](ES5/builtins#x15.10 "wikilink") 给出了 ECMAScript 的 [<span title="RegExp grammar">正则文法</span>](ES5/builtins#x15.10 "wikilink")。此文法的[终结符也由](#terminal "wikilink") *[SourceCharacter](ES5/source#SourceCharacter "wikilink")* 定义。它定义了一套[产生式](#production "wikilink")，从**目标符** *[Pattern](ES5/builtins#Patterns-Pattern "wikilink")* 起始，描述了如何将这样的字符序列翻译成一个正则表达式模式。
+[15.10](ES5/builtins#x15.10 "wikilink")给出了ECMAScript的[<span title="RegExp grammar">正则表达式文法</span>](ES5/builtins#x15.10 "wikilink")。该文法的[终结符](#terminal "wikilink")也由*[SourceCharacter](ES5/source#SourceCharacter "wikilink")*定义。该文法定义了一组[产生式](#production "wikilink")，从**目标符***[Pattern](ES5/builtins#Patterns-Pattern "wikilink")*开始，描述了如何将诸如此类的字符序列翻译成一个正则表达式模式。
 
-两个冒号“::”作为分隔符分割词法和正则的文法[产生式](#production "wikilink")。词法和正则的文法共享某些[产生式](#production "wikilink")。
+双冒号“::”作为分隔符分割了词法和正则表达式的文法[产生式](#production "wikilink")。同时，词法和正则表达式的文法共享乐某些[产生式](#production "wikilink")。
 
 ### 数字字符串文法
 
