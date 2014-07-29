@@ -14,21 +14,21 @@
 
 [15.10](ES5/builtins#x15.10 "wikilink")给出了ECMAScript的[<span title="RegExp grammar">正则表达式文法</span>](ES5/builtins#x15.10 "wikilink")。该文法的[终结符](#terminal "wikilink")也由*[SourceCharacter](ES5/source#SourceCharacter "wikilink")*定义。该文法定义了一组[产生式](#production "wikilink")，从**目标符***[Pattern](ES5/builtins#Patterns-Pattern "wikilink")*开始，描述了如何将诸如此类的字符序列翻译成一个正则表达式模式。
 
-双冒号“::”作为分隔符分割了词法和正则表达式的文法[产生式](#production "wikilink")。同时，词法和正则表达式的文法共享乐某些[产生式](#production "wikilink")。
+双冒号`“::”`作为分隔符分割了词法和正则表达式的文法[产生式](#production "wikilink")。同时，词法和正则表达式的文法可共享某些[产生式](#production "wikilink")。
 
 ### 数字字符串文法
 
 用于将字符串转换为数字值的另一种文法。此文法与部分词法类似，都与数字字面量有关；该文法有作为[终结符](#terminal "wikilink")的*[SourceCharacter](ES5/source#SourceCharacter "wikilink")*。此文法将出现在[9.3.1](ES5/conversion#x9.3.1 "wikilink") 。
 
-三冒号“:::”作为分隔符分割数字字符串文法的[产生式](#production "wikilink")。
+三冒号`“:::”`作为分隔符分割数字字符串文法的[产生式](#production "wikilink")。
 
 ### 句法
 
-第 [11](ES5/expressions "wikilink")、[12](ES5/statements "wikilink")、[13](ES5/functions "wikilink")、[14](ES5/program "wikilink") 章给出了 ECMAScript 的句法。词法定义的 ECMAScript [Token](#Token "wikilink") 是此文法的[终结符](#terminal "wikilink")（[5.1.2](#x5.1.2 "wikilink")）。它定义了一组起始于 *[Program](ES5/program#Program "wikilink")* 目标符的[产生式](#production "wikilink")，描述了怎样的 [Token](#Token "wikilink") 序列才能形成句法上正确的 ECMAScript 程序。
+第[11](ES5/expressions "wikilink")、[12](ES5/statements "wikilink")、[13](ES5/functions "wikilink")和[14](ES5/program "wikilink")章给出了ECMAScript的句法。句法将由词法所定义的ECMAScript[Token](#Token "wikilink") 作为它的[终结符](#terminal "wikilink")（[5.1.2](#x5.1.2 "wikilink")）。句法定义了一组起始于*[Program](ES5/program#Program "wikilink")*目标符的[产生式](#production "wikilink")，描述了[Token](#Token "wikilink")序列如何才能形成句法上正确的ECMAScript程序。
 
-当一个字符流被解析为 ECMAScript 程序时，它首先通过词法应用程序反复转换为一个**输入元素**流；然后再用一个句法应用程序解析这个**输入元素**流。当**输入元素**流没有更多 [Token](#Token "wikilink") 时，如果 [Token](#Token "wikilink") 不能解析为 *[Program](ES5/program#Program "wikilink")* 目标[非终结符的单一实例](#nonterminal "wikilink")，那么程序在句法上存在错误。
+当一个字符流被解析为 ECMAScript程序时，它首先通过词法应用程序反复转换为一个**输入元素**流；然后再用一个句法应用程序解析这个**输入元素**流。当**输入元素**流没有更多 [Token](#Token "wikilink") 时，如果 [Token](#Token "wikilink") 不能解析为 *[Program](ES5/program#Program "wikilink")* 目标[非终结符的单一实例](#nonterminal "wikilink")，那么程序在句法上存在错误。
 
-只用一个冒号“:”作为分隔符分割句法的[产生式](#production "wikilink")。
+只用一个冒号`“:”`作为分隔符分割句法的[产生式](#production "wikilink")。
 
 事实上第 [11](ES5/expressions "wikilink")、[12](ES5/statements "wikilink")、[13](ES5/functions "wikilink")、[14](ES5/program "wikilink") 章给出的句法，并不能完全说明一个正确的 ECMAScript 程序能接受的 [Token](#Token "wikilink") 序列。一些额外的 [Token](#Token "wikilink") 序列也被接受，即某些特殊位置（如[行结束符前](ES5/lexical#line-terminator "wikilink")）加入分号可以被文法接受。此外，文法描述的某些 [Token](#Token "wikilink") 序列不被文法接受，如一个[行结束符出现在了](ES5/lexical#line-terminator "wikilink")“尴尬”的位置。
 
