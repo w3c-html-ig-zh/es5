@@ -42,7 +42,7 @@ JSON文法由JSON词法和JSON句法组成。JSON词法用于将字符序列转�
 
 ### 文法标记法
 
-词法、正则表达式文法、字符串数字文法，以及一些其它文法，每当这些文法的<b id="terminal" title="terminal symbols">终结符</b>被文本直接涉及到时，使用<b title="Fixed width">等宽</b>字符来显示，它们都在文法<b titlie="production" id="production">产生式</b> 中，并且贯穿这份文档。他们表示程序书写正确。所有以这种方式指定的<b title="terminal symbols">终结符</b>，都可以理解为 Unicode 字符的完整的 ASCII 范围，不是任何其他乌焉成马的 Unicode 范围字符。
+每当文本直接引用诸如词法、正则表达式文法、数字字符串文法及其他文法的<b id="terminal" title="terminal symbols">终结符</b>时，就使用<b title="Fixed width">等宽</b>字体来显示；这些都在文法<b titlie="production" id="production">产生式</b>中，并且贯穿该文档。这些终结符都会出现在程序中，正如写的那样。所有以这种方式指定的<b title="terminal symbols">终结符</b>，都可以理解为ASCII范围内完整的Unicode字符，而不是任何其他乌焉成马范围内的Unicode字符。
 
 <b title="nonterminal" id="nonterminal">非终结符</b>以<i title="italic">斜体</i>显示。一个<b title="nonterminal">非终结符</b>的定义由<b title="nonterminal">非终结符</b>名称和其后定义的一个或多个冒号给出。（冒号的数量表示[产生式所属的文法](#production "wikilink")。）<b title="nonterminal">非终结符</b>的右侧有一个或多个替代子紧跟在下一行。 例如，句法定义：
 
