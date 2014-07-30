@@ -10,35 +10,35 @@
 
 [第7章](ES5/lexical "wikilink")给出了ECMAScript的<b title="lexical grammar">词法</b>。该文法的[终结符字符](#terminal "wikilink")（Unicode代码单元）符合[第6章](ES5/source "wikilink")定义的*[SourceCharacter](ES5/source#SourceCharacter "wikilink")*的规则。该词法定义了一组[产生式](#production "wikilink")，从目标符*[InputElementDiv](ES5/lexical#InputElementDiv "wikilink")*或*[InputElementRegExp](ES5/lexical#InputElementRegExp "wikilink")*开始，描述了如何将诸如此类的字符序列转换成一个输入元素序列。
 
-除[空白字符](ES5/lexical#white-space "wikilink")和[注释](ES5/lexical#comments "wikilink")之外的**输入元素**构成了ECMAScript句法的[终结符](#terminal "wikilink")，同时这些输入元素被称为 ECMAScript的<b title="tokens" id="Token">Token</b>。这些[Token](#Token "wikilink")是ECMAScript语言的[保留字](ES5/lexical#reserved-words "wikilink")、[标识符](ES5/lexical#x7.6 "wikilink")、[字面量](ES5/lexical#literals "wikilink")及[标点符号](ES5/lexical#x7.7 "wikilink")。此外，[行终止符](ES5/lexical#line-terminator "wikilink")虽然不被视为[Token](#Token "wikilink")，但会成为**输入元素**流的一部分，用于引导处理[自动插入分号](ES5/lexical#x7.9 "wikilink")。[空白字符](ES5/lexical#white-space "wikilink")和[单行注释](ES5/lexical#SingleLineComment "wikilink")会被简单地丢弃，而不会出现在句法的**输入元素**流中。如果一个[多行注释](ES5/lexical#MultiLineComment "wikilink")（即形式为“/\*...\*/”的注释，不管其是否跨行）不包含[行终止符](ES5/lexical#line-terminator "wikilink")也会被简单地丢弃；但如果一个[多行注释](ES5/lexical#MultiLineComment "wikilink")包含一个或多个[行终止符](ES5/lexical#line-terminator "wikilink")，那么注释会被替换为一个[行终止符](ES5/lexical#line-terminator "wikilink")，进而成为**句法**的**输入元素**流的一部分。
+除[空白字符](ES5/lexical#white-space "wikilink")和[注释](ES5/lexical#comments "wikilink")之外的**输入元素**构成了ECMAScript句法的[终结符](#terminal "wikilink")，同时这些输入元素被称为 ECMAScript的<b title="tokens" id="Token">Token</b>。这些[Token](#Token "wikilink")是ECMAScript语言的[保留字](ES5/lexical#reserved-words "wikilink")、[标识符](ES5/lexical#x7.6 "wikilink")、[字面量](ES5/lexical#literals "wikilink")及[标点符号](ES5/lexical#x7.7 "wikilink")。此外，[行终止符](ES5/lexical#line-terminator "wikilink")虽然不被视为[Token](#Token "wikilink")，但会成为**输入元素**流的一部分，用于引导处理[自动插入分号](ES5/lexical#x7.9 "wikilink")。[空白字符](ES5/lexical#white-space "wikilink")和[单行注释](ES5/lexical#SingleLineComment "wikilink")会被简单地丢弃，而不会出现在句法的**输入元素**流中。如果一个[多行注释](ES5/lexical#MultiLineComment "wikilink")（即形式为`/*...*/`的注释，不管其是否跨行）不包含[行终止符](ES5/lexical#line-terminator "wikilink")也会被简单地丢弃；但如果一个[多行注释](ES5/lexical#MultiLineComment "wikilink")包含一个或多个[行终止符](ES5/lexical#line-terminator "wikilink")，那么注释会被替换为一个[行终止符](ES5/lexical#line-terminator "wikilink")，进而成为**句法**的**输入元素**流的一部分。
 
 [15.10](ES5/builtins#x15.10 "wikilink")给出了ECMAScript的[<span title="RegExp grammar">正则表达式文法</span>](ES5/builtins#x15.10 "wikilink")。该文法的[终结符](#terminal "wikilink")也由*[SourceCharacter](ES5/source#SourceCharacter "wikilink")*定义。该文法定义了一组[产生式](#production "wikilink")，从**目标符***[Pattern](ES5/builtins#Patterns-Pattern "wikilink")*开始，描述了如何将诸如此类的字符序列翻译成一个正则表达式模式。
 
-双冒号`“::”`作为分隔符分割了词法和正则表达式的文法[产生式](#production "wikilink")。同时，词法和正则表达式的文法可共享某些[产生式](#production "wikilink")。
+双冒号`::`作为分隔符分割了词法和正则表达式的文法[产生式](#production "wikilink")。同时，词法和正则表达式的文法可共享某些[产生式](#production "wikilink")。
 
 ### 数字字符串文法
 
 用于将字符串转换为数字值的另一种文法。此文法与部分词法类似，都与数字字面量有关；该文法有作为[终结符](#terminal "wikilink")的*[SourceCharacter](ES5/source#SourceCharacter "wikilink")*。此文法将出现在[9.3.1](ES5/conversion#x9.3.1 "wikilink") 。
 
-三冒号`“:::”`作为分隔符分割数字字符串文法的[产生式](#production "wikilink")。
+三冒号`:::`作为分隔符分割数字字符串文法的[产生式](#production "wikilink")。
 
 ### 句法
 
-第[11](ES5/expressions "wikilink")、[12](ES5/statements "wikilink")、[13](ES5/functions "wikilink")和[14](ES5/program "wikilink")章给出了ECMAScript的句法。句法将由词法所定义的ECMAScript[Token](#Token "wikilink") 作为它的[终结符](#terminal "wikilink")（[5.1.2](#x5.1.2 "wikilink")）。句法定义了一组起始于*[Program](ES5/program#Program "wikilink")*目标符的[产生式](#production "wikilink")，描述了[Token](#Token "wikilink")序列如何才能形成句法上正确的ECMAScript程序。
+第[11](ES5/expressions "wikilink")、[12](ES5/statements "wikilink")、[13](ES5/functions "wikilink")和[14](ES5/program "wikilink")章给出了ECMAScript的句法。句法将由词法所定义的ECMAScript [Token](#Token "wikilink")作为它的[终结符](#terminal "wikilink")（[5.1.2](#x5.1.2 "wikilink")）。句法定义了一组起始于*[Program](ES5/program#Program "wikilink")*目标符的[产生式](#production "wikilink")，描述了[Token](#Token "wikilink")序列如何才能形成句法上正确的ECMAScript程序。
 
-当一个字符流被解析为 ECMAScript程序时，它首先通过词法应用程序反复转换为一个**输入元素**流；然后再用一个句法应用程序解析这个**输入元素**流。当**输入元素**流没有更多 [Token](#Token "wikilink") 时，如果 [Token](#Token "wikilink") 不能解析为 *[Program](ES5/program#Program "wikilink")* 目标[非终结符的单一实例](#nonterminal "wikilink")，那么程序在句法上存在错误。
+当一个字符流被解析为ECMAScript程序时，它首先通过词法应用程序反复转换为一个输入元素流；然后再通过一个句法应用程序解析该输入元素流。当输入元素流没有更多的[Token](#Token "wikilink")时，如果存在[Token](#Token "wikilink")不能被解析为*[Program](ES5/program#Program "wikilink")*目标[非终结符](#nonterminal "wikilink")的实例，那么程序在句法上存在错误。
 
-只用一个冒号`“:”`作为分隔符分割句法的[产生式](#production "wikilink")。
+单冒号`:`作为分隔符分割句法的[产生式](#production "wikilink")。
 
-事实上第 [11](ES5/expressions "wikilink")、[12](ES5/statements "wikilink")、[13](ES5/functions "wikilink")、[14](ES5/program "wikilink") 章给出的句法，并不能完全说明一个正确的 ECMAScript 程序能接受的 [Token](#Token "wikilink") 序列。一些额外的 [Token](#Token "wikilink") 序列也被接受，即某些特殊位置（如[行结束符前](ES5/lexical#line-terminator "wikilink")）加入分号可以被文法接受。此外，文法描述的某些 [Token](#Token "wikilink") 序列不被文法接受，如一个[行结束符出现在了](ES5/lexical#line-terminator "wikilink")“尴尬”的位置。
+事实上，第[11](ES5/expressions "wikilink")、[12](ES5/statements "wikilink")、[13](ES5/functions "wikilink")、[14](ES5/program "wikilink")章所给出的句法，并不能完全说明一个正确的ECMAScript程序所能接受的[Token](#Token "wikilink")序列。进而需要接受一些额外的[Token](#Token "wikilink")序列，比如说，某些特殊位置（如[行结束符](ES5/lexical#line-terminator "wikilink")前）加入分号可以被文法接受。此外，当终止符出现在某些“尴尬”的位置时，有些文法所描述的[Token](#Token "wikilink")序列并不会被接受。
 
-### JSON 文法
+### JSON文法
 
-JSON 文法用于描述 ECMAScript 对象的字符串转换为实际的对象。[15.12.1](ES5/builtins#x15.12.1 "wikilink") 给出了 JSON 文法 。
+JSON文法将描述ECMAScript对象的字符串转换为实际的对象。[15.12.1](ES5/builtins#x15.12.1 "wikilink")给出了JSON文法。
 
-JSON 文法由 JSON 词法和 JSON 句法组成。JSON 词法用于将字符序列转换为 [Token](#Token "wikilink")，类似 ECMAScript 词法。JSON 句法说明 JSON 词法给出怎样的 [Token](#Token "wikilink") 序列才能转换为句法上是正确的 JSON 对象。
+JSON文法由JSON词法和JSON句法组成。JSON词法用于将字符序列转换为[Token](#Token "wikilink")，类似于ECMAScript词法。JSON句法描述了JSON词法[Token](#Token "wikilink")序列如何才能形成句法上正确的JSON对象。
 
-两个冒号“::”作为分隔符分割 JSON 词法的[产生式](#production "wikilink")。JSON 词法使用某些 ECMAScript 词法的[产生式](#production "wikilink")。JSON 句法与 ECMAScript 句法类似。JSON 句法[产生式被一个冒号](#production "wikilink")“:”作为分隔符分割。
+双冒号`::`作为分隔符分割JSON词法的[产生式](#production "wikilink")。JSON词法使用了ECMAScript词法的某些[产生式](#production "wikilink")。JSON句法类似于ECMAScript句法。JSON句法的[产生式](#production "wikilink")被单冒号`:`作为分隔符分割。
 
 ### 文法标记法
 
