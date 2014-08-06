@@ -1,27 +1,35 @@
-ECMAScript 程序的源文本先转换成一个由 [Token](#Token "wikilink")、[行终止符](#line-terminator "wikilink")、[注释](#comments "wikilink")、[空白字符](#white-space "wikilink") 组成的输入元素序列；源文本被从左到右地扫描，反复获取尽可能长的字符序列来作为下一个输入元素的。
+ECMAScript程序的源代码文本首先转换成一个由[Token](#Token "wikilink")、[行终止符](#line-terminator "wikilink")、[注释](#comments "wikilink")、[空白字符](#white-space "wikilink") 组成的输入元素序列；从左到右扫描源代码文本，反复获取尽可能长的字符序列来作为下一个输入元素。
 
-词法有两个目标符。** 目标符用在允许除法 (**/**) 或除赋值 (**/=**) 运算符开始的句法上下文中。** 目标符用在其他句法文法上下文。
+词法有两个目标符。*InputElementDiv*目标符用于允许以除法（**/**）或除赋值（**/=**）运算符开始的句法上下文中。*InputElementRegExp*目标符用于其他句法文法上下文中。
 
-语法：
+注：不存在既允许以除法或除赋值运算符开头又允许以*RegularExpressionLiteral*开头的句法上下文。这一点不会受分号插入的影响（见7.9节）；如下示例：
 
-` `*<b id="InputElementDiv">`InputElementDiv`</b>*` ::`
-`   `**
-`   `**
-`   `**
-`   `**
-`   `**
+`  a = b `<br/>
+`  /hi/g.exec(c).map(d);`
 
-` `*<b id="InputElementRegExp">`InputElementRegExp`</b>*` ::`
-`   `**
-`   `**
-`   `**
-`   `**
-`   `**
+其中， *LineTerminator*之后的第一个非空白、非注释字符是斜杠（**/**），并且该句法上下文允许除法或除赋值运算符，所以不会在*LineTerminator*位置插入分号。换言之，上面的例子解释为：
 
-Unicode 格式控制字符
---------------------
+`  a = b / hi / g.exec(c).map(d);`
 
-Unicode 格式控制字符（即，Unicode 字符数据库中 [Cf分类](http://www.fileformat.info/info/unicode/category/Cf/list.htm) 里的字符，如“<span title="left-to-right mark">左至右符号</span>”或“<span title="left-to-right mark">右至左符号</span>”）是用来控制被更高层级协议（如标记语言）忽略的文本范围的格式的控制代码。
+**语法**：
+
+` `*<b id="InputElementDiv">`InputElementDiv`</b>*` ::`<br/>
+`   `*`WhiteSpace`*<br/>
+`   `*`LineTerminator`*<br/>
+`   `*`Comment`*<br/>
+`   `*`Token`*<br/>
+`   `*`DivPunctuator`*
+
+` `*<b id="InputElementRegExp">`InputElementRegExp`</b>*` ::`<br/>
+`   `*`WhiteSpace`*<br/>
+`   `*`LineTerminator`*<br/>
+`   `*`Comment`*<br/>
+`   `*`Token`*<br/>
+`   `*`RegularExpressionLiteral`*
+
+## Unicode格式控制字符
+
+Unicode格式控制字符（即，Unicode 字符数据库中 [Cf分类](http://www.fileformat.info/info/unicode/category/Cf/list.htm) 里的字符，如“<span title="left-to-right mark">左至右符号</span>”或“<span title="left-to-right mark">右至左符号</span>”）是用来控制被更高层级协议（如标记语言）忽略的文本范围的格式的控制代码。
 
 允许在源代码文本中出现控制字符是有利于编辑和显示的。所有格式控制字符可写入到注释、字符串字面量、正则表达式字面量中。
 
