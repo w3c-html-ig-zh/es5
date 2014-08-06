@@ -29,24 +29,23 @@ ECMAScript程序的源代码文本首先转换成一个由[Token](#Token "wikili
 
 ## Unicode格式控制字符
 
-Unicode格式控制字符（即，Unicode 字符数据库中 [Cf分类](http://www.fileformat.info/info/unicode/category/Cf/list.htm) 里的字符，如“<span title="left-to-right mark">左至右符号</span>”或“<span title="left-to-right mark">右至左符号</span>”）是用来控制被更高层级协议（如标记语言）忽略的文本范围的格式的控制代码。
+Unicode格式控制字符（例如，Unicode字符数据库中[Cf分类](http://www.fileformat.info/info/unicode/category/Cf/list.htm)中的字符，如“<span title="left-to-right mark">左至右符号</span>”或“<span title="left-to-right mark">右至左符号</span>”）用来控制被更高层级协议（如标记语言）忽略的某个范围内文本格式化的控制代码。
 
-允许在源代码文本中出现控制字符是有利于编辑和显示的。所有格式控制字符可写入到注释、字符串字面量、正则表达式字面量中。
+允许在源代码文本中出现控制字符非常有利于编辑和显示。所有格式控制字符均可用于注释、字符串字面量、正则表达式字面量。
 
-**<ZWNJ>** 和 **<ZWJ>** 是格式控制字符，它们被用于在某些语言中形成单词或段落时产生必要的差异。在ECMAScript源代码文本中，**<ZWNJ>** 和 **<ZWJ>** 可能也被用于标识符的首字符之后。
+`<ZWNJ>`和`<ZWJ>`是格式控制字符，可用于在某些语言中形成单词或段落时产生必要的差异。在ECMAScript源代码文本中，`<ZWNJ>`和`<ZWJ>`也可用于首字符之后的标识符。
 
-**<BOM>** 是一个格式控制字符，它主要被用在文本的开头，将文本作为 Unicode 来标记，且允许检查文本编码和字节顺序。为了达到这个目的，**<BOM>** 字符有时也能显示在文本的开始位置之后，例如作为一个合并文件的结果。**<BOM>** 字符被作为[空白字符来对待](#white-space "wikilink")（见 [7.2](#7.2 "wikilink")）
+`<BOM>`是一个格式控制字符，主要用于文本的开头，将文本标记为Unicode，且允许检查文本编码和字节顺序。为此目的，`<BOM>`字符有时也可显示在文本的开始位置之后，例如作为一个合并文件的结果。`<BOM>`字符还可用作[空白字符](#white-space "wikilink")（见[7.2](#7.2 "wikilink")节）
 
-**表1** 总结了一些在注释，字符串字面量，正则表达式字面量之外被特殊对待的格式控制字符。
+**表1**总结了一些在注释、字符串字面量、正则表达式字面量之外被特殊对待的格式控制字符。
 
 |代码单元值|名称|正式名称|用法|
-|----------|----|--------|----|
-|\\u200C|<span title="Zero width non-joiner">零宽度非连接器</span>|<ZWNJ>|*[IdentifierPart](#IdentifierPart "wikilink")*|
-|\\u200D|<span title="Zero width joiner">零宽度连接器</span>|<ZWJ>|*[IdentifierPart](#IdentifierPart "wikilink")*|
-|\\uFEFF|<span title="Byte Order Mark">字节顺序标记</span>|<BOM>|*[Whitespace](#Whitespace "wikilink")*|
+|:---------|:---|:-------|:---|
+|`\u200C`|<span title="Zero width non-joiner">零宽度非连接器</span>|`<ZWNJ>`|*[IdentifierPart](#IdentifierPart "wikilink")*|
+|`\u200D`|<span title="Zero width joiner">零宽度连接器</span>|`<ZWJ>`|*[IdentifierPart](#IdentifierPart "wikilink")*|
+|`\uFEFF`|<span title="Byte Order Mark">字节顺序标记</span>|`<BOM>`|*[Whitespace](#Whitespace "wikilink")*|
 
-空白字符
---------
+## 空白字符
 
 空白字符用来改善源文本的可读性和分割 [Token](ES5/notation#Token "wikilink")（不可分割的词法单位），此外就无关紧要。空白字符可以出现在两个 [Token](ES5/notation#Token "wikilink") 之间，还可以出现在输入的开始或结束位置，也可以出现在 *[StringLiteral](#StringLiteral "wikilink")* 或 *[RegularExpressionLiteral](#RegularExpressionLiteral "wikilink")*（在这里它表示组成字面量的字符）或 *[Comment](#Comment "wikilink")* 中，但是不能出现的其他任何 [Token](ES5/notation#Token "wikilink") 内。
 
