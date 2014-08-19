@@ -37,7 +37,7 @@ Unicode 格式控制字符（例如，Unicode 字符数据库中 [Cf 分类](htt
 
 `<BOM>` 是一个格式控制字符，主要用于文本的开头，将文本标记为 Unicode，且允许检查文本编码和字节顺序。为此目的，`<BOM>` 字符有时也可显示在文本的开始位置之后，例如作为一个合并文件的结果。`<BOM>` 字符还可用作[空白字符](#white-space "wikilink")（见[7.2](#7.2 "wikilink")节）
 
-**表1**总结了一些在注释、字符串字面量、正则表达式字面量之外被特殊对待的格式控制字符。
+**表1** 总结了一些在注释、字符串字面量、正则表达式字面量之外被特殊对待的格式控制字符。
 
 |代码单元值|名称|正式名称|用法|
 |:---------|:---|:-------|:---|
@@ -47,34 +47,32 @@ Unicode 格式控制字符（例如，Unicode 字符数据库中 [Cf 分类](htt
 
 ## 空白字符
 
-空白字符用来改善源文本的可读性和分割 [Token](ES5/notation#Token "wikilink")（不可分割的词法单位），此外就无关紧要。空白字符可以出现在两个 [Token](ES5/notation#Token "wikilink") 之间，还可以出现在输入的开始或结束位置，也可以出现在 *[StringLiteral](#StringLiteral "wikilink")* 或 *[RegularExpressionLiteral](#RegularExpressionLiteral "wikilink")*（在这里它表示组成字面量的字符）或 *[Comment](#Comment "wikilink")* 中，但是不能出现的其他任何 [Token](ES5/notation#Token "wikilink") 内。
+空白字符用来改善源文本的可读性和分割 [Token](ES5/notation#Token "wikilink")（不可分割的词法单位），此外就无关紧要。空白字符既可以出现在任意两个 [Token](ES5/notation#Token "wikilink") 之间，又可以出现在输入的开始或结束位置，还可以出现在 *[StringLiteral](#StringLiteral "wikilink")* 或 *[RegularExpressionLiteral](#RegularExpressionLiteral "wikilink")*（在这里它们表示组成字面量的字符）抑或 *[Comment](#Comment "wikilink")* 中，但是不能出现的其他任何 [Token](ES5/notation#Token "wikilink") 内。
 
-**表2** 中列出了 ECMAScript 空白字符。
+**表2** 列出了 ECMAScript 空白字符。
 
 |代码单元值|名称|正式名称|
-|----------|----|--------|
-|\\u0009|制表符|<TAB>|
-|\\u000B|垂直制表符|<VT>|
-|\\u000C|换页符|<FF>|
-|\\u0020|空格符|<SP>|
-|\\u00A0|非中断空格符|<NBSP>|
-|\\uFEFF
-其它 [Zs类字符](http://www.fileformat.info/info/unicode/category/Zs/list.htm)|字节顺序标记
-其它 Unicode 空白分隔符|<BOM>
-<USP>|
+|:---------|:---|:-------|
+|`\u0009`|制表符|`<TAB>`|
+|`\u000B`|垂直制表符|`<VT>`|
+|`\u000C`|换页符|`<FF>`|
+|`\u0020`|空格符|`<SP>`|
+|`\u00A0`|非中断空格符|`<NBSP>`|
+|`\uFEFF`|字节顺序标记|`<BOM>`|
+|其他 [Zs 类字符](http://www.fileformat.info/info/unicode/category/Zs/list.htm)|其他 Unicode 空白分隔符|`<USP>`|
 
-ECMAScript 实现必须认可 Unicode 3.0 中定义的所有空白字符。后续版本的 Unicode 标准可能定义其他空白字符。ECMAScript 实现可以认可更高版本 Unicode 标准里的空白字符。
+ECMAScript 实现必须识别出 Unicode 3.0 中定义的所有空白字符。后续版本的 Unicode 标准可能定义其他空白字符。ECMAScript 实现可以识别出更高版本的 Unicode 标准中的空白字符。
 
 语法：
 
-` `*<b id="WhiteSpace">`WhiteSpace`</b>*` ::`
-`   `<TAB>
-`   `<VT>
-`   `<FF>
-`   `<SP>
-`   `<NBSP>
-`   `<BOM>
-`   `<USP>
+` `*<b id="WhiteSpace">`WhiteSpace`</b>*` ::`<br/>
+`   <TAB>`<br/>
+`   <VT>`<br/>
+`   <FF>`<br/>
+`   <SP>`<br/>
+`   <NBSP>`<br/>
+`   <BOM>`<br/>
+`   <USP>`
 
 行终止符
 --------
