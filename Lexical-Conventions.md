@@ -74,40 +74,39 @@ ECMAScript 实现必须识别出 Unicode 3.0 中定义的所有空白字符。�
 `   <BOM>`<br/>
 `   <USP>`
 
-行终止符
---------
+## 行终止符
 
-像空白字符一样，行终止字符用于改善源文本的可读性和分割 [Token](ES5/notation#Token "wikilink")（不可分割的词法单位）。然而，不像空白字符，行终止符对句法的行为有一定的影响。一般情况下，行终止符可以出现在任何两个 [Token](ES5/notation#Token "wikilink") 之间，但也有少数地方，句法禁止这样做。行终止符也影响自动插入分号的过程（[7.9](#automatic-semicolon-insertion "wikilink")）。行终止符不能出现在 ** 之外的任何 [Token](ES5/notation#Token "wikilink") 内。行终止符只能出现在作为 ** 的一部分的 ** 里。
+像空白字符一样，行终止字符用于改善源文本的可读性和分割 [Token](ES5/notation#Token "wikilink")（不可分割的词法单位）。然而，和空白字符不同的是，行终止符对句法的行为有一定的影响。通常，行终止符可以出现在任何两个 [Token](ES5/notation#Token "wikilink") 之间；但也有少数地方，句法禁止这样做。行终止符也影响自动插入分号的过程（[7.9](#automatic-semicolon-insertion "wikilink")）。行终止符不能出现在 *StringLiteral* 之外的任何 [Token](ES5/notation#Token "wikilink") 内。行终止符只能作为 *LineContinuation* 的一部分出现在 *StringLiteral* 内。
 
-行终止符可以出现在 ** 内，但不能出现在 ** 内。
+行终止符可以出现在 *MultiLineComment* 内，但不能出现在 *SingleLineComment* 内。
 
-正则表达式的 **\\s** 类匹配的空白字符集中包含行终止符。
+正则表达式 **`\s`** 类所匹配的空白字符集中包含行终止符。
 
 **表3** 列出了 ECMAScript 的行终止字符。
 
 |代码单元值|名称|正式名称|
-|----------|----|--------|
-|\\u000A|<span title="Line Feed">换行符</span>|<LF>|
-|\\u000D|<span title="Carriage Return">回车符</span>|<CR>|
-|\\u2028|<span title="Line separator">行分隔符</span>|<LS>|
-|\\u2029|<span title="Paragraph separator">段落分割符</span>|<PS>|
+|:---------|:---|:-------|
+|`\u000A`|换行符|`<LF>`|
+|`\u000D`|回车符|`<CR>`|
+|`\u2028`|行分隔符|`<LS>`|
+|`\u2029`|段落分割符|`<PS>`|
 
-只有 **表3** 中的字符才被视为行终止符。其他新行或折行字符被视为空白，但不作为行终止符。字符序列 **<CR><LF>** 作一个行终止符。计算行数时它应该被视为一个字符。
+只有 **表3** 中的字符才被视为行终止符。其他新行或折行字符被视为空白，但不作为行终止符。字符序列 `<CR><LF>` 常作为一个行终止符。计算行数时它应该被视为一个字符。
 
 语法：
 
-` `*<b id="LineTerminator">`LineTerminator`</b>*` ::`
-`   `<LF>
-`   `<CR>
-`   `<LS>
-`   `<PS>
+` `*<b id="LineTerminator">`LineTerminator`</b>*` ::`<br/>
+`   <LF>`<br/>
+`   <CR>`<br/>
+`   <LS>`<br/>
+`   <PS>`<br/>
 
-` `*<b id="LineTerminatorSequence">`LineTerminatorSequence`</b>*` ::`
-`   `<LF>
-`   `<CR>` [`[`lookahead` `?`](ES5/notation#lookahead-not-in "wikilink")` `<LF>` ]`
-`   `<LS>
-`   `<PS>
-`   `<CR>` `<LF>
+` `*<b id="LineTerminatorSequence">`LineTerminatorSequence`</b>*` ::`<br/>
+`   <LF>`<br/>
+`   <CR>[`[`lookahead ?`](ES5/notation#lookahead-not-in "wikilink")` <LF>]`<br/>
+`   <LS>`<br/>
+`   <PS>`<br/>
+`   <CR><LF>`
 
 注释
 ----
