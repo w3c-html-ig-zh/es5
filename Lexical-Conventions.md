@@ -108,46 +108,45 @@ ECMAScript 实现必须识别出 Unicode 3.0 中定义的所有空白字符。�
 `   <PS>`<br/>
 `   <CR><LF>`
 
-注释
-----
+## 注释
 
-注释可以是单行或多行。多行注释不能嵌套。
+注释可单行或多行。多行注释不能嵌套。
 
-因为单行注释可以包含除了 ** 字符之外的任何字符，又因为有一般规则：一个 [Token](ES5/notation#Token "wikilink") 总是尽可能匹配更长，所以一个单行注释总是包含从 **//** 到行终止符之间的所有字符。然而，在该行末尾的 ** 不被看成是单行注释的一部分，它被词法识别成句法输入元素流的一部分。这一点非常重要，因为这意味着是否存在单行注释都不影响自动分号插入进程（见 [7.9](#automatic-semicolon-insertion "wikilink")）。
+因为单行注释可以包含除了 *LineTerminator* 字符之外的任何字符，又因为有个常规：一个 [Token](ES5/notation#Token "wikilink") 总是尽可能匹配更长，所以一个单行注释总是包含从 `//` 到行终止符之间的所有字符。然而，在该行末尾的 *LineTerminator* 不是单行注释的一部分，它被词法识别成句法输入元素流的一部分。这一点非常重要，因为这意味着无论是否存在单行注释都不会影响自动分号插入过程（见 [7.9](#automatic-semicolon-insertion "wikilink")）。
 
-像空白一样，注释会被句法简单丢弃，除了 ** 包含行终止符字符的情况，这种情况下整个注释会当作一个 ** 提供给句法文法解析。
+像空白字符一样，注释会被句法简单丢弃，除了 *MultiLineComment* 包含行终止符字符的情况，这种情况下整个注释会被当作一个 *LineTerminator* 提供给句法文法解析。
 
 语法：
 
-` `*<b id="Comment">`Comment`</b>*` ::`
-`   `**
-`   `**
+` `*<b id="Comment">`Comment`</b>*` ::`<br/>
+`   `*`MultiLineComment`*<br/>
+`   `*`SingleLineComment`*<br/>
 
-` `*<b id="MultiLineComment">`MultiLineComment`</b>*` ::`
-`   `**`/*`**` `**` `**`*/`**
+` `*<b id="MultiLineComment">`MultiLineComment`</b>*` ::`<br/>
+`   `**`/*`**` `*`MultiLineCommentChars`*<sub>`opt`</sub>` `**`*/`**
 
-` `*<b id="MultilineCommentChars">`MultiLineCommentChars`</b>*` ::`
-`   `**` `**
-`   `**`*`**` `**
+` `*<b id="MultilineCommentChars">`MultiLineCommentChars`</b>*` ::`<br/>
+`   `*MultiLineNotAsteriskChar*` `*`MultiLineCommentChars`*<sub>`opt`</sub><br/>
+`   `**`*`**` `*`PostAsteriskCommentChars`*<sub>`opt`</sub>
 
-` `*<b id="PostAsteriskCommentChars">`PostAsteriskCommentChars`</b>*` ::`
-`   `**` `**
-`   `**`*`**` `**
+` `*<b id="PostAsteriskCommentChars">`PostAsteriskCommentChars`</b>*` ::`<br/>
+`   `*MultiLineNotForwardSlashOrAsteriskChar*` `*`MultiLineCommentChars`*<sub>`opt`</sub><br/>
+`   `**`*`**` `*`PostAsteriskCommentChars`*<sub>`opt`</sub>
 
-` `*<b id="MultiLineNotAsteriskChar">`MultiLineNotAsteriskChar`</b>*` ::`
-`   `*[`SourceCharacter`](ES5#SourceCharacter "wikilink")*` `**`but` `not` `*`**
+` `*<b id="MultiLineNotAsteriskChar">`MultiLineNotAsteriskChar`</b>*` ::`<br/>
+`   `*`SourceCharacter`*` `**`but` `not` `*`**
 
-` `*<b id="MultiLineNotForwardSlashOrAsteriskChar">`MultiLineNotForwardSlashOrAsteriskChar`</b>*` ::`
-`   `*[`SourceCharacter`](ES5#SourceCharacter "wikilink")*` `**`but` `not` `/` `or` `*`**
+` `*<b id="MultiLineNotForwardSlashOrAsteriskChar">`MultiLineNotForwardSlashOrAsteriskChar`</b>*` ::`<br/>
+`   `*`SourceCharacter`*` `**`but` `not` `/` `or` `*`**
 
-` `*<b id="SingleLineComment">`SingleLineComment`</b>*` ::`
-`   `**`//`**` `**
+` `*<b id="SingleLineComment">`SingleLineComment`</b>*` ::`<br/>
+`   `**`//`**` `*`SingleLineCommentChars`*<sub>`opt`</sub>
 
-` `*<b id="SingleLineCommentChars">`SingleLineCommentChars`</b>*` ::`
-`   `**` `**
+` `*<b id="SingleLineCommentChars">`SingleLineCommentChars`</b>*` ::`<br/>
+`   `*SingleLineCommentChar*` `*`SingleLineCommentChar`*<sub>`opt`</sub>
 
-` `*<b id="SingleLineCommentChar">`SingleLineCommentChar`</b>*` ::`
-`   `*[`SourceCharacter`](ES5#SourceCharacter "wikilink")*` `**`but` `not`**` `**
+` `*<b id="SingleLineCommentChar">`SingleLineCommentChar`</b>*` ::`<br/>
+`   `*`SourceCharacter`*` `**`but` `not`**` `*LineTerminator*
 
 Token 
 ------
