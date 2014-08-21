@@ -148,16 +148,17 @@ ECMAScript 实现必须识别出 Unicode 3.0 中定义的所有空白字符。�
 ` `*<b id="SingleLineCommentChar">`SingleLineCommentChar`</b>*` ::`<br/>
 `   `*`SourceCharacter`*` `**`but` `not`**` `*LineTerminator*
 
-Token 
-------
+## Token
 
 语法：
 
-` `*<b id="Token">`Token`</b>*` ::`
-`   `**
-`   `**
-`   `**
-`   `**
+` `*<b id="Token">`Token`</b>*` ::`<br/>
+`   `*`IdentifierName`*<br/>
+`   `*`Punctuator`*<br/>
+`   `*`NumericLiteral`*<br/>
+`   `*`StringLiteral`*
+
+注：*DivPunctuator* 和 *RegularExpressionLiteral* 产生式定义了 **Token**，但 *Token* 产生式并不包含它们。
 
 标识符名和标识符
 ----------------
