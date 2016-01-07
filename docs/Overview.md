@@ -42,7 +42,7 @@ ECMAScript不使用诸如C++、Smalltalk、Java中的类。相反，可以通过
 
 所有不直接包含其原型中所包含的特定属性的对象都会共享此属性及其属性值。**图1**说明了这一点：
 
-![**图1** — 对象与原型的关系图](res/figure-1.svg)
+![**图1** — 对象与原型的关系图](../images/figure-1.svg)
 
 <var>CF</var>是一个构造器（也是一个对象）。用**new**表达式创建的5个对象：<var>cf<sub>1</sub></var>、<var>cf<sub>2</sub></var>、<var>cf<sub>3</sub></var>、<var>cf<sub>4</sub></var>、<var>cf<sub>5</sub></var>。每个对象都有名为<var>q1</var>和<var>q2</var>的属性。虚线表示隐式原型关系；例如：<var>cf<sub>3</sub></var>的原型是<var>CF<sub>p</sub></var>。构造器<var>CF</var>有名为<var>P1</var>和<var>P2</var>的两个属性；这两个属性对<var>CF<sub>p</sub></var>、<var>cf<sub>1</sub></var>、<var>cf<sub>2</sub></var>、<var>cf<sub>3</sub></var>、<var>cf<sub>4</sub></var>、<var>cf<sub>5</sub></var>都是不可见的。<var>CF<sub>p</sub></var>有名为<var>CFP1</var>的属性，该属性和任何在<var>CF<sub>p</sub></var>的隐式原型链中能找到且不是<var>q1</var>、<var>q2</var>、<var>CFP1</var>的属性都能被<var>cf<sub>1</sub></var>、<var>cf<sub>2</sub></var>、<var>cf<sub>3</sub></var>、<var>cf<sub>4</sub></var>、<var>cf<sub>5</sub></var>所共享（但不被<var>CF</var>共享）。请注意<var>CF</var>和<var>CF<sub>p</sub></var>之间没有隐式原型链接。
 
